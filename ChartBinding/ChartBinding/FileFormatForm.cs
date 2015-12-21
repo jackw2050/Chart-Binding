@@ -5,9 +5,12 @@ namespace ChartBinding
 {
     public partial class FileFormatForm : Form
     {
+
+        Form1 mainForm = new Form1();
         public FileFormatForm()
         {
             InitializeComponent();
+            
         }
 
         private void textRadioButton_CheckedChanged(object sender, EventArgs e)
@@ -63,8 +66,11 @@ namespace ChartBinding
         {
             if (dateFormatRadioButton1.Checked == true)
             {
-                Form1.fileDateFormat = 1;
+               // Form1.fileDateFormat = 1;
                 UpdateFileNameText();
+                //open text file to dump data
+
+
             }
 
         }
@@ -95,16 +101,21 @@ namespace ChartBinding
             
             if (Form1.fileDateFormat == 1)
             {
-                sampleFileNamelabel.Text = Form1.surveyName + " 2015-Jan-1 15-23-34." + Form1.fileType;
+                sampleFileNamelabel.Text =  mainForm.meterNumberTextBox.Text + "-" +   mainForm.surveyTextBox.Text + "-2015-Jan-1 15-23-34." + Form1.fileType;
             }
             else if (Form1.fileDateFormat == 2)
             {
-                sampleFileNamelabel.Text = Form1.surveyName + " 2015-1-1 15-23-34." + Form1.fileType;
+                sampleFileNamelabel.Text = mainForm.meterNumberTextBox.Text + "-" + mainForm.surveyTextBox.Text + "-2015-1-1 15-23-34." + Form1.fileType;
             }
             else if (Form1.fileDateFormat == 3)
             {
-                sampleFileNamelabel.Text = Form1.surveyName + " 2015-1 15-23-34." + Form1.fileType;
+                sampleFileNamelabel.Text = mainForm.meterNumberTextBox.Text + "-" + mainForm.surveyTextBox.Text + "-2015-1 15-23-34." + Form1.fileType;
                 
+            }
+            else if (Form1.fileDateFormat == 4)
+            {
+                                sampleFileNamelabel.Text = CustomNameTextBox.Text + "." + Form1.fileType;
+
             }
 
             
@@ -120,6 +131,11 @@ namespace ChartBinding
 
                 sampleFileNamelabel.Text = Form1.surveyName + CustomNameTextBox.Text + Form1.fileType;
           
+        }
+
+        private void cancelButton_Click(object sender, EventArgs e)
+        {
+            this.Hide();
         }
     }
 }

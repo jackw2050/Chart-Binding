@@ -32,7 +32,7 @@
             this.SwitchesSpringTensionCheckBox = new System.Windows.Forms.CheckBox();
             this.SwitchesTorqueMotorsCheckBox = new System.Windows.Forms.CheckBox();
             this.switchesGyroCheckBox = new System.Windows.Forms.CheckBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.gyroLabel = new System.Windows.Forms.Label();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.doneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
@@ -69,6 +69,7 @@
             this.SwitchesTorqueMotorsCheckBox.TabIndex = 7;
             this.SwitchesTorqueMotorsCheckBox.Text = "Torque Motors OFF";
             this.SwitchesTorqueMotorsCheckBox.UseVisualStyleBackColor = true;
+            this.SwitchesTorqueMotorsCheckBox.CheckedChanged += new System.EventHandler(this.SwitchesTorqueMotorsCheckBox_CheckedChanged);
             // 
             // switchesGyroCheckBox
             // 
@@ -79,15 +80,17 @@
             this.switchesGyroCheckBox.TabIndex = 6;
             this.switchesGyroCheckBox.Text = "Gyro (200Hz) OFF";
             this.switchesGyroCheckBox.UseVisualStyleBackColor = true;
+            this.switchesGyroCheckBox.CheckedChanged += new System.EventHandler(this.switchesGyroCheckBox_CheckedChanged);
             // 
-            // label1
+            // gyroLabel
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(148, 65);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(153, 13);
-            this.label1.TabIndex = 11;
-            this.label1.Text = "Please wait for gyros to spin up";
+            this.gyroLabel.AutoSize = true;
+            this.gyroLabel.Location = new System.Drawing.Point(148, 65);
+            this.gyroLabel.Name = "gyroLabel";
+            this.gyroLabel.Size = new System.Drawing.Size(153, 13);
+            this.gyroLabel.TabIndex = 11;
+            this.gyroLabel.Text = "Please wait for gyros to spin up";
+            this.gyroLabel.Visible = false;
             // 
             // menuStrip1
             // 
@@ -112,7 +115,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(348, 207);
             this.ControlBox = false;
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.gyroLabel);
             this.Controls.Add(this.SwitchesAlarmsCheckBox);
             this.Controls.Add(this.SwitchesSpringTensionCheckBox);
             this.Controls.Add(this.SwitchesTorqueMotorsCheckBox);
@@ -121,6 +124,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "SwitchesForm";
             this.Text = "Manual Startup";
+            this.Load += new System.EventHandler(this.SwitchesForm_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -134,7 +138,7 @@
         private System.Windows.Forms.CheckBox SwitchesSpringTensionCheckBox;
         private System.Windows.Forms.CheckBox SwitchesTorqueMotorsCheckBox;
         private System.Windows.Forms.CheckBox switchesGyroCheckBox;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label gyroLabel;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem doneToolStripMenuItem;
     }

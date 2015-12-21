@@ -104,7 +104,12 @@
             this.label10 = new System.Windows.Forms.Label();
             this.traceVisibilityComboBox = new System.Windows.Forms.ComboBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.traceColorComboBox = new System.Windows.Forms.ComboBox();
             this.chartOptionsButton = new System.Windows.Forms.Button();
+            this.surveyTextBox = new System.Windows.Forms.TextBox();
+            this.meterNumberTextBox = new System.Windows.Forms.TextBox();
+            this.label11 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.crossCouplingChart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
@@ -155,12 +160,14 @@
             this.saveConfigFileToolStripMenuItem.Name = "saveConfigFileToolStripMenuItem";
             this.saveConfigFileToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
             this.saveConfigFileToolStripMenuItem.Text = "Save Config file";
+            this.saveConfigFileToolStripMenuItem.Click += new System.EventHandler(this.saveConfigFileToolStripMenuItem_Click);
             // 
             // printConfigFileToolStripMenuItem
             // 
             this.printConfigFileToolStripMenuItem.Name = "printConfigFileToolStripMenuItem";
             this.printConfigFileToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
             this.printConfigFileToolStripMenuItem.Text = "Print Config file";
+            this.printConfigFileToolStripMenuItem.Click += new System.EventHandler(this.printConfigFileToolStripMenuItem_Click);
             // 
             // printGravityChartToolStripMenuItem
             // 
@@ -350,6 +357,7 @@
             this.crossCouplingChart.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.crossCouplingChart.BackColor = System.Drawing.Color.WhiteSmoke;
+            chartArea1.AlignmentOrientation = ((System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations)((System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Vertical | System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Horizontal)));
             chartArea1.Name = "ChartArea1";
             this.crossCouplingChart.ChartAreas.Add(chartArea1);
             legend1.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
@@ -357,6 +365,7 @@
             this.crossCouplingChart.Legends.Add(legend1);
             this.crossCouplingChart.Location = new System.Drawing.Point(0, 426);
             this.crossCouplingChart.Name = "crossCouplingChart";
+            this.crossCouplingChart.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Fire;
             series1.ChartArea = "ChartArea1";
             series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
             series1.Legend = "Legend1";
@@ -405,9 +414,9 @@
             this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dataGridView1.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(0, 658);
+            this.dataGridView1.Location = new System.Drawing.Point(0, 683);
             this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(1380, 57);
+            this.dataGridView1.Size = new System.Drawing.Size(1380, 65);
             this.dataGridView1.TabIndex = 21;
             // 
             // label1
@@ -558,13 +567,14 @@
             // 
             // recordingTextBox
             // 
-            this.recordingTextBox.BackColor = System.Drawing.Color.Red;
+            this.recordingTextBox.BackColor = System.Drawing.Color.Lime;
             this.recordingTextBox.Location = new System.Drawing.Point(446, 3);
             this.recordingTextBox.Name = "recordingTextBox";
             this.recordingTextBox.Size = new System.Drawing.Size(100, 20);
             this.recordingTextBox.TabIndex = 40;
             this.recordingTextBox.Text = "Recording to file";
             this.recordingTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.recordingTextBox.TextChanged += new System.EventHandler(this.recordingTextBox_TextChanged);
             // 
             // label3
             // 
@@ -608,6 +618,7 @@
             this.GravityChart.BackImageTransparentColor = System.Drawing.Color.Black;
             this.GravityChart.BackSecondaryColor = System.Drawing.Color.Black;
             this.GravityChart.BorderSkin.PageColor = System.Drawing.Color.Black;
+            chartArea2.AlignmentOrientation = ((System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations)((System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Vertical | System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Horizontal)));
             chartArea2.AxisX.MajorGrid.LineColor = System.Drawing.Color.Gold;
             chartArea2.AxisY.LineColor = System.Drawing.Color.Gold;
             chartArea2.AxisY.MajorGrid.LineColor = System.Drawing.Color.Gold;
@@ -661,9 +672,9 @@
             "White",
             "Gray",
             "Black"});
-            this.chartColorComboBox.Location = new System.Drawing.Point(150, 19);
+            this.chartColorComboBox.Location = new System.Drawing.Point(285, 19);
             this.chartColorComboBox.Name = "chartColorComboBox";
-            this.chartColorComboBox.Size = new System.Drawing.Size(121, 21);
+            this.chartColorComboBox.Size = new System.Drawing.Size(118, 21);
             this.chartColorComboBox.TabIndex = 45;
             this.chartColorComboBox.Text = "Chart color scheme";
             this.chartColorComboBox.SelectedIndexChanged += new System.EventHandler(this.chartColorComboBox_SelectedIndexChanged_1);
@@ -671,10 +682,10 @@
             // traceTrackBar
             // 
             this.traceTrackBar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.traceTrackBar.Location = new System.Drawing.Point(295, 32);
+            this.traceTrackBar.Location = new System.Drawing.Point(454, 19);
             this.traceTrackBar.Minimum = 1;
             this.traceTrackBar.Name = "traceTrackBar";
-            this.traceTrackBar.Size = new System.Drawing.Size(121, 45);
+            this.traceTrackBar.Size = new System.Drawing.Size(97, 45);
             this.traceTrackBar.TabIndex = 47;
             this.traceTrackBar.Value = 1;
             this.traceTrackBar.Scroll += new System.EventHandler(this.traceTrackBar_Scroll);
@@ -683,7 +694,7 @@
             // 
             this.label10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(302, 16);
+            this.label10.Location = new System.Drawing.Point(451, 3);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(63, 13);
             this.label10.TabIndex = 48;
@@ -705,34 +716,94 @@
             "AX2",
             "LACC",
             "XACC"});
-            this.traceVisibilityComboBox.Location = new System.Drawing.Point(23, 19);
+            this.traceVisibilityComboBox.Location = new System.Drawing.Point(165, 19);
             this.traceVisibilityComboBox.Name = "traceVisibilityComboBox";
-            this.traceVisibilityComboBox.Size = new System.Drawing.Size(121, 21);
+            this.traceVisibilityComboBox.Size = new System.Drawing.Size(97, 21);
             this.traceVisibilityComboBox.TabIndex = 49;
             this.traceVisibilityComboBox.Text = "Trace visibility";
             this.traceVisibilityComboBox.SelectedIndexChanged += new System.EventHandler(this.traceVisibilityComboBox_SelectedIndexChanged);
             // 
             // groupBox1
             // 
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.traceColorComboBox);
             this.groupBox1.Controls.Add(this.traceVisibilityComboBox);
             this.groupBox1.Controls.Add(this.traceTrackBar);
             this.groupBox1.Controls.Add(this.label10);
             this.groupBox1.Controls.Add(this.chartColorComboBox);
-            this.groupBox1.Location = new System.Drawing.Point(705, 589);
+            this.groupBox1.Location = new System.Drawing.Point(678, 614);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(552, 63);
+            this.groupBox1.Size = new System.Drawing.Size(621, 63);
             this.groupBox1.TabIndex = 50;
             this.groupBox1.TabStop = false;
             // 
+            // traceColorComboBox
+            // 
+            this.traceColorComboBox.FormattingEnabled = true;
+            this.traceColorComboBox.Items.AddRange(new object[] {
+            "None",
+            "Bright",
+            "Grayscale",
+            "Excel",
+            "Light",
+            "Pastel",
+            "EarthTones",
+            "SemiTransparant",
+            "Berry",
+            "Chocolate",
+            "Fire",
+            "SeaGreen",
+            "BrightPastel"});
+            this.traceColorComboBox.Location = new System.Drawing.Point(11, 19);
+            this.traceColorComboBox.Name = "traceColorComboBox";
+            this.traceColorComboBox.Size = new System.Drawing.Size(121, 21);
+            this.traceColorComboBox.TabIndex = 50;
+            this.traceColorComboBox.Text = "Trace Color Palette";
+            this.traceColorComboBox.SelectedIndexChanged += new System.EventHandler(this.traceColorComboBox_SelectedIndexChanged);
+            // 
             // chartOptionsButton
             // 
+            this.chartOptionsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.chartOptionsButton.Location = new System.Drawing.Point(560, 617);
             this.chartOptionsButton.Name = "chartOptionsButton";
-            this.chartOptionsButton.Size = new System.Drawing.Size(126, 23);
+            this.chartOptionsButton.Size = new System.Drawing.Size(87, 23);
             this.chartOptionsButton.TabIndex = 50;
             this.chartOptionsButton.Text = "Chart Options";
             this.chartOptionsButton.UseVisualStyleBackColor = true;
             this.chartOptionsButton.Click += new System.EventHandler(this.chartOptionsButton_Click);
+            // 
+            // surveyTextBox
+            // 
+            this.surveyTextBox.Location = new System.Drawing.Point(355, 107);
+            this.surveyTextBox.Name = "surveyTextBox";
+            this.surveyTextBox.Size = new System.Drawing.Size(235, 20);
+            this.surveyTextBox.TabIndex = 51;
+            // 
+            // meterNumberTextBox
+            // 
+            this.meterNumberTextBox.Location = new System.Drawing.Point(95, 107);
+            this.meterNumberTextBox.Name = "meterNumberTextBox";
+            this.meterNumberTextBox.Size = new System.Drawing.Size(100, 20);
+            this.meterNumberTextBox.TabIndex = 52;
+            this.meterNumberTextBox.TextChanged += new System.EventHandler(this.meterNumberTextBox_TextChanged);
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(22, 110);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(44, 13);
+            this.label11.TabIndex = 53;
+            this.label11.Text = "Meter #";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(251, 110);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(95, 13);
+            this.label12.TabIndex = 54;
+            this.label12.Text = "Survey Information";
             // 
             // Form1
             // 
@@ -740,8 +811,12 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.ClientSize = new System.Drawing.Size(1380, 716);
+            this.ClientSize = new System.Drawing.Size(1380, 749);
             this.ControlBox = false;
+            this.Controls.Add(this.label12);
+            this.Controls.Add(this.label11);
+            this.Controls.Add(this.meterNumberTextBox);
+            this.Controls.Add(this.surveyTextBox);
             this.Controls.Add(this.chartOptionsButton);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.GravityChart);
@@ -851,6 +926,11 @@
         private System.Windows.Forms.ComboBox traceVisibilityComboBox;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Button chartOptionsButton;
+        private System.Windows.Forms.ComboBox traceColorComboBox;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label label12;
+        public System.Windows.Forms.TextBox surveyTextBox;
+        public System.Windows.Forms.TextBox meterNumberTextBox;
     }
 }
 

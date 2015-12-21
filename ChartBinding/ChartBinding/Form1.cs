@@ -1,4 +1,6 @@
 ﻿using FileHelpers;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
 using System;
 using System.Data;
 using System.IO;
@@ -19,6 +21,7 @@ namespace ChartBinding
         public static string surveyName = null;
         public static string fileType;
         public static int fileDateFormat = 1;
+        public static string meterNumber;
         public GravityChartForm GravityChartForm = new GravityChartForm();
         public GravityDataForm GravityDataForm = new GravityDataForm();
         public CrossCouplingForm CrossCouplingChartForm = new CrossCouplingForm();
@@ -93,6 +96,8 @@ namespace ChartBinding
             CrossCouplingDataForm.dataGridView2.Columns[5].Name = "AX2";
             CrossCouplingDataForm.dataGridView2.Columns[6].Name = "LACC";
             CrossCouplingDataForm.dataGridView2.Columns[7].Name = "XACC";
+
+            this.crossCouplingChart.Palette = ChartColorPalette.Pastel;
         }
 
         public static class ChartColors
@@ -304,7 +309,7 @@ namespace ChartBinding
             this.GravityChart.DataSource = dataTable;
             this.GravityChart.DataBind();
 
-           // this.GravityChart.Titles.Add("Gravity");
+            // this.GravityChart.Titles.Add("Gravity");
             SetChartAreaColors(1);// white background
 
             //      X AXIS
@@ -312,50 +317,38 @@ namespace ChartBinding
             // this.GravityChart.ChartAreas["ChartArea1"].AxisX.Interval = 10;
 
             //  this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoom(2, 3);
-          //  this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.ZoomReset(1);
+            //  this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.ZoomReset(1);
             this.GravityChart.ChartAreas["ChartArea1"].AxisX.LabelStyle.Angle = 0;// can vary from -90 to + 90
             this.GravityChart.ChartAreas["ChartArea1"].AxisX.LabelStyle.Format = "yyyy-MM-dd HH:mm:ss";
 
             this.GravityChart.ChartAreas["ChartArea1"].CursorX.IsUserEnabled = true;
             this.GravityChart.ChartAreas["ChartArea1"].CursorX.IsUserSelectionEnabled = true;
             this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoomable = true;
-   //         this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.IsPositionedInside = false;
+            //         this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.IsPositionedInside = false;
 
             // Change scrollbar colors
-//            GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.BackColor = System.Drawing.Color.LightGray;
-//            GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.ButtonColor = System.Drawing.Color.Gray;
-//            GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.LineColor = System.Drawing.Color.Black;
+            //            GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.BackColor = System.Drawing.Color.LightGray;
+            //            GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.ButtonColor = System.Drawing.Color.Gray;
+            //            GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.LineColor = System.Drawing.Color.Black;
 
             // Set scrollbar size
-//            this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.Size = 12;
+            //            this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.Size = 12;
             // show either just the center scroll button..
-//            this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.ButtonStyle = ScrollBarButtonStyles.SmallScroll;
+            //            this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.ButtonStyle = ScrollBarButtonStyles.SmallScroll;
             // .. or include the left and right buttons:
- //           this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.ButtonStyle =
-//                ScrollBarButtonStyles.All ^ ScrollBarButtonStyles.ResetZoom;
+            //           this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.ButtonStyle =
+            //                ScrollBarButtonStyles.All ^ ScrollBarButtonStyles.ResetZoom;
 
             // Scrollbars position
-//            this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.IsPositionedInside = true;
-//            this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.Enabled = true;
+            //            this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.IsPositionedInside = true;
+            //            this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.Enabled = true;
             //   this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Size = 100;  // number (!) of data points visible
 
             //  Y AXIS
-          //  this.GravityChart.ChartAreas["ChartArea1"].AxisY.ScaleView.ZoomReset(1);
+            //  this.GravityChart.ChartAreas["ChartArea1"].AxisY.ScaleView.ZoomReset(1);
             this.GravityChart.ChartAreas["ChartArea1"].CursorY.IsUserEnabled = true;
             this.GravityChart.ChartAreas["ChartArea1"].CursorY.IsUserSelectionEnabled = true;
             this.GravityChart.ChartAreas["ChartArea1"].AxisY.ScaleView.Zoomable = true;
-
-
-
-
-	
-	
-
-
-
-
-
-
 
             if (false)
             {  //this.GravityChart.Legends["Default"].Enabled = false;
@@ -481,7 +474,7 @@ namespace ChartBinding
             CrossCouplingChartForm.crossCouplingChart.DataSource = dataTable;
             CrossCouplingChartForm.crossCouplingChart.DataBind();
 
-        //    CrossCouplingChartForm.crossCouplingChart.Titles.Add("Cross Coupling");
+            //    CrossCouplingChartForm.crossCouplingChart.Titles.Add("Cross Coupling");
 
             CrossCouplingChartForm.crossCouplingChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoom(2, 3);
             CrossCouplingChartForm.crossCouplingChart.ChartAreas["ChartArea1"].AxisX.ScaleView.ZoomReset(1);
@@ -561,7 +554,13 @@ namespace ChartBinding
             this.crossCouplingChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.IsPositionedInside = true;
             this.crossCouplingChart.ChartAreas["ChartArea1"].AxisY.ScrollBar.IsPositionedInside = true;
 
-            SetChartColors();
+            //SetChartColors();
+
+            this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.BrightPastel;
+            this.crossCouplingChart.ApplyPaletteColors();
+
+            this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.BrightPastel;
+            this.GravityChart.ApplyPaletteColors();
         }
 
         public void SetChartColors()
@@ -1106,6 +1105,378 @@ namespace ChartBinding
             if (engineerDebug) Console.WriteLine("MAXIMUM SPRING TENSION VALUE--------- \t" + Convert.ToString(ConfigData.springTensionMax));
         }
 
+        //http://www.codeproject.com/Articles/686994/Create-Read-Advance-PDF-Report-using-iTextSharp-in#1
+
+        private void LogConfigDataToFile()
+        {
+            PdfPTable table = new PdfPTable(2);
+            PdfPCell cell = new PdfPCell(new Phrase("Header spanning 2 columns"));
+
+            cell.Colspan = 3;
+            cell.HorizontalAlignment = 1; //0=Left, 1=Centre, 2=Right
+            table.AddCell(cell);
+
+            //  Setup margins
+            //  Left Margin: 36pt => 0.5 inch
+            //  Right Margin: 72pt => 1 inch
+            //  Top Margin: 108pt => 1.5 inch
+            //  Bottom Margini: 180pt => 2.5 inch
+
+            BaseFont bfTimes = BaseFont.CreateFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, false);
+
+            Font times = new Font(bfTimes, 10);
+
+            //Create a System.IO.FileStream object:
+            FileStream fs = new FileStream("C:\\LCT stuff\\Meter Configuration.pdf", FileMode.Create, FileAccess.Write, FileShare.None);
+
+            //Step 2: Create a iTextSharp.text.Document object: with page size and margins
+            Document doc = new Document(PageSize.LETTER, 36, 72, 36, 36);
+
+            // Setting Document properties e.g.
+            // 1. Title
+            // 2. Subject
+            // 3. Keywords
+            // 4. Creator
+            // 5. Author
+            // 6. Header
+            doc.AddTitle("Configuration for meter #: " + meterNumber);
+            doc.AddSubject("Configuration data");
+            //  doc.AddKeywords("Metadata, iTextSharp 5.4.4, Chapter 1, Tutorial");
+            doc.AddCreator("ZLS");
+            doc.AddAuthor("Jack Walker");
+            doc.AddHeader("Nothing", "No Header");// Add creation date
+
+            //Step 3: Create a iTextSharp.text.pdf.PdfWriter object. It helps to write the Document to the Specified FileStream:
+            PdfWriter writer = PdfWriter.GetInstance(doc, fs);
+
+            //Step 4: Openning the Document:
+            doc.Open();
+
+            //Step 5: Adding a Paragraph by creating a iTextSharp.text.Paragraph object:
+
+            doc.Add(new Paragraph("\n\t User defined parameters\n", times));
+            doc.Add(new Paragraph("Number of auxillary analog channels \t\t" + Convert.ToString(ConfigData.numAuxChan)));
+            doc.Add(new Paragraph("DIGITAL INPUT SWITCH \t\t" + Convert.ToString(ConfigData.digitalInputSwitch)));
+            doc.Add(new Paragraph("MONITOR DISPLAY SWITCH \t\t" + Convert.ToString(ConfigData.monitorDisplaySwitch)));
+            doc.Add(new Paragraph("LINE PRINTER SWITCH \t\t" + Convert.ToString(ConfigData.linePrinterSwitch)));
+            doc.Add(new Paragraph("FILE NAME SWITCH \t\t" + Convert.ToString(ConfigData.fileNameSwitch)));
+            doc.Add(new Paragraph("HARD DISK SWITCH \t\t" + Convert.ToString(ConfigData.hardDiskSwitch)));
+            doc.Add(new Paragraph("SERIAL PORT FORMAT SWITCH \t\t" + Convert.ToString(ConfigData.serialPortSwitch)));
+            doc.Add(new Paragraph("SERIAL PORT OUTPUT SWITCH \t\t" + Convert.ToString(ConfigData.serialPortOutputSwitch)));
+            doc.Add(new Paragraph("ALARM SWITCH \t\t" + Convert.ToString(ConfigData.alarmSwitch)));
+            if (ConfigData.printerEmulationSwitch == 2)
+            {
+                doc.Add(new Paragraph("PRINTER EMULATION-------------------- \t" + "ESC_P"));
+            }
+            if (ConfigData.printerEmulationSwitch == 3)
+            {
+                doc.Add(new Paragraph("PRINTER EMULATION-------------------- \t" + "ESC_P2"));
+            }
+            else
+            {
+                doc.Add(new Paragraph("PRINTER EMULATION-------------------- \t" + "DPL24C"));
+            }
+            if (ConfigData.modeSwitch == 0)
+            {
+                doc.Add(new Paragraph("MODE SWITCH-------------------------- \t" + "Marine"));
+            }
+            else
+            {
+                doc.Add(new Paragraph("MODE SWITCH-------------------------- \t" + "Hires"));
+            }
+            doc.Add(new Paragraph("\n\tParameters defined by ZLS.\n"));
+            doc.Add(new Paragraph("BEAM SCALE FACTOR-------------------- \t" + Math.Round(ConfigData.beamScale, 6)));
+            doc.Add(new Paragraph("CROSS-AXIS PERIOD-------------------- \t" + Math.Round(ConfigData.crossPeriod, 4)));
+
+            doc.Add(new Paragraph("CROSS-AXIS DAMPING------------------- \t" + Math.Round(ConfigData.crossDampFactor, 4)));
+            doc.Add(new Paragraph("CROSS-AXIS GAIN---------------------- \t" + Convert.ToString(ConfigData.crossGain)));
+            doc.Add(new Paragraph("CROSS-AXIS LEAD---------------------- \t" + Convert.ToString(ConfigData.crossLead)));
+            doc.Add(new Paragraph("CROSS-AXIS COMPENSATION (4)---------- \t" + Math.Round(ConfigData.crossCouplingFactors[13], 4)));
+            doc.Add(new Paragraph("CROSS-AXIS COMPENSATION PHASE (4)---- \t" + Convert.ToString(ConfigData.analogFilter[5])));
+            if (ConfigData.crossCouplingFactors[15] == 1)
+            {
+                doc.Add(new Paragraph("CROSS-AXIS COMPENSATION (16)--------- \t" + "N/A"));
+            }
+            else
+            {
+                doc.Add(new Paragraph("CROSS-AXIS COMPENSATION (16)--------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[15])));
+            }
+
+            if (ConfigData.crossCouplingFactors[15] == 1)
+            {
+                doc.Add(new Paragraph("CROSS-AXIS COMPENSATION PHASE (16)--- \t" + "N/A"));
+            }
+            else
+            {
+                doc.Add(new Paragraph("CROSS-AXIS COMPENSATION PHASE (16)--- \t" + Convert.ToString(ConfigData.analogFilter[7])));
+            }
+            doc.Add(new Paragraph("CROSS-AXIS BIAS---------------------- \t" + Math.Round(ConfigData.crossBias, 4)));
+            doc.Add(new Paragraph("LONG-AXIS PERIOD-------------------- \t" + Math.Round(ConfigData.longPeriod)));
+            doc.Add(new Paragraph("LONG-AXIS DAMPING------------------- \t" + Math.Round(ConfigData.longDampFactor)));
+            doc.Add(new Paragraph("LONG-AXIS GAIN---------------------- \t" + Math.Round(ConfigData.longGain)));
+            doc.Add(new Paragraph("LONG-AXIS LEAD---------------------- \t" + Convert.ToString(ConfigData.longLead)));
+            doc.Add(new Paragraph("LONG-AXIS COMPENSATION (4)----------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[14])));
+            doc.Add(new Paragraph("LONG AXIS COMPENSATION PHASE (4)----- \t" + Convert.ToString(ConfigData.analogFilter[6])));
+            if (ConfigData.crossCouplingFactors[15] == 1)
+            {
+                doc.Add(new Paragraph("LONG-AXIS COMPENSATION (16)---------- \t" + "N/A"));
+            }
+            else
+            {
+                doc.Add(new Paragraph("LONG-AXIS COMPENSATION (16)---------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[16])));
+            }
+            if (ConfigData.crossCouplingFactors[15] == 1)
+            {
+                doc.Add(new Paragraph("LONG-AXIS COMPENSATION PHASE (16)---- \t" + "N/A"));
+            }
+            else
+            {
+                doc.Add(new Paragraph("LONG-AXIS COMPENSATION PHASE (16)--- \t" + Convert.ToString(ConfigData.analogFilter[7])));
+            }
+            doc.Add(new Paragraph("LONG-AXIS BIAS---------------------- \t" + Convert.ToString(ConfigData.longBias)));
+            doc.Add(new Paragraph("VCC---------------------------------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[6])));
+            doc.Add(new Paragraph("AL----------------------------------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[7])));
+            doc.Add(new Paragraph("AX----------------------------------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[8])));
+            doc.Add(new Paragraph("VE----------------------------------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[9])));
+            doc.Add(new Paragraph("AX2---------------------------------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[10])));
+            doc.Add(new Paragraph("XACC**2------------------------------ \t" + Convert.ToString(ConfigData.crossCouplingFactors[11])));
+            doc.Add(new Paragraph("LACC**2------------------------------ \t" + Convert.ToString(ConfigData.crossCouplingFactors[12])));
+            doc.Add(new Paragraph("AX PHASE----------------------------- \t" + Convert.ToString(ConfigData.analogFilter[1])));
+            doc.Add(new Paragraph("AL PHASE----------------------------- \t" + Convert.ToString(ConfigData.analogFilter[2])));
+            doc.Add(new Paragraph("VCC PHASE---------------------------- \t" + Convert.ToString(ConfigData.analogFilter[4])));
+            doc.Add(new Paragraph("MAXIMUM SPRING TENSION VALUE--------- \t" + Convert.ToString(ConfigData.springTensionMax)));
+
+            //Step 6: Closing the Document:
+            doc.Close();
+        }
+
+        private void LogConfigDataToFileTable()
+        {
+
+
+
+             iTextSharp.text.Font fontTinyItalic = FontFactory.GetFont("Arial", 10, iTextSharp.text.Font.NORMAL, BaseColor.BLACK);
+
+            PdfPTable table = new PdfPTable(2);
+
+            PdfPCell cell = new PdfPCell(new Phrase("User defined parameters", fontTinyItalic));
+            PdfPCell cell2 = new PdfPCell(new Phrase("ZLS defined parameters"));
+
+            PdfPCell theCell = new PdfPCell(new Paragraph("Configuration Data for " + meterNumber, fontTinyItalic));
+            theCell.Colspan = 2;
+            theCell.HorizontalAlignment = 1; //0=Left, 1=Centre, 2=Right
+            table.AddCell(theCell);
+
+            cell.Colspan = 2;
+            cell.HorizontalAlignment = 1; //0=Left, 1=Centre, 2=Right
+
+            table.AddCell(cell);
+            table.TotalWidth = 400f;
+
+            //fix the absolute width of the table
+            table.LockedWidth = true;
+
+            //relative col widths in proportions - 1/3 and 2/3
+            float[] widths = new float[] { 4f, 1f };
+            table.SetWidths(widths);
+            table.HorizontalAlignment = 0;
+
+            //leave a gap before and after the table
+
+            table.SpacingBefore = 40f;
+
+            table.SpacingAfter = 30f;
+
+         
+
+            //Create a System.IO.FileStream object:
+            FileStream fs = new FileStream("C:\\LCT stuff\\Meter Configuration.pdf", FileMode.Create, FileAccess.Write, FileShare.None);
+
+            //Step 2: Create a iTextSharp.text.Document object: with page size and margins
+            Document doc = new Document(PageSize.LETTER, 36, 72, 36, 36);
+
+            doc.AddTitle("Configuration for meter #: " + meterNumber);
+            doc.AddSubject("Configuration data");
+            //  doc.AddKeywords("Metadata, iTextSharp 5.4.4, Chapter 1, Tutorial");
+            doc.AddCreator("ZLS");
+            doc.AddAuthor("Jack Walker");
+            doc.AddHeader("Nothing", "No Header");// Add creation date
+
+            //Step 3: Create a iTextSharp.text.pdf.PdfWriter object. It helps to write the Document to the Specified FileStream:
+            PdfWriter writer = PdfWriter.GetInstance(doc, fs);
+
+            //Step 4: Openning the Document:
+            doc.Open();
+            doc.Add(new Paragraph("Configuration Data for " + meterNumber, fontTinyItalic));
+
+            //Step 5: Adding a Paragraph by creating a iTextSharp.text.Paragraph object:
+
+
+          //  table.AddCell(new PdfPCell(new Paragraph(new PdfPCell(new Paragraph(Label1.Text, fontTinyItalic)));
+
+            //  table.AddCell(new PdfPCell(new Paragraph("User defined parameters", fontTinyItalic));
+            table.AddCell(new PdfPCell(new Paragraph("Number of auxillary analog channels", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(ConfigData.numAuxChan), fontTinyItalic)));
+
+            table.AddCell(new PdfPCell(new Paragraph("DIGITAL INPUT SWITCH", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(ConfigData.digitalInputSwitch), fontTinyItalic)));
+
+            table.AddCell(new PdfPCell(new Paragraph("MONITOR DISPLAY SWITCH", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(ConfigData.monitorDisplaySwitch), fontTinyItalic)));
+
+            table.AddCell(new PdfPCell(new Paragraph("LINE PRINTER SWITCH", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(ConfigData.linePrinterSwitch), fontTinyItalic)));
+
+            table.AddCell(new PdfPCell(new Paragraph("FILE NAME SWITCH", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(ConfigData.fileNameSwitch), fontTinyItalic)));
+
+            table.AddCell(new PdfPCell(new Paragraph("HARD DISK SWITCH", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(ConfigData.hardDiskSwitch), fontTinyItalic)));
+
+            table.AddCell(new PdfPCell(new Paragraph("SERIAL PORT FORMAT SWITCH", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(ConfigData.serialPortSwitch), fontTinyItalic)));
+
+            table.AddCell(new PdfPCell(new Paragraph("SERIAL PORT OUTPUT SWITCH", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(ConfigData.serialPortOutputSwitch), fontTinyItalic)));
+
+            table.AddCell(new PdfPCell(new Paragraph("ALARM SWITCH", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(ConfigData.alarmSwitch), fontTinyItalic)));
+
+            if (ConfigData.printerEmulationSwitch == 2)
+            {
+                table.AddCell(new PdfPCell(new Paragraph("PRINTER EMULATION", fontTinyItalic)));
+                table.AddCell(new PdfPCell(new Paragraph("ESC_P", fontTinyItalic)));
+            }
+            if (ConfigData.printerEmulationSwitch == 3)
+            {
+                table.AddCell(new PdfPCell(new Paragraph("PRINTER EMULATION", fontTinyItalic)));
+                table.AddCell(new PdfPCell(new Paragraph("ESC_P2", fontTinyItalic)));
+            }
+            else
+            {
+                table.AddCell(new PdfPCell(new Paragraph("PRINTER EMULATION", fontTinyItalic)));
+                table.AddCell(new PdfPCell(new Paragraph("DPL24C", fontTinyItalic)));
+            }
+            if (ConfigData.modeSwitch == 0)
+            {
+                table.AddCell(new PdfPCell(new Paragraph("MODE SWITCH", fontTinyItalic)));
+                table.AddCell(new PdfPCell(new Paragraph("Marine", fontTinyItalic)));
+            }
+            else
+            {
+                table.AddCell(new PdfPCell(new Paragraph("MODE SWITCH", fontTinyItalic)));
+                table.AddCell(new PdfPCell(new Paragraph("Hires", fontTinyItalic)));
+            }
+
+            
+            // Items specified by ZLS
+            cell2.Colspan = 2;
+            cell2.HorizontalAlignment = 1; //0=Left, 1=Centre, 2=Right
+            table.AddCell(cell2);
+
+
+            table.AddCell(new PdfPCell(new Paragraph("BEAM SCALE FACTOR", fontTinyItalic))); 
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString( Math.Round(ConfigData.beamScale, 6)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("CROSS-AXIS PERIOD", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString( Math.Round(ConfigData.crossPeriod, 4)), fontTinyItalic)));
+
+            table.AddCell(new PdfPCell(new Paragraph("CROSS-AXIS DAMPING", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString( Math.Round(ConfigData.crossDampFactor, 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("CROSS-AXIS GAIN", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.crossGain,4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("CROSS-AXIS LEAD", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph( Convert.ToString(Math.Round(ConfigData.crossLead,4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("CROSS-AXIS COMPENSATION (4 inch)", fontTinyItalic)) );
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString( Math.Round(ConfigData.crossCouplingFactors[13], 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("CROSS-AXIS COMPENSATION PHASE (4 inch)", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph( Convert.ToString(Math.Round(ConfigData.analogFilter[5],4)), fontTinyItalic)));
+            if (ConfigData.crossCouplingFactors[15] == 1)
+            {
+                table.AddCell(new PdfPCell(new Paragraph("CROSS-AXIS COMPENSATION (16 inch)", fontTinyItalic)));
+                table.AddCell(new PdfPCell(new Paragraph( "N/A", fontTinyItalic)));
+            }
+            else
+            {
+                table.AddCell(new PdfPCell(new Paragraph("CROSS-AXIS COMPENSATION (16 inch)", fontTinyItalic)));
+                table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.crossCouplingFactors[15],4)), fontTinyItalic)));
+            }
+
+            if (ConfigData.crossCouplingFactors[15] == 1)
+            {
+                table.AddCell(new PdfPCell(new Paragraph("CROSS-AXIS COMPENSATION PHASE 16 inch", fontTinyItalic)));
+                table.AddCell(new PdfPCell(new Paragraph("N/A", fontTinyItalic)));
+            }
+            else
+            {
+                table.AddCell(new PdfPCell(new Paragraph("CROSS-AXIS COMPENSATION PHASE 16 inch", fontTinyItalic)));
+                table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.analogFilter[7],4)), fontTinyItalic)));
+            }
+            table.AddCell(new PdfPCell(new Paragraph("CROSS-AXIS BIAS ", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.crossBias,4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("LONG-AXIS PERIOD ", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.longPeriod, 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("LONG-AXIS DAMPING ", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.longDampFactor, 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("LONG-AXIS GAIN ", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.longGain, 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("LONG-AXIS LEAD ", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.longLead, 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("LONG-AXIS COMPENSATION (4 inch )", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.crossCouplingFactors[14], 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("LONG AXIS COMPENSATION PHASE (4 inch)", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.analogFilter[6])), fontTinyItalic)));
+
+            
+            if (ConfigData.crossCouplingFactors[15] == 1)
+            {
+                table.AddCell(new PdfPCell(new Paragraph("LONG-AXIS COMPENSATION (16 inch)", fontTinyItalic)));
+              table.AddCell(new PdfPCell(new Paragraph( "N/A", fontTinyItalic)));
+            }
+            else
+            {
+                table.AddCell(new PdfPCell(new Paragraph("LONG-AXIS COMPENSATION (16 inch) ", fontTinyItalic)));
+                table.AddCell(new PdfPCell(new Paragraph(Convert.ToString( Math.Round(ConfigData.crossCouplingFactors[16],4)), fontTinyItalic)));
+            }
+            if (ConfigData.crossCouplingFactors[15] == 1)
+            {
+                table.AddCell(new PdfPCell(new Paragraph("LONG-AXIS COMPENSATION PHASE (16 inch)", fontTinyItalic))); 
+                table.AddCell(new PdfPCell(new Paragraph( "N/A", fontTinyItalic)));
+            }
+            else
+            {
+                table.AddCell(new PdfPCell(new Paragraph("LONG-AXIS COMPENSATION PHASE (16 inch)", fontTinyItalic))); 
+                table.AddCell(new PdfPCell(new Paragraph(Convert.ToString( Math.Round(ConfigData.analogFilter[7],4 )), fontTinyItalic)));
+            }
+            table.AddCell(new PdfPCell(new Paragraph("LONG-AXIS BIAS" , fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString( Math.Round(ConfigData.longBias,4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("VCC", fontTinyItalic)) );
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString( Math.Round(ConfigData.crossCouplingFactors[6],4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("AL", fontTinyItalic)) );
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString( Math.Round(ConfigData.crossCouplingFactors[7],4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("AX", fontTinyItalic)) );
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.crossCouplingFactors[8],4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("VE", fontTinyItalic)) );
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString( Math.Round(ConfigData.crossCouplingFactors[9],4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("AX2" , fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString( Math.Round(ConfigData.crossCouplingFactors[10],4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("XACC**2" , fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString( Math.Round(ConfigData.crossCouplingFactors[11],4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("LACC**2", fontTinyItalic)) );
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString( Math.Round(ConfigData.crossCouplingFactors[12],4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("AX PHASE", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString( Math.Round(ConfigData.analogFilter[1],4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("AL PHASE", fontTinyItalic)) );
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString( Math.Round(ConfigData.analogFilter[2],4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("VCC PHASE", fontTinyItalic))); 
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.analogFilter[4],4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("MAXIMUM SPRING TENSION VALUE" , fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString( Math.Round(ConfigData.springTensionMax,4)), fontTinyItalic)));
+            doc.Add(table);
+
+            //Step 6: Closing the Document:
+            doc.Close();
+        }
+
         private void oneSecStuff()// change to array    double[] data1, double[] data2, double[] data3, double ccFact
         {
             ConfigData ConfigData = new ConfigData();
@@ -1450,7 +1821,8 @@ namespace ChartBinding
 
         private void engineeringPanelToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            EngineeringForm.Show();
+            PasswordForm myPassword = new PasswordForm();
+            myPassword.Show();
         }
 
         private void manualStartupToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1607,7 +1979,7 @@ namespace ChartBinding
 
         private void traceVisibilityComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            string traceSelect = traceName[traceVisibilityComboBox.SelectedIndex ];
+            string traceSelect = traceName[traceVisibilityComboBox.SelectedIndex];
 
             switch (traceSelect)
             {
@@ -1621,6 +1993,7 @@ namespace ChartBinding
                         ChartVisibility.digitalGravity = true;
                     }
                     break;
+
                 case "Spring Tension":
                     if (ChartVisibility.springTension == true)
                     {
@@ -1631,6 +2004,7 @@ namespace ChartBinding
                         ChartVisibility.springTension = true;
                     }
                     break;
+
                 case "Cross Coupling":
                     if (ChartVisibility.crossCoupling == true)
                     {
@@ -1641,6 +2015,7 @@ namespace ChartBinding
                         ChartVisibility.crossCoupling = true;
                     }
                     break;
+
                 case "Raw Beam":
                     if (ChartVisibility.rawBeam == true)
                     {
@@ -1651,6 +2026,7 @@ namespace ChartBinding
                         ChartVisibility.rawBeam = true;
                     }
                     break;
+
                 case "Total Correction":
                     if (ChartVisibility.totalCorrection == true)
                     {
@@ -1661,6 +2037,7 @@ namespace ChartBinding
                         ChartVisibility.totalCorrection = true;
                     }
                     break;
+
                 case "Raw Gravity":
                     if (ChartVisibility.rawGravity == true)
                     {
@@ -1671,6 +2048,7 @@ namespace ChartBinding
                         ChartVisibility.rawGravity = true;
                     }
                     break;
+
                 case "AL":
                     if (ChartVisibility.AL == true)
                     {
@@ -1681,6 +2059,7 @@ namespace ChartBinding
                         ChartVisibility.AL = true;
                     }
                     break;
+
                 case "AX":
                     if (ChartVisibility.AX == true)
                     {
@@ -1691,6 +2070,7 @@ namespace ChartBinding
                         ChartVisibility.AX = true;
                     }
                     break;
+
                 case "VE":
                     if (ChartVisibility.VE == true)
                     {
@@ -1701,6 +2081,7 @@ namespace ChartBinding
                         ChartVisibility.VE = true;
                     }
                     break;
+
                 case "AX2":
                     if (ChartVisibility.AX2 == true)
                     {
@@ -1711,6 +2092,7 @@ namespace ChartBinding
                         ChartVisibility.AX2 = true;
                     }
                     break;
+
                 case "XACC":
                     if (ChartVisibility.XACC == true)
                     {
@@ -1721,6 +2103,7 @@ namespace ChartBinding
                         ChartVisibility.XACC = true;
                     }
                     break;
+
                 case "LACC":
                     if (ChartVisibility.LACC == true)
                     {
@@ -1736,7 +2119,6 @@ namespace ChartBinding
                     break;
             }
             SetChartVisibility();
-
         }
 
         public void SetChartVisibility()
@@ -1832,7 +2214,6 @@ namespace ChartBinding
                 this.crossCouplingChart.Series["AX2"].Color = ChartColors.AX2;
             }
 
-
             if (ChartVisibility.LACC == false)
             {
                 this.crossCouplingChart.Series["LACC"].Color = System.Drawing.Color.Transparent;
@@ -1851,10 +2232,8 @@ namespace ChartBinding
                 this.crossCouplingChart.Series["XACC"].Color = ChartColors.XACC;
             }
 
-
-
-        //    this.GravityChart.Update();
-         //   this.crossCouplingChart.Update();
+            //    this.GravityChart.Update();
+            //   this.crossCouplingChart.Update();
         }
 
         private void chartOptionsButton_Click(object sender, EventArgs e)
@@ -1867,9 +2246,140 @@ namespace ChartBinding
             else
             {
                 chartOptionsButton.Text = "Chart Options";
-                    groupBox1.Visible = false;
+                groupBox1.Visible = false;
             }
         }
+
+        private void recordingTextBox_TextChanged(object sender, EventArgs e)
+        {
+        }
+
+        private void traceColorComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //Object traceSelect = traceColorComboBox.SelectedIndex;
+            string palettSelect = Convert.ToString(traceColorComboBox.SelectedItem);
+
+            switch (palettSelect)
+            {
+                case "None":
+                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.None;
+                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.None;
+
+                    break;
+
+                case "Bright":
+                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Bright;
+                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Bright;
+
+                    break;
+
+                case "Grayscale":
+                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Grayscale;
+                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Grayscale;
+
+                    break;
+
+                case "Excel":
+                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Excel;
+                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Excel;
+
+                    break;
+
+                case "Light":
+                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Light;
+                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Light;
+
+                    break;
+
+                case "Pastel":
+                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Pastel;
+                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Pastel;
+
+                    break;
+
+                case "EarthTones":
+                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.EarthTones;
+                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.EarthTones;
+
+                    break;
+
+                case "SemiTransparant":
+                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.SemiTransparent;
+                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.SemiTransparent;
+
+                    break;
+
+                case "Berry":
+                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Berry;
+                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Berry;
+
+                    break;
+
+                case "Chocolate":
+                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Chocolate;
+                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Chocolate;
+
+                    break;
+
+                case "Fire":
+                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Fire;
+                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Fire;
+
+                    break;
+
+                case "SeaGreen":
+                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.SeaGreen;
+                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.SeaGreen;
+
+                    break;
+
+                case "BrightPastel":
+                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.BrightPastel;
+                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.BrightPastel;
+
+                    break;
+
+                default:
+                    break;
+            }
+            this.crossCouplingChart.ApplyPaletteColors();
+            this.GravityChart.ApplyPaletteColors();
+        }
+
+        private void printConfigFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LogConfigDataToFile();
+        }
+
+        private void meterNumberTextBox_TextChanged(object sender, EventArgs e)
+        {
+            meterNumber = meterNumberTextBox.Text;
+        }
+
+        private void saveConfigFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LogConfigDataToFileTable();
+        }
+
+        /*
+                public void ShowMyDialogBox()
+                {
+                    Form2 testDialog = new Form2();
+
+                    // Show testDialog as a modal dialog and determine if DialogResult = OK.
+                    if (testDialog.ShowDialog(this) == DialogResult.OK)
+                    {
+                        // Read the contents of testDialog's TextBox.
+                        this.txtResult.Text = testDialog.TextBox1.Text;
+                    }
+                    else
+                    {
+                        this.txtResult.Text = "Cancelled";
+                    }
+                    testDialog.Dispose();
+                }
+
+        */
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
     }
