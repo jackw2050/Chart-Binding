@@ -1,0 +1,200 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C634FF0F-57BD-4B91-8C05-B546BB58DA57}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ChartBinding</RootNamespace>
+    <AssemblyName>ChartBinding</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="FileHelpers">
+      <HintPath>..\packages\FileHelpers.3.1.5\lib\net45\FileHelpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ConfigData.cs" />
+    <Compile Include="CrossCouplingDataForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CrossCouplingDataForm.Designer.cs">
+      <DependentUpon>CrossCouplingDataForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CrossCouplingForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CrossCouplingForm.Designer.cs">
+      <DependentUpon>CrossCouplingForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CrossCouplingOptionsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CrossCouplingOptionsForm.Designer.cs">
+      <DependentUpon>CrossCouplingOptionsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DateTimeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DateTimeForm.Designer.cs">
+      <DependentUpon>DateTimeForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EngineeringForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EngineeringForm.Designer.cs">
+      <DependentUpon>EngineeringForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FileFormatForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FileFormatForm.Designer.cs">
+      <DependentUpon>FileFormatForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GravityChartForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GravityChartForm.Designer.cs">
+      <DependentUpon>GravityChartForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GravityChartOptionsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GravityChartOptionsForm.Designer.cs">
+      <DependentUpon>GravityChartOptionsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GravityDataForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GravityDataForm.Designer.cs">
+      <DependentUpon>GravityDataForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MeterData.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SurveyForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SurveyForm.Designer.cs">
+      <DependentUpon>SurveyForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SwitchesForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SwitchesForm.Designer.cs">
+      <DependentUpon>SwitchesForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SystemAuxForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SystemAuxForm.Designer.cs">
+      <DependentUpon>SystemAuxForm.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="CrossCouplingDataForm.resx">
+      <DependentUpon>CrossCouplingDataForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CrossCouplingForm.resx">
+      <DependentUpon>CrossCouplingForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DateTimeForm.resx">
+      <DependentUpon>DateTimeForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EngineeringForm.resx">
+      <DependentUpon>EngineeringForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FileFormatForm.resx">
+      <DependentUpon>FileFormatForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GravityChartForm.resx">
+      <DependentUpon>GravityChartForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GravityChartOptionsForm.resx">
+      <DependentUpon>GravityChartOptionsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GravityDataForm.resx">
+      <DependentUpon>GravityDataForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="SurveyForm.resx">
+      <DependentUpon>SurveyForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SwitchesForm.resx">
+      <DependentUpon>SwitchesForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SystemAuxForm.resx">
+      <DependentUpon>SystemAuxForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
