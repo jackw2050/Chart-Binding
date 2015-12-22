@@ -37,6 +37,7 @@ namespace ChartBinding
         public static double gravity;
         public static int year, day, Hour, Min, Sec;
         public static double i4Par;
+        public static DateTime dataTime = new DateTime(2015, 1,1);
 
 
         public void CheckMeterData(byte[] meterBytes)
@@ -111,9 +112,11 @@ namespace ChartBinding
                 //    Console.Write("Spring Tension\t" + data1[3] + "\n");
 
 
-
-
-
+                dataTime = dataTime.AddYears(year - 2015);
+                dataTime = dataTime.AddDays(day - 1);
+                dataTime = dataTime.AddHours(Hour);
+                dataTime = dataTime.AddMinutes(Min);
+                dataTime = dataTime.AddSeconds(Sec);
 
                 //GET RAW BEAM  ------------------------------------------------------------
                 tempByte[0] = meterBytes[13];

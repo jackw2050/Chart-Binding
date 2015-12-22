@@ -16,5 +16,10 @@ namespace ChartBinding
         {
             InitializeComponent();
         }
+
+        private void EngineeringForm_Load(object sender, EventArgs e)
+        {
+            longDampingFactorTextBox.Text = Convert.ToString( ConfigData.longDampFactor);
+        }
     }
 }

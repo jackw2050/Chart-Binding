@@ -36,12 +36,12 @@
             this.label34 = new System.Windows.Forms.Label();
             this.textBox17 = new System.Windows.Forms.TextBox();
             this.textBox18 = new System.Windows.Forms.TextBox();
-            this.textBox22 = new System.Windows.Forms.TextBox();
-            this.textBox25 = new System.Windows.Forms.TextBox();
-            this.textBox26 = new System.Windows.Forms.TextBox();
+            this.ALFactorTextBox = new System.Windows.Forms.TextBox();
+            this.AXFactorTextBox = new System.Windows.Forms.TextBox();
+            this.VEFactorTextBox = new System.Windows.Forms.TextBox();
             this.textBox27 = new System.Windows.Forms.TextBox();
             this.textBox28 = new System.Windows.Forms.TextBox();
-            this.textBox29 = new System.Windows.Forms.TextBox();
+            this.vccFactorTextBox = new System.Windows.Forms.TextBox();
             this.label19 = new System.Windows.Forms.Label();
             this.label20 = new System.Windows.Forms.Label();
             this.label28 = new System.Windows.Forms.Label();
@@ -65,7 +65,7 @@
             this.textBox24 = new System.Windows.Forms.TextBox();
             this.textBox7 = new System.Windows.Forms.TextBox();
             this.textBox8 = new System.Windows.Forms.TextBox();
-            this.textBox11 = new System.Windows.Forms.TextBox();
+            this.longDampingFactorTextBox = new System.Windows.Forms.TextBox();
             this.textBox12 = new System.Windows.Forms.TextBox();
             this.textBox13 = new System.Windows.Forms.TextBox();
             this.textBox14 = new System.Windows.Forms.TextBox();
@@ -172,26 +172,26 @@
             this.textBox18.Size = new System.Drawing.Size(100, 20);
             this.textBox18.TabIndex = 137;
             // 
-            // textBox22
+            // ALFactorTextBox
             // 
-            this.textBox22.Location = new System.Drawing.Point(562, 80);
-            this.textBox22.Name = "textBox22";
-            this.textBox22.Size = new System.Drawing.Size(100, 20);
-            this.textBox22.TabIndex = 136;
+            this.ALFactorTextBox.Location = new System.Drawing.Point(562, 80);
+            this.ALFactorTextBox.Name = "ALFactorTextBox";
+            this.ALFactorTextBox.Size = new System.Drawing.Size(100, 20);
+            this.ALFactorTextBox.TabIndex = 136;
             // 
-            // textBox25
+            // AXFactorTextBox
             // 
-            this.textBox25.Location = new System.Drawing.Point(562, 105);
-            this.textBox25.Name = "textBox25";
-            this.textBox25.Size = new System.Drawing.Size(100, 20);
-            this.textBox25.TabIndex = 135;
+            this.AXFactorTextBox.Location = new System.Drawing.Point(562, 105);
+            this.AXFactorTextBox.Name = "AXFactorTextBox";
+            this.AXFactorTextBox.Size = new System.Drawing.Size(100, 20);
+            this.AXFactorTextBox.TabIndex = 135;
             // 
-            // textBox26
+            // VEFactorTextBox
             // 
-            this.textBox26.Location = new System.Drawing.Point(562, 130);
-            this.textBox26.Name = "textBox26";
-            this.textBox26.Size = new System.Drawing.Size(100, 20);
-            this.textBox26.TabIndex = 134;
+            this.VEFactorTextBox.Location = new System.Drawing.Point(562, 130);
+            this.VEFactorTextBox.Name = "VEFactorTextBox";
+            this.VEFactorTextBox.Size = new System.Drawing.Size(100, 20);
+            this.VEFactorTextBox.TabIndex = 134;
             // 
             // textBox27
             // 
@@ -207,12 +207,12 @@
             this.textBox28.Size = new System.Drawing.Size(100, 20);
             this.textBox28.TabIndex = 132;
             // 
-            // textBox29
+            // vccFactorTextBox
             // 
-            this.textBox29.Location = new System.Drawing.Point(562, 55);
-            this.textBox29.Name = "textBox29";
-            this.textBox29.Size = new System.Drawing.Size(100, 20);
-            this.textBox29.TabIndex = 131;
+            this.vccFactorTextBox.Location = new System.Drawing.Point(562, 55);
+            this.vccFactorTextBox.Name = "vccFactorTextBox";
+            this.vccFactorTextBox.Size = new System.Drawing.Size(100, 20);
+            this.vccFactorTextBox.TabIndex = 131;
             // 
             // label19
             // 
@@ -410,12 +410,12 @@
             this.textBox8.Size = new System.Drawing.Size(100, 20);
             this.textBox8.TabIndex = 108;
             // 
-            // textBox11
+            // longDampingFactorTextBox
             // 
-            this.textBox11.Location = new System.Drawing.Point(330, 80);
-            this.textBox11.Name = "textBox11";
-            this.textBox11.Size = new System.Drawing.Size(100, 20);
-            this.textBox11.TabIndex = 107;
+            this.longDampingFactorTextBox.Location = new System.Drawing.Point(330, 80);
+            this.longDampingFactorTextBox.Name = "longDampingFactorTextBox";
+            this.longDampingFactorTextBox.Size = new System.Drawing.Size(100, 20);
+            this.longDampingFactorTextBox.TabIndex = 107;
             // 
             // textBox12
             // 
@@ -748,12 +748,12 @@
             this.Controls.Add(this.label34);
             this.Controls.Add(this.textBox17);
             this.Controls.Add(this.textBox18);
-            this.Controls.Add(this.textBox22);
-            this.Controls.Add(this.textBox25);
-            this.Controls.Add(this.textBox26);
+            this.Controls.Add(this.ALFactorTextBox);
+            this.Controls.Add(this.AXFactorTextBox);
+            this.Controls.Add(this.VEFactorTextBox);
             this.Controls.Add(this.textBox27);
             this.Controls.Add(this.textBox28);
-            this.Controls.Add(this.textBox29);
+            this.Controls.Add(this.vccFactorTextBox);
             this.Controls.Add(this.label19);
             this.Controls.Add(this.label20);
             this.Controls.Add(this.label28);
@@ -777,7 +777,7 @@
             this.Controls.Add(this.textBox24);
             this.Controls.Add(this.textBox7);
             this.Controls.Add(this.textBox8);
-            this.Controls.Add(this.textBox11);
+            this.Controls.Add(this.longDampingFactorTextBox);
             this.Controls.Add(this.textBox12);
             this.Controls.Add(this.textBox13);
             this.Controls.Add(this.textBox14);
@@ -813,6 +813,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "EngineeringForm";
             this.Text = "Engineering";
+            this.Load += new System.EventHandler(this.EngineeringForm_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -830,12 +831,12 @@
         private System.Windows.Forms.Label label34;
         private System.Windows.Forms.TextBox textBox17;
         private System.Windows.Forms.TextBox textBox18;
-        private System.Windows.Forms.TextBox textBox22;
-        private System.Windows.Forms.TextBox textBox25;
-        private System.Windows.Forms.TextBox textBox26;
+        private System.Windows.Forms.TextBox ALFactorTextBox;
+        private System.Windows.Forms.TextBox AXFactorTextBox;
+        private System.Windows.Forms.TextBox VEFactorTextBox;
         private System.Windows.Forms.TextBox textBox27;
         private System.Windows.Forms.TextBox textBox28;
-        private System.Windows.Forms.TextBox textBox29;
+        private System.Windows.Forms.TextBox vccFactorTextBox;
         private System.Windows.Forms.Label label19;
         private System.Windows.Forms.Label label20;
         private System.Windows.Forms.Label label28;
@@ -859,7 +860,7 @@
         private System.Windows.Forms.TextBox textBox24;
         private System.Windows.Forms.TextBox textBox7;
         private System.Windows.Forms.TextBox textBox8;
-        private System.Windows.Forms.TextBox textBox11;
+        private System.Windows.Forms.TextBox longDampingFactorTextBox;
         private System.Windows.Forms.TextBox textBox12;
         private System.Windows.Forms.TextBox textBox13;
         private System.Windows.Forms.TextBox textBox14;

@@ -51,7 +51,6 @@
             this.saveConfigFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.printConfigFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.printGravityChartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.printPreviewCrossCouplingChartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.surveyInformationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.fileFormatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -110,6 +109,8 @@
             this.meterNumberTextBox = new System.Windows.Forms.TextBox();
             this.label11 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
+            this.pageSetupDialog1 = new System.Windows.Forms.PageSetupDialog();
+            this.markersCheckBox = new System.Windows.Forms.CheckBox();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.crossCouplingChart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
@@ -149,8 +150,7 @@
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.saveConfigFileToolStripMenuItem,
             this.printConfigFileToolStripMenuItem,
-            this.printGravityChartToolStripMenuItem,
-            this.printPreviewCrossCouplingChartToolStripMenuItem});
+            this.printGravityChartToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
@@ -158,29 +158,23 @@
             // saveConfigFileToolStripMenuItem
             // 
             this.saveConfigFileToolStripMenuItem.Name = "saveConfigFileToolStripMenuItem";
-            this.saveConfigFileToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
+            this.saveConfigFileToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
             this.saveConfigFileToolStripMenuItem.Text = "Save Config file";
             this.saveConfigFileToolStripMenuItem.Click += new System.EventHandler(this.saveConfigFileToolStripMenuItem_Click);
             // 
             // printConfigFileToolStripMenuItem
             // 
             this.printConfigFileToolStripMenuItem.Name = "printConfigFileToolStripMenuItem";
-            this.printConfigFileToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
+            this.printConfigFileToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
             this.printConfigFileToolStripMenuItem.Text = "Print Config file";
             this.printConfigFileToolStripMenuItem.Click += new System.EventHandler(this.printConfigFileToolStripMenuItem_Click);
             // 
             // printGravityChartToolStripMenuItem
             // 
             this.printGravityChartToolStripMenuItem.Name = "printGravityChartToolStripMenuItem";
-            this.printGravityChartToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
-            this.printGravityChartToolStripMenuItem.Text = "Print gravity chart";
-            // 
-            // printPreviewCrossCouplingChartToolStripMenuItem
-            // 
-            this.printPreviewCrossCouplingChartToolStripMenuItem.Name = "printPreviewCrossCouplingChartToolStripMenuItem";
-            this.printPreviewCrossCouplingChartToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
-            this.printPreviewCrossCouplingChartToolStripMenuItem.Text = "Print cross coupling chart";
-            this.printPreviewCrossCouplingChartToolStripMenuItem.Click += new System.EventHandler(this.printPreviewCrossCouplingChartToolStripMenuItem_Click);
+            this.printGravityChartToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
+            this.printGravityChartToolStripMenuItem.Text = "Print gravity charts";
+            this.printGravityChartToolStripMenuItem.Click += new System.EventHandler(this.printGravityChartToolStripMenuItem_Click_1);
             // 
             // editToolStripMenuItem
             // 
@@ -619,11 +613,8 @@
             this.GravityChart.BackSecondaryColor = System.Drawing.Color.Black;
             this.GravityChart.BorderSkin.PageColor = System.Drawing.Color.Black;
             chartArea2.AlignmentOrientation = ((System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations)((System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Vertical | System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Horizontal)));
-            chartArea2.AxisX.MajorGrid.LineColor = System.Drawing.Color.Gold;
-            chartArea2.AxisY.LineColor = System.Drawing.Color.Gold;
             chartArea2.AxisY.MajorGrid.LineColor = System.Drawing.Color.Gold;
-            chartArea2.AxisY2.MajorGrid.LineColor = System.Drawing.Color.Gold;
-            chartArea2.BackColor = System.Drawing.Color.Black;
+            chartArea2.BackColor = System.Drawing.Color.White;
             chartArea2.Name = "ChartArea1";
             this.GravityChart.ChartAreas.Add(chartArea2);
             legend2.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
@@ -672,7 +663,7 @@
             "White",
             "Gray",
             "Black"});
-            this.chartColorComboBox.Location = new System.Drawing.Point(285, 19);
+            this.chartColorComboBox.Location = new System.Drawing.Point(241, 20);
             this.chartColorComboBox.Name = "chartColorComboBox";
             this.chartColorComboBox.Size = new System.Drawing.Size(118, 21);
             this.chartColorComboBox.TabIndex = 45;
@@ -682,7 +673,7 @@
             // traceTrackBar
             // 
             this.traceTrackBar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.traceTrackBar.Location = new System.Drawing.Point(454, 19);
+            this.traceTrackBar.Location = new System.Drawing.Point(365, 18);
             this.traceTrackBar.Minimum = 1;
             this.traceTrackBar.Name = "traceTrackBar";
             this.traceTrackBar.Size = new System.Drawing.Size(97, 45);
@@ -694,7 +685,7 @@
             // 
             this.label10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(451, 3);
+            this.label10.Location = new System.Drawing.Point(390, 3);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(63, 13);
             this.label10.TabIndex = 48;
@@ -716,7 +707,7 @@
             "AX2",
             "LACC",
             "XACC"});
-            this.traceVisibilityComboBox.Location = new System.Drawing.Point(165, 19);
+            this.traceVisibilityComboBox.Location = new System.Drawing.Point(138, 20);
             this.traceVisibilityComboBox.Name = "traceVisibilityComboBox";
             this.traceVisibilityComboBox.Size = new System.Drawing.Size(97, 21);
             this.traceVisibilityComboBox.TabIndex = 49;
@@ -726,6 +717,7 @@
             // groupBox1
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.markersCheckBox);
             this.groupBox1.Controls.Add(this.traceColorComboBox);
             this.groupBox1.Controls.Add(this.traceVisibilityComboBox);
             this.groupBox1.Controls.Add(this.traceTrackBar);
@@ -733,7 +725,7 @@
             this.groupBox1.Controls.Add(this.chartColorComboBox);
             this.groupBox1.Location = new System.Drawing.Point(678, 614);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(621, 63);
+            this.groupBox1.Size = new System.Drawing.Size(690, 63);
             this.groupBox1.TabIndex = 50;
             this.groupBox1.TabStop = false;
             // 
@@ -778,6 +770,7 @@
             this.surveyTextBox.Name = "surveyTextBox";
             this.surveyTextBox.Size = new System.Drawing.Size(235, 20);
             this.surveyTextBox.TabIndex = 51;
+            this.surveyTextBox.TextChanged += new System.EventHandler(this.surveyTextBox_TextChanged);
             // 
             // meterNumberTextBox
             // 
@@ -804,6 +797,17 @@
             this.label12.Size = new System.Drawing.Size(95, 13);
             this.label12.TabIndex = 54;
             this.label12.Text = "Survey Information";
+            // 
+            // markersCheckBox
+            // 
+            this.markersCheckBox.AutoSize = true;
+            this.markersCheckBox.Location = new System.Drawing.Point(483, 21);
+            this.markersCheckBox.Name = "markersCheckBox";
+            this.markersCheckBox.Size = new System.Drawing.Size(64, 17);
+            this.markersCheckBox.TabIndex = 51;
+            this.markersCheckBox.Text = "Markers";
+            this.markersCheckBox.UseVisualStyleBackColor = true;
+            this.markersCheckBox.CheckedChanged += new System.EventHandler(this.markersCheckBox_CheckedChanged);
             // 
             // Form1
             // 
@@ -914,7 +918,6 @@
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.ToolStripMenuItem printGravityChartToolStripMenuItem;
         private System.Windows.Forms.PrintDialog printDialog1;
-        private System.Windows.Forms.ToolStripMenuItem printPreviewCrossCouplingChartToolStripMenuItem;
         private System.Windows.Forms.PrintPreviewDialog printPreviewDialog;
         private System.Windows.Forms.ToolStripMenuItem configureToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem gravityChartToolStripMenuItem1;
@@ -931,6 +934,8 @@
         private System.Windows.Forms.Label label12;
         public System.Windows.Forms.TextBox surveyTextBox;
         public System.Windows.Forms.TextBox meterNumberTextBox;
+        private System.Windows.Forms.PageSetupDialog pageSetupDialog1;
+        private System.Windows.Forms.CheckBox markersCheckBox;
     }
 }
 

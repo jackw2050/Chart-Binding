@@ -26,7 +26,7 @@ namespace ChartBinding
         {
             if (commaRadioButton.Checked == true)
             {
-                Form1.fileType = "cvs";
+                Form1.fileType = "csv";
                 UpdateFileNameText();
             }
         }
@@ -35,7 +35,7 @@ namespace ChartBinding
         {
             if (tabRadioButton.Checked == true)
             {
-                Form1.fileType = "tvs";
+                Form1.fileType = "tsv";
                 UpdateFileNameText();
             }
         }
@@ -44,6 +44,16 @@ namespace ChartBinding
         {
             this.CustomNameTextBox.Visible = false;
             DateTime myDateTime = DateTime.Now;
+            dateFormatRadioButton1.Checked = true;
+            commaRadioButton.Checked = true;
+            if (Form1.meterNumber == "")
+            {
+                Form1.meterNumber = "Unknown meter"; 
+            }
+            if (Form1.surveyName == "")
+            {
+                Form1.surveyName = "Survey";
+            }
 
 
         }
@@ -53,20 +63,18 @@ namespace ChartBinding
             if (this.customFileNameRadioButton.Checked)
             {
                 this.CustomNameTextBox.Visible = true;
+                Form1.fileDateFormat = 2;
 
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            this.Hide();
-        }
+
 
         private void dateFormatRadioButton1_CheckedChanged(object sender, EventArgs e)
         {
             if (dateFormatRadioButton1.Checked == true)
             {
-               // Form1.fileDateFormat = 1;
+                Form1.fileDateFormat = 1;
                 UpdateFileNameText();
                 //open text file to dump data
 
@@ -98,33 +106,29 @@ namespace ChartBinding
 
         private void UpdateFileNameText()
         {
-            
+            DateTime now = DateTime.Now;
             if (Form1.fileDateFormat == 1)
             {
-                sampleFileNamelabel.Text =  mainForm.meterNumberTextBox.Text + "-" +   mainForm.surveyTextBox.Text + "-2015-Jan-1 15-23-34." + Form1.fileType;
+                sampleFileNamelabel.Text = Form1.meterNumber + " " + Form1.surveyName + " " + now.ToString("yyyy-MMM-dd-HH-mm-ss") + "." + Form1.fileType;
             }
             else if (Form1.fileDateFormat == 2)
             {
-                sampleFileNamelabel.Text = mainForm.meterNumberTextBox.Text + "-" + mainForm.surveyTextBox.Text + "-2015-1-1 15-23-34." + Form1.fileType;
+                sampleFileNamelabel.Text = Form1.meterNumber + " " + Form1.surveyName + " " + now.ToString("yyyy-mm-dd-HH-mm-ss") + "." + Form1.fileType;
             }
             else if (Form1.fileDateFormat == 3)
             {
-                sampleFileNamelabel.Text = mainForm.meterNumberTextBox.Text + "-" + mainForm.surveyTextBox.Text + "-2015-1 15-23-34." + Form1.fileType;
+                sampleFileNamelabel.Text = Form1.meterNumber + " " + Form1.surveyName + " " + now.ToString("yyyy-dd-HH-mm-ss") + "." + Form1.fileType;
                 
             }
             else if (Form1.fileDateFormat == 4)
             {
-                                sampleFileNamelabel.Text = CustomNameTextBox.Text + "." + Form1.fileType;
-
+              sampleFileNamelabel.Text = CustomNameTextBox.Text + "." + Form1.fileType;
             }
 
             
         }
 
-        private void checkedListBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            
-        }
+
 
         private void CustomNameTextBox_TextChanged(object sender, EventArgs e)
         {
@@ -135,6 +139,14 @@ namespace ChartBinding
 
         private void cancelButton_Click(object sender, EventArgs e)
         {
+            this.Hide();
+        }
+
+        private void openFileButton_Click(object sender, EventArgs e)
+        {
+            FileClass FileClass = new FileClass();
+            Form1.gravityFileName = sampleFileNamelabel.Text;
+            FileClass.RecordDataToFile("Open");
             this.Hide();
         }
     }

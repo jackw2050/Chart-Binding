@@ -38,7 +38,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.customFileNameRadioButton = new System.Windows.Forms.RadioButton();
             this.CustomNameTextBox = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.openFileButton = new System.Windows.Forms.Button();
             this.sampleFileNamelabel = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -99,7 +99,7 @@
             this.commaRadioButton.Size = new System.Drawing.Size(164, 17);
             this.commaRadioButton.TabIndex = 4;
             this.commaRadioButton.TabStop = true;
-            this.commaRadioButton.Text = "Comma delimited (*.cvs)";
+            this.commaRadioButton.Text = "Comma delimited (*.csv)";
             this.commaRadioButton.UseVisualStyleBackColor = true;
             this.commaRadioButton.CheckedChanged += new System.EventHandler(this.commaRadioButton_CheckedChanged);
             // 
@@ -110,7 +110,7 @@
             this.tabRadioButton.Size = new System.Drawing.Size(164, 17);
             this.tabRadioButton.TabIndex = 5;
             this.tabRadioButton.TabStop = true;
-            this.tabRadioButton.Text = "Tab delimited (*.tvs)";
+            this.tabRadioButton.Text = "Tab delimited (*.tsv)";
             this.tabRadioButton.UseVisualStyleBackColor = true;
             this.tabRadioButton.CheckedChanged += new System.EventHandler(this.tabRadioButton_CheckedChanged);
             // 
@@ -152,15 +152,15 @@
             this.CustomNameTextBox.TabIndex = 11;
             this.CustomNameTextBox.TextChanged += new System.EventHandler(this.CustomNameTextBox_TextChanged);
             // 
-            // button1
+            // openFileButton
             // 
-            this.button1.Location = new System.Drawing.Point(307, 289);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(151, 23);
-            this.button1.TabIndex = 12;
-            this.button1.Text = "Open file and exit";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.openFileButton.Location = new System.Drawing.Point(307, 289);
+            this.openFileButton.Name = "openFileButton";
+            this.openFileButton.Size = new System.Drawing.Size(151, 23);
+            this.openFileButton.TabIndex = 12;
+            this.openFileButton.Text = "Open file and exit";
+            this.openFileButton.UseVisualStyleBackColor = true;
+            this.openFileButton.Click += new System.EventHandler(this.openFileButton_Click);
             // 
             // sampleFileNamelabel
             // 
@@ -226,7 +226,7 @@
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.sampleFileNamelabel);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.openFileButton);
             this.Controls.Add(this.CustomNameTextBox);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -253,7 +253,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.RadioButton customFileNameRadioButton;
         private System.Windows.Forms.TextBox CustomNameTextBox;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button openFileButton;
         private System.Windows.Forms.Label sampleFileNamelabel;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.GroupBox groupBox1;
