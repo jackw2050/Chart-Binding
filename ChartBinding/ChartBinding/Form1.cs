@@ -2,14 +2,14 @@
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using System;
+using System.Data;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
-using System.Data;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
-    
+
 //  Delimited file operations using FileHelpers  http://www.filehelpers.net
 // iTextSharp  http://www.mikesdotnetting.com/article/89/itextsharp-page-layout-with-columns
 
@@ -17,7 +17,7 @@ namespace ChartBinding
 {
     public partial class Form1 : Form
     {
-        public DataTable dataTable = new DataTable();
+        public static DataTable dataTable = new DataTable();
         public static Boolean engineerDebug = false;
         public static double cper = 18;
         public static string lineId;
@@ -26,13 +26,12 @@ namespace ChartBinding
         public static int fileDateFormat = 1;
         public static string meterNumber;
         public static string gravityFileName;
-        public GravityChartForm GravityChartForm = new GravityChartForm();
-        public GravityDataForm GravityDataForm = new GravityDataForm();
-        public CrossCouplingForm CrossCouplingChartForm = new CrossCouplingForm();
-        public CrossCouplingDataForm CrossCouplingDataForm = new CrossCouplingDataForm();
+        public static bool firstTime = true;
         public EngineeringForm EngineeringForm = new EngineeringForm();
         public SwitchesForm SwitchesForm = new SwitchesForm();
         public FileClass FileClass = new FileClass();
+
+        private delegate void SetChartCallback(object meterData);
 
         public static double[] table1 = {
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -60,25 +59,29 @@ namespace ChartBinding
         private byte[] freshData12 = { 0x4E, 0x00, 0xDF, 0x07, 0x1F, 0x01, 0x14, 0x2C, 0x02, 0x24, 0x3E, 0x9D, 0x45, 0xC0, 0xC8, 0xD3, 0xC4, 0xEE, 0xAB, 0xEB, 0xC0, 0x21, 0x85, 0xE8, 0xBD, 0x4B, 0x33, 0x58, 0x3D, 0x91, 0x32, 0xE5, 0x3D, 0xA4, 0x5A, 0x3E, 0xB9, 0x0C, 0xBA, 0x6F, 0x3C, 0x34, 0x18, 0x74, 0x3D, 0x94, 0x02, 0x4C, 0xC0, 0xD4, 0x55, 0x0B, 0x41, 0xC4, 0xFE, 0xBC, 0xFE, 0xD1, 0xFE, 0xC4, 0xFE, 0xFF, 0xFF, 0xFF, 0xB0, 0xB7, 0x95, 0x48, 0xFA, 0x95, 0x7E, 0xBF, 0x71, 0x40, 0x82, 0xBE, 0x00, 0xFF, 0xAA };
         public string[] traceName = { "Digital Gravity", "Spring Tension", "Cross Coupling", "Raw Beam", "Total Correction", "Raw Gravity", "AL", "AX", "VE", "AX2", "LACC", "XACC" };
 
+        #region Fields
+
+        // Thread Add Data delegate
+        public delegate void AddDataDelegate();
+
+        public AddDataDelegate addDataDel;
+
+        #endregion Fields
+
         public Form1()
         {
-            
             InitializeComponent();
-            
 
-
-            recordingTextBox.Visible = false;
+            InitializedataGridView();
             DataRow myDataRow = dataTable.NewRow();
             ConfigData configData = new ConfigData();
-            //  SETUP FLOATING DATA GRID
-            GravityDataForm.dataGridView1.ColumnCount = 6;
-            GravityDataForm.dataGridView1.Columns[0].Name = "Date/ Time";
-            GravityDataForm.dataGridView1.Columns[1].Name = "Digital Gravity";
-            GravityDataForm.dataGridView1.Columns[2].Name = "Spring Tension";
-            GravityDataForm.dataGridView1.Columns[3].Name = "Cross Coupling";
-            GravityDataForm.dataGridView1.Columns[4].Name = "Raw Beam";
-            GravityDataForm.dataGridView1.Columns[5].Name = "Total Correction";
 
+            recordingTextBox.Visible = false;
+            this.crossCouplingChart.Palette = ChartColorPalette.Pastel;
+        }
+
+        private void InitializedataGridView()
+        {
             //  SETUP MAIN  DATA GRID
             this.dataGridView1.ColumnCount = 13;
             this.dataGridView1.Columns[0].Name = "Date/ Time";
@@ -94,19 +97,6 @@ namespace ChartBinding
             this.dataGridView1.Columns[10].Name = "AX2";
             this.dataGridView1.Columns[11].Name = "LACC";
             this.dataGridView1.Columns[12].Name = "XACC";
-
-            //  SETUP FLOATING CROSS COUPLING DATA GRID
-            CrossCouplingDataForm.dataGridView2.ColumnCount = 8;
-            CrossCouplingDataForm.dataGridView2.Columns[0].Name = "Date/ Time";
-            CrossCouplingDataForm.dataGridView2.Columns[1].Name = "Raw Gravity";
-            CrossCouplingDataForm.dataGridView2.Columns[2].Name = "AL";
-            CrossCouplingDataForm.dataGridView2.Columns[3].Name = "AX";
-            CrossCouplingDataForm.dataGridView2.Columns[4].Name = "VE";
-            CrossCouplingDataForm.dataGridView2.Columns[5].Name = "AX2";
-            CrossCouplingDataForm.dataGridView2.Columns[6].Name = "LACC";
-            CrossCouplingDataForm.dataGridView2.Columns[7].Name = "XACC";
-
-            this.crossCouplingChart.Palette = ChartColorPalette.Pastel;
         }
 
         public static class ChartColors
@@ -258,8 +248,6 @@ namespace ChartBinding
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            
-
             SetupChart();
             SetupDataTable();
             FileClass.ReadConfigFile();
@@ -279,7 +267,7 @@ namespace ChartBinding
         private void SetupChart()
         {
             BindingSource SBind = new BindingSource();
-
+            SetChartAreaColors(0);
             // this.GravityChart.Series["Digital Gravity"].Label = "Y = #VALY\nX = #VALX"; sample
 
             //      SETUP MAIN PAGE GRAVITY CHART
@@ -287,13 +275,15 @@ namespace ChartBinding
             this.GravityChart.Series["Digital Gravity"].XValueMember = "dateTime";
             this.GravityChart.Series["Digital Gravity"].XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
             this.GravityChart.Series["Digital Gravity"].YValueMembers = "gravity";
-            this.GravityChart.Series["Digital Gravity"].ToolTip = "#VALY";
+            this.GravityChart.Series["Digital Gravity"].ToolTip = "Time = #VALX\n#VALY";
             this.GravityChart.DataSource = dataTable;
             this.GravityChart.DataBind();
 
+            this.GravityChart.Series["Digital Gravity"].XValueType = ChartValueType.DateTime;
+
             this.GravityChart.Series["Spring Tension"].XValueMember = "dateTime";
             this.GravityChart.Series["Spring Tension"].YValueMembers = "springTension";
-            this.GravityChart.Series["Spring Tension"].ToolTip = "#VALY";
+            this.GravityChart.Series["Spring Tension"].ToolTip = "Time = #VALX\n#VALY";
             this.GravityChart.DataSource = dataTable;
             this.GravityChart.DataBind();
 
@@ -322,205 +312,106 @@ namespace ChartBinding
 
             // this.GravityChart.ChartAreas["ChartArea1"].AxisX.Interval = 10;
 
-            //  this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoom(2, 3);
-            //  this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.ZoomReset(1);
-            this.GravityChart.ChartAreas["ChartArea1"].AxisX.LabelStyle.Angle = 0;// can vary from -90 to + 90
-            this.GravityChart.ChartAreas["ChartArea1"].AxisX.LabelStyle.Format = "yyyy-MM-dd HH:mm:ss";
+            // Set cursor interval properties
+            this.GravityChart.ChartAreas["ChartArea1"].CursorX.Interval = .001D;
+            this.GravityChart.ChartAreas["ChartArea1"].CursorX.IntervalType = DateTimeIntervalType.Seconds;
+            this.GravityChart.ChartAreas["ChartArea1"].CursorY.Interval = 1;
+            this.GravityChart.ChartAreas["ChartArea1"].AxisX.LabelStyle.Format = "hh:mm:ss";
 
-            this.GravityChart.ChartAreas["ChartArea1"].CursorX.IsUserEnabled = true;
-            this.GravityChart.ChartAreas["ChartArea1"].CursorX.IsUserSelectionEnabled = true;
-            this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoomable = true;
-            //         this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.IsPositionedInside = false;
+            // Set automatic zooming
+            GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoomable = true;
+            GravityChart.ChartAreas["ChartArea1"].AxisY.ScaleView.Zoomable = true;
 
-            // Change scrollbar colors
-            //            GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.BackColor = System.Drawing.Color.LightGray;
-            //            GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.ButtonColor = System.Drawing.Color.Gray;
-            //            GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.LineColor = System.Drawing.Color.Black;
+            // Set automatic scrolling
+            GravityChart.ChartAreas["ChartArea1"].CursorX.AutoScroll = true;
+            GravityChart.ChartAreas["ChartArea1"].CursorY.AutoScroll = true;
 
-            // Set scrollbar size
-            //            this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.Size = 12;
-            // show either just the center scroll button..
-            //            this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.ButtonStyle = ScrollBarButtonStyles.SmallScroll;
-            // .. or include the left and right buttons:
-            //           this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.ButtonStyle =
-            //                ScrollBarButtonStyles.All ^ ScrollBarButtonStyles.ResetZoom;
+            if (false)
+            {
+                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoom(2, 3);
+                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.ZoomReset(1);
+                this.GravityChart.ChartAreas["ChartArea1"].AxisX.LabelStyle.Angle = 0;// can vary from -90 to + 90
 
-            // Scrollbars position
-            //            this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.IsPositionedInside = true;
-            //            this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.Enabled = true;
-            //   this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Size = 100;  // number (!) of data points visible
+                this.GravityChart.ChartAreas["ChartArea1"].CursorX.IsUserEnabled = true;
+                this.GravityChart.ChartAreas["ChartArea1"].CursorX.IsUserSelectionEnabled = true;
+                this.GravityChart.ChartAreas["ChartArea1"].CursorX.IntervalType = DateTimeIntervalType.Minutes;
+                this.GravityChart.ChartAreas["ChartArea1"].CursorX.Interval = .01;// .1D;
 
+                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollSizeType = DateTimeIntervalType.Minutes;
+                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollSize = .1D;
+                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoomable = true;
+
+                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.MinSizeType = DateTimeIntervalType.Minutes;
+                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.MinSize = .1D;
+
+                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollMinSizeType = DateTimeIntervalType.Minutes;
+                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollMinSize = .1D;
+                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.IsPositionedInside = false;
+
+                // Change scrollbar colors
+                GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.BackColor = System.Drawing.Color.LightGray;
+                GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.ButtonColor = System.Drawing.Color.Gray;
+                GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.LineColor = System.Drawing.Color.Black;
+            }
+
+            if (true)
+            {
+                // Set scrollbar size
+                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.Size = 12;
+                // show either just the center scroll button..
+                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.ButtonStyle = ScrollBarButtonStyles.SmallScroll;
+                // .. or include the left and right buttons:
+                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.ButtonStyle =
+                     ScrollBarButtonStyles.All ^ ScrollBarButtonStyles.ResetZoom;
+
+                // Scrollbars position
+                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.IsPositionedInside = true;
+                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.Enabled = true;
+                // this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Size = 100;  // number (!) of data points visible
+            }
             //  Y AXIS
             //  this.GravityChart.ChartAreas["ChartArea1"].AxisY.ScaleView.ZoomReset(1);
             this.GravityChart.ChartAreas["ChartArea1"].CursorY.IsUserEnabled = true;
             this.GravityChart.ChartAreas["ChartArea1"].CursorY.IsUserSelectionEnabled = true;
             this.GravityChart.ChartAreas["ChartArea1"].AxisY.ScaleView.Zoomable = true;
 
-            if (false)
-            {  //this.GravityChart.Legends["Default"].Enabled = false;
-                Legend legend1 = new Legend("Legend1");
-                LegendItem legendItem1 = new LegendItem("Digital Gravity", ChartColors.digitalGravity, "");
-                legend1.CustomItems.Add(legendItem1);
-                this.GravityChart.Legends.Add(legend1);
-
-                // Set title
-                GravityChart.Legends["Legend1"].Title = "My legend";
-                // Assign the legend to Series1.
-                GravityChart.Series["Digital Gravity"].Legend = "Legend1";
-                GravityChart.Series["Digital Gravity"].IsVisibleInLegend = true;
-                GravityChart.Series["Spring Tension"].Legend = "Legend1";
-                GravityChart.Series["Spring Tension"].IsVisibleInLegend = true;
-
-                // Set tag property for all custom items to appropriate series
-                //this.GravityChart.Legends["Legend1"].CustomItems[1].Tag = GravityChart.Series["Digital Gravity"];
-                //          this.GravityChart.Legends["Legend2"].CustomItems[2].Tag = GravityChart.Series["Spring Tension"];
-                //          this.GravityChart.Legends["Legend2"].CustomItems[3].Tag = GravityChart.Series["Cross Coupling"];
-                //          this.GravityChart.Legends["Legend2"].CustomItems[4].Tag = GravityChart.Series["Raw Beam"];
-                //          this.GravityChart.Legends["Legend2"].CustomItems[4].Tag = GravityChart.Series["Total Correction"];
-            }
-
-            //      SETUP FLOATING GRAVITY CHART
-            GravityChartForm.GravityChart.Series["Digital Gravity"].XValueMember = "dateTime";
-            GravityChartForm.GravityChart.Series["Digital Gravity"].XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
-            GravityChartForm.GravityChart.ChartAreas["ChartArea1"].AxisX.LabelStyle.Format = "yyyy-MM-dd HH:mm:ss";
-            GravityChartForm.GravityChart.ChartAreas["ChartArea1"].AxisX.LabelStyle.Angle = 0;
-            GravityChartForm.GravityChart.Series["Digital Gravity"].YValueMembers = "gravity";
-            GravityChartForm.GravityChart.DataSource = dataTable;
-            GravityChartForm.GravityChart.DataBind();
-
-            GravityChartForm.GravityChart.Series["Spring Tension"].XValueMember = "dateTime";
-            GravityChartForm.GravityChart.Series["Spring Tension"].YValueMembers = "springTension";
-            GravityChartForm.GravityChart.DataSource = dataTable;
-            GravityChartForm.GravityChart.DataBind();
-
-            GravityChartForm.GravityChart.Series["Cross Coupling"].XValueMember = "dateTime";
-            GravityChartForm.GravityChart.Series["Cross Coupling"].YValueMembers = "crossCoupling";
-            GravityChartForm.GravityChart.DataSource = dataTable;
-            GravityChartForm.GravityChart.DataBind();
-
-            GravityChartForm.GravityChart.Series["Raw Beam"].XValueMember = "dateTime";
-            GravityChartForm.GravityChart.Series["Raw Beam"].YValueMembers = "RawBeam";
-            GravityChartForm.GravityChart.DataSource = dataTable;
-            GravityChartForm.GravityChart.DataBind();
-
-            GravityChartForm.GravityChart.Series["Total Correction"].XValueMember = "dateTime";
-            GravityChartForm.GravityChart.Series["Total Correction"].YValueMembers = "TotalCorrection";
-            GravityChartForm.GravityChart.DataSource = dataTable;
-            GravityChartForm.GravityChart.DataBind();
-
-            GravityChartForm.GravityChart.Titles.Add("Gravity");
-
-            GravityChartForm.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoom(2, 3);
-            GravityChartForm.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.ZoomReset(1);
-            GravityChartForm.GravityChart.ChartAreas["ChartArea1"].AxisY.ScaleView.ZoomReset(1);
-            GravityChartForm.GravityChart.ChartAreas["ChartArea1"].AxisX.LabelStyle.Angle = 0;// can vary from -90 to + 90
-
-            //Enable range selection and zooming end user interface
-
-            GravityChartForm.GravityChart.ChartAreas["ChartArea1"].CursorX.IsUserEnabled = true;
-            GravityChartForm.GravityChart.ChartAreas["ChartArea1"].CursorY.IsUserEnabled = true;
-            GravityChartForm.GravityChart.ChartAreas["ChartArea1"].CursorX.IsUserSelectionEnabled = true;
-            GravityChartForm.GravityChart.ChartAreas["ChartArea1"].CursorY.IsUserSelectionEnabled = true;
-            GravityChartForm.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoomable = true;
-            GravityChartForm.GravityChart.ChartAreas["ChartArea1"].AxisY.ScaleView.Zoomable = true;
-            GravityChartForm.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.IsPositionedInside = true;
-            GravityChartForm.GravityChart.ChartAreas["ChartArea1"].AxisY.ScrollBar.IsPositionedInside = true;
-
-            //          Cross Coupling Chart
-
-            //             CROSS COUPLING CHART
-            //      SETUP MAIN PAGE CROSS COUPLING CHART
-            CrossCouplingChartForm.crossCouplingChart.Series["Raw Gravity"].XValueMember = "dateTime";
-            CrossCouplingChartForm.crossCouplingChart.Series["Raw Gravity"].XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
-            CrossCouplingChartForm.crossCouplingChart.ChartAreas["ChartArea1"].AxisX.LabelStyle.Format = "yyyy-MM-dd HH:mm:ss";
-            CrossCouplingChartForm.crossCouplingChart.ChartAreas["ChartArea1"].AxisX.LabelStyle.Angle = 0;
-            CrossCouplingChartForm.crossCouplingChart.Series["Raw Gravity"].YValueMembers = "gravity";
-            CrossCouplingChartForm.crossCouplingChart.DataSource = dataTable;
-            CrossCouplingChartForm.crossCouplingChart.DataBind();
-
-            CrossCouplingChartForm.crossCouplingChart.Series["AL"].XValueMember = "dateTime";
-            CrossCouplingChartForm.crossCouplingChart.Series["AL"].YValueMembers = "springTension";
-            CrossCouplingChartForm.crossCouplingChart.DataSource = dataTable;
-            CrossCouplingChartForm.crossCouplingChart.DataBind();
-
-            CrossCouplingChartForm.crossCouplingChart.Series["AX"].XValueMember = "dateTime";
-            CrossCouplingChartForm.crossCouplingChart.Series["AX"].YValueMembers = "crossCoupling";
-            CrossCouplingChartForm.crossCouplingChart.DataSource = dataTable;
-            CrossCouplingChartForm.crossCouplingChart.DataBind();
-
-            CrossCouplingChartForm.crossCouplingChart.Series["VE"].XValueMember = "dateTime";
-            CrossCouplingChartForm.crossCouplingChart.Series["VE"].YValueMembers = "RawBeam";
-            CrossCouplingChartForm.crossCouplingChart.DataSource = dataTable;
-            CrossCouplingChartForm.crossCouplingChart.DataBind();
-
-            CrossCouplingChartForm.crossCouplingChart.Series["AX2"].XValueMember = "dateTime";
-            CrossCouplingChartForm.crossCouplingChart.Series["AX2"].YValueMembers = "TotalCorrection";
-            CrossCouplingChartForm.crossCouplingChart.DataSource = dataTable;
-            CrossCouplingChartForm.crossCouplingChart.DataBind();
-
-            CrossCouplingChartForm.crossCouplingChart.Series["XACC"].XValueMember = "dateTime";
-            CrossCouplingChartForm.crossCouplingChart.Series["XACC"].YValueMembers = "TotalCorrection";
-            CrossCouplingChartForm.crossCouplingChart.DataSource = dataTable;
-            CrossCouplingChartForm.crossCouplingChart.DataBind();
-
-            CrossCouplingChartForm.crossCouplingChart.Series["LACC"].XValueMember = "dateTime";
-            CrossCouplingChartForm.crossCouplingChart.Series["LACC"].YValueMembers = "TotalCorrection";
-            CrossCouplingChartForm.crossCouplingChart.DataSource = dataTable;
-            CrossCouplingChartForm.crossCouplingChart.DataBind();
-
-            //    CrossCouplingChartForm.crossCouplingChart.Titles.Add("Cross Coupling");
-
-            CrossCouplingChartForm.crossCouplingChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoom(2, 3);
-            CrossCouplingChartForm.crossCouplingChart.ChartAreas["ChartArea1"].AxisX.ScaleView.ZoomReset(1);
-            CrossCouplingChartForm.crossCouplingChart.ChartAreas["ChartArea1"].AxisY.ScaleView.ZoomReset(1);
-            CrossCouplingChartForm.crossCouplingChart.ChartAreas["ChartArea1"].AxisX.LabelStyle.Angle = 0;// can vary from -90 to + 90
-            //Enable range selection and zooming end user interface
-
-            CrossCouplingChartForm.crossCouplingChart.ChartAreas["ChartArea1"].CursorX.IsUserEnabled = true;
-            CrossCouplingChartForm.crossCouplingChart.ChartAreas["ChartArea1"].CursorY.IsUserEnabled = true;
-            CrossCouplingChartForm.crossCouplingChart.ChartAreas["ChartArea1"].CursorX.IsUserSelectionEnabled = true;
-            CrossCouplingChartForm.crossCouplingChart.ChartAreas["ChartArea1"].CursorY.IsUserSelectionEnabled = true;
-            CrossCouplingChartForm.crossCouplingChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoomable = true;
-            CrossCouplingChartForm.crossCouplingChart.ChartAreas["ChartArea1"].AxisY.ScaleView.Zoomable = true;
-            CrossCouplingChartForm.crossCouplingChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.IsPositionedInside = true;
-            CrossCouplingChartForm.crossCouplingChart.ChartAreas["ChartArea1"].AxisY.ScrollBar.IsPositionedInside = true;
-
             //      SETUP FLOATING CROSS COUPLING CHART
             this.crossCouplingChart.Series["Raw Gravity"].XValueMember = "dateTime";
             this.crossCouplingChart.Series["Raw Gravity"].XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
             this.crossCouplingChart.ChartAreas["ChartArea1"].AxisX.LabelStyle.Format = "yyyy-MM-dd HH:mm:ss";
+            this.crossCouplingChart.ChartAreas["ChartArea1"].AxisX.LabelStyle.Format = "hh:mm:ss";
             this.crossCouplingChart.ChartAreas["ChartArea1"].AxisX.LabelStyle.Angle = 0;
             this.crossCouplingChart.Series["Raw Gravity"].YValueMembers = "gravity";
             this.crossCouplingChart.DataSource = dataTable;
             this.crossCouplingChart.DataBind();
 
             this.crossCouplingChart.Series["AL"].XValueMember = "dateTime";
-            this.crossCouplingChart.Series["AL"].YValueMembers = "springTension";
+            this.crossCouplingChart.Series["AL"].YValueMembers = "AL";
             this.crossCouplingChart.DataSource = dataTable;
             this.crossCouplingChart.DataBind();
 
             this.crossCouplingChart.Series["AX"].XValueMember = "dateTime";
-            this.crossCouplingChart.Series["AX"].YValueMembers = "crossCoupling";
+            this.crossCouplingChart.Series["AX"].YValueMembers = "AX";
             this.crossCouplingChart.DataSource = dataTable;
             this.crossCouplingChart.DataBind();
 
             this.crossCouplingChart.Series["VE"].XValueMember = "dateTime";
-            this.crossCouplingChart.Series["VE"].YValueMembers = "RawBeam";
+            this.crossCouplingChart.Series["VE"].YValueMembers = "VE";
             this.crossCouplingChart.DataSource = dataTable;
             this.crossCouplingChart.DataBind();
 
             this.crossCouplingChart.Series["AX2"].XValueMember = "dateTime";
-            this.crossCouplingChart.Series["AX2"].YValueMembers = "TotalCorrection";
+            this.crossCouplingChart.Series["AX2"].YValueMembers = "AX2";
             this.crossCouplingChart.DataSource = dataTable;
             this.crossCouplingChart.DataBind();
 
             this.crossCouplingChart.Series["XACC"].XValueMember = "dateTime";
-            this.crossCouplingChart.Series["XACC"].YValueMembers = "TotalCorrection";
+            this.crossCouplingChart.Series["XACC"].YValueMembers = "XACC2";
             this.crossCouplingChart.DataSource = dataTable;
             this.crossCouplingChart.DataBind();
 
             this.crossCouplingChart.Series["LACC"].XValueMember = "dateTime";
-            this.crossCouplingChart.Series["LACC"].YValueMembers = "TotalCorrection";
+            this.crossCouplingChart.Series["LACC"].YValueMembers = "LACC";
             this.crossCouplingChart.DataSource = dataTable;
             this.crossCouplingChart.DataBind();
 
@@ -700,7 +591,8 @@ namespace ChartBinding
             // Add the custTable to the DataSet.
             dtSet.Tables.Add(dataTable);
         }
-        public void ChartMarkers( bool enable)
+
+        public void ChartMarkers(bool enable)
         {
             if (enable == true)
             {
@@ -735,6 +627,7 @@ namespace ChartBinding
                 this.crossCouplingChart.Series["XACC"].MarkerStyle = MarkerStyle.None;
             }
         }
+
         public void UpdateChart()
         {
             //   DataTable dataTable = new DataTable();
@@ -748,20 +641,20 @@ namespace ChartBinding
             this.GravityChart.Series["Cross Coupling"].Points.AddXY(myDateTime, MeterData.data4[4]);
             this.GravityChart.Series["Raw Beam"].Points.AddXY(myDateTime, MeterData.data1[5]);
             this.GravityChart.Series["Total Correction"].Points.AddXY(myDateTime, MeterData.totalCorrection);
-            
 
+            if (firstTime)
+            {
+                //  this.GravityChart.ChartAreas[0].AxisX.Maximum = myDateTime.AddMinutes(1).ToOADate();
+                this.GravityChart.ChartAreas[0].AxisX.IntervalType = DateTimeIntervalType.Seconds;
+                this.GravityChart.ChartAreas[0].AxisX.Interval = 10;
+                //  this.GravityChart.ChartAreas[0].AxisX.Maximum = myDateTime.AddMinutes(10).Date.ToOADate();
 
+                long ticks = myDateTime.Ticks;
+                this.GravityChart.ChartAreas[0].AxisX.Minimum = myDateTime.ToOADate();//42291.863;
+                firstTime = false;
+            }
 
             this.GravityChart.Update();
-
-            //      UPDATE FLOATING GRAVITY CHART
-
-            GravityChartForm.GravityChart.Series["Digital Gravity"].Points.AddXY(myDateTime, MeterData.data4[2]);
-            GravityChartForm.GravityChart.Series["Spring Tension"].Points.AddXY(myDateTime, MeterData.data1[3]);
-            GravityChartForm.GravityChart.Series["Cross Coupling"].Points.AddXY(myDateTime, MeterData.data4[4]);
-            GravityChartForm.GravityChart.Series["Raw Beam"].Points.AddXY(myDateTime, MeterData.data1[5]);
-            GravityChartForm.GravityChart.Series["Total Correction"].Points.AddXY(myDateTime, MeterData.totalCorrection);
-            GravityChartForm.GravityChart.Update();
 
             //      UPDATE MAIN CROSS COUPLING CHART
 
@@ -774,12 +667,29 @@ namespace ChartBinding
             this.crossCouplingChart.Series["XACC"].Points.AddXY(myDateTime, MeterData.data4[14]);
             this.crossCouplingChart.Update();
 
+            this.SetChartBorderWidth(2);
 
+            if (false)
+            {
+                if (this.GravityChart.ChartAreas[0].AxisX.ScaleView.IsZoomed)
+                {
+                    double offset = this.GravityChart.ChartAreas[0].AxisX.Minimum - this.GravityChart.ChartAreas[0].AxisX.ScaleView.Position;
 
-            SetChartBorderWidth(2);
-
-
-
+                    this.GravityChart.ChartAreas[0].AxisX.LabelStyle.IntervalOffset = offset;
+                    this.GravityChart.ChartAreas[0].AxisX.MajorGrid.IntervalOffset = offset;
+                    this.GravityChart.ChartAreas[0].AxisX.MajorTickMark.IntervalOffset = offset;
+                    this.GravityChart.ChartAreas[0].AxisX.MinorGrid.IntervalOffset = offset;
+                    this.GravityChart.ChartAreas[0].AxisX.MinorTickMark.IntervalOffset = offset;
+                }
+                else
+                {
+                    this.GravityChart.ChartAreas[0].AxisX.LabelStyle.IntervalOffset = 0;
+                    this.GravityChart.ChartAreas[0].AxisX.MajorGrid.IntervalOffset = 0;
+                    this.GravityChart.ChartAreas[0].AxisX.MajorTickMark.IntervalOffset = 0;
+                    this.GravityChart.ChartAreas[0].AxisX.MinorGrid.IntervalOffset = 0;
+                    this.GravityChart.ChartAreas[0].AxisX.MinorTickMark.IntervalOffset = 0;
+                }
+            }
         }
 
         private void oneSecStuff()// change to array    double[] data1, double[] data2, double[] data3, double ccFact
@@ -807,7 +717,8 @@ namespace ChartBinding
             MeterData.oldBeam = MeterData.beam;
             MeterData.totalCorrection = MeterData.beamFirstDifference * 3 + MeterData.data4[4];   // Scale velocity to mGal & add cross coupling
             MeterData.rAwg = MeterData.data4[3] + MeterData.totalCorrection;                      // Add spring tension
-            MeterData.data4[2] = DigitalFilter(MeterData.data4[2]);               // Filter with LaCoste 60 point table
+            MeterData.data4[2] = DigitalFilter(MeterData.rAwg);               // Filter with LaCoste 60 point table
+
             MeterData.gravity = UpLook(MeterData.data4[2]) + .05;                 // Apply calibration table
         }
 
@@ -816,40 +727,50 @@ namespace ChartBinding
             // CONVERTS GRAVITY VALUES ACCORDING TO THE CALIBRATION TABLE
             // FOR METERS WITH A CONSTANT CALIBRATION FACTOR, A DUMMY
             // CALIBRATION TABLE MUST BE CREATED USING MKTABLE.
-            int IND;
+            int ind;
+            double upLook;
+            ind = Convert.ToInt32(Math.Abs(gVal/100)) ;;
 
-            IND = Convert.ToInt32(gVal / 100);
-            if (IND > 120) IND = 120;
-            //        UPLOOK = TABLE(1,IND) + (gVal-(IND*100))*  TABLE(2,IND);
+            if (ind > 60)
+            {
+                ind = 60;
+            }
+            upLook = table1[ind] + (gVal - (ind * 100)) * table2[ind];
 
             return gVal;
         }
 
         private double DigitalFilter(double data)// PERFORMS 60 POINT DIGITAL FILTER ON GRAVITY
         {
-            /*
-                    private double[] GT;
-                    int nPoint = 0;
+            double[] GT = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            double[] DATA = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            int K;
+            double dfilt;
+            int nPoint = 0;
 
-                    DATA GT,/60*0.,0/
             // FILTER WEIGHTS
-                    private double[] filterWeights = {-.00034,-.00038,-.00041,-.00044,-.00046,-.00046,-.00044,-.00039,-.00030,-.00015,.00007,.00037,.00079,.00133,.00202,.00289,.00396,.00526,.00679,.00859,.01066,.01299,.01558,.01841,.02143,.02460,.02785,.03110,.03426,.03723,.03992,.04223,.04408,.04539,.04613,.04626,.04579,.04474,.04315,.04109,.03864,.03589,.03292,.02984,.02671,.02362,.02063,.01780,.01516,.01274,.01056,.00863,.00694,.00548,.00424,.00321,.00235,.00166,.00111,.00068};
+            double[] filterWeights = { -.00034, -.00038, -.00041, -.00044, -.00046, -.00046, -.00044, -.00039, -.00030, -.00015, .00007, .00037, .00079, .00133, .00202, .00289, .00396, .00526, .00679, .00859, .01066, .01299, .01558, .01841, .02143, .02460, .02785, .03110, .03426, .03723, .03992, .04223, .04408, .04539, .04613, .04626, .04579, .04474, .04315, .04109, .03864, .03589, .03292, .02984, .02671, .02362, .02063, .01780, .01516, .01274, .01056, .00863, .00694, .00548, .00424, .00321, .00235, .00166, .00111, .00068 };
+            nPoint++;
+            if (nPoint >= 60)
+            {
+                nPoint = 0;
+            }
 
-                    nPoint++;
-                    if (nPoint > 60)
-                    {nPoint = 1;}
-                    GT(nPoint) = G
-                    K = nPoint
-                    DFILT = 0.
-                    DO 100 I=1,60
-                    K = K + 1
-                    IF (K .GT. 60) K = 1
-            100     DFILT = DFILT + FW(I)*(GT(K)-GT(1))
-                    DFILT = DFILT + GT(1)
-                    END
-             *
-             * */
-            return data;
+            GT[nPoint] = data;
+            K = nPoint;
+            dfilt = 0;
+
+            for (int i = 0; i < 60; i++)
+            {
+                K++;
+                if (K >= 60)
+                {
+                    K = 0;
+                }
+
+                dfilt = dfilt + filterWeights[i] * GT[K] - GT[1];
+            }
+            return dfilt;
         }
 
         private void Filter320()        //(double[] data1, double[] data2, double[] data3, double[] data4);
@@ -876,7 +797,6 @@ namespace ChartBinding
 
             DateTime myDateTime = firstDateTime.AddDays(MeterData.day - 1);
             bool normalGravity = true;
-
             string digitalGravity = MeterData.data4[2].ToString("F4");
             string springTension = MeterData.data1[3].ToString("F4");
             string crossCoupling = MeterData.data4[4].ToString("F4");
@@ -897,10 +817,8 @@ namespace ChartBinding
                 //string[] row1 = new string[] { Convert.ToString(myDateTime), digitalGravity, springTension, crossCoupling, rawBeam, totalCorrection };
                 string[] row1 = new string[] { Convert.ToString(myDateTime), digitalGravity, springTension, crossCoupling, rawBeam, totalCorrection, rawGravity, AL, AX, VE, AX2, LACC, XACC };
 
-                GravityDataForm.dataGridView1.Rows.Add(row1);
                 this.dataGridView1.Rows.Add(row1);
             }
-            GravityDataForm.dataGridView1.Update();
             this.dataGridView1.Update();
         }
 
@@ -933,26 +851,95 @@ namespace ChartBinding
             }
         }
 
-        private void button4_Click_1(object sender, EventArgs e)
+        private void GetMeterData()
         {
             MeterData MeterData = new MeterData();
             //    MeterData.CheckMeterDataSim();
+
+            MeterData Class1 = new MeterData();
+
+            DataGridView dataGridView1 = new DataGridView();
+
+            int arrayLength = mySimData.simData.GetLength(1);
+            int arrayWidth = mySimData.simData.GetLength(0);
+            byte[] byteArray = new byte[arrayWidth];
+
+            for (int ii = 0; ii < arrayWidth; ii++)
+            {
+                var task = Task.Factory.StartNew(() =>
+                {
+                    for (int i = 0; i < arrayLength; i++)
+                    {
+                        byteArray[i] = mySimData.simData[ii, i];
+                    }
+
+                    Class1.CheckMeterData(byteArray);
+                    oneSecStuff();
+                    AddDataToGrid();
+                    UpdateChart();
+                    Thread.Sleep(1000);
+                });
+            }
+        }
+
+        [DelimitedRecord(",")]
+        public class Orders
+        {
+            public string LineID;
+
+            public int Year;
+            public int Days;
+            public int Hour;
+            public int Minute;
+            public int Second;
+
+            [FieldConverter(ConverterKind.Double)]
+            public double Gravity;
+
+            public double SpringTension;
+            public double CrossCoupling;
+            public double AvgBeam;
+            public double VCC;
+            public double AL;
+            public double AX;
+            public double VE;
+            public double AX2;
+            public double XACC2;
+            public double LACC2;
+            public double XACC;
+            public double LACC;
+            public double Period;
+            public double ParallelData;
+
+            //  [FieldConverter(ConverterKind.Double)]
+            public double AUX1;
+
+            public double AUX2;
+            public double AUX3;
+            //  public double AUX4;
+        }
+
+        private void ArrayData()
+        {
+            MeterData MeterData = new MeterData();
+            MeterData Class1 = new MeterData();
+
+            DataGridView dataGridView1 = new DataGridView();
+
+            int arrayLength = mySimData.simData.GetLength(1);
+            int arrayWidth = mySimData.simData.GetLength(0);
+            byte[] byteArray = new byte[arrayWidth];
 
             if (surveyName == "dude")
             {
                 // MessageBox.Show("Survey name cannot be empty.");
             }
+            //////////////////////////////////////////////////////////
             else
             {
-                recordingTextBox.Visible = true;
-                Thread.Sleep(100);
-                MeterData Class1 = new MeterData();
+                //  recordingTextBox.Visible = true;
 
-                DataGridView dataGridView1 = new DataGridView();
-
-                int arrayLength = mySimData.simData.GetLength(1);
-                int arrayWidth = mySimData.simData.GetLength(0);
-                byte[] byteArray = new byte[arrayWidth];
+                // start new thread here GetMeterData();
 
                 for (int ii = 0; ii < arrayWidth; ii++)
                 {
@@ -966,156 +953,223 @@ namespace ChartBinding
                     AddDataToGrid();
                     UpdateChart();
                     FileClass.RecordDataToFile("Append");
+
+                    // Thread.Sleep(1000);
                 }
-
-                /*
-
-                                Class1.CheckMeterData(freshData1);
-                                oneSecStuff();
-                                if (MeterData.Sec % 10 == 0)
-                                {
-                                    TenSecondStuff();
-                                }
-
-                                AddDataToGrid();
-                                UpdateChart();
-                                //   Thread.Sleep(1000);
-
-                                Class1.CheckMeterData(freshData2);
-                                oneSecStuff();
-                                AddDataToGrid();
-                                UpdateChart();
-                                //Thread.Sleep(1000);
-
-                                Class1.CheckMeterData(freshData3);
-                                oneSecStuff();
-                                AddDataToGrid();
-                                UpdateChart();
-                                //Thread.Sleep(1000);
-
-                                Class1.CheckMeterData(freshData4);
-                                oneSecStuff();
-                                AddDataToGrid();
-                                UpdateChart();
-                                // Thread.Sleep(1000);
-
-                                Class1.CheckMeterData(freshData5);
-                                oneSecStuff();
-                                AddDataToGrid();
-                                UpdateChart();
-                                // Thread.Sleep(1000);
-
-                                Class1.CheckMeterData(freshData6);
-                                oneSecStuff();
-                                AddDataToGrid();
-                                UpdateChart();
-                                // Thread.Sleep(1000);
-
-                                Class1.CheckMeterData(freshData7);
-                                oneSecStuff();
-                                AddDataToGrid();
-                                UpdateChart();
-                                // Thread.Sleep(1000);
-
-                                Class1.CheckMeterData(freshData8);
-                                oneSecStuff();
-                                AddDataToGrid();
-                                UpdateChart();
-                                // Thread.Sleep(1000);
-
-                                Class1.CheckMeterData(freshData9);
-                                oneSecStuff();
-                                AddDataToGrid();
-                                UpdateChart();
-                                // Thread.Sleep(1000);
-
-                                Class1.CheckMeterData(freshData10);
-                                oneSecStuff();
-                                AddDataToGrid();
-                                UpdateChart();
-                                // Thread.Sleep(1000);
-
-                                Class1.CheckMeterData(freshData11);
-                                oneSecStuff();
-                                AddDataToGrid();
-                                UpdateChart();
-                                // Thread.Sleep(1000);
-
-                                Class1.CheckMeterData(freshData12);
-                                oneSecStuff();
-                                AddDataToGrid();
-                                UpdateChart();
-                 *
-                 *
-                 * */
+                //      FileClass.RecordDataToFile("Append");
             }
         }
 
-        private void UpdateStuff()
+        public class myData//  set this up so all chart data in in one class.  Maybe not needed use MeterData
         {
+            public DateTime Date;
+            public string LineID;
+            public int Year;
+            public int Days;
+            public int Hour;
+            public int Minute;
+            public int Second;
+            public double Gravity;
+            public double SpringTension;
+            public double CrossCoupling;
+            public double RawBeam;
+            public double TotalCorrection;
+            public double RawGravity;
+            public double VCC;
+            public double AL;
+            public double AX;
+            public double VE;
+            public double AX2;
+            public double XACC2;
+            public double LACC2;
+            public double XACC;
+            public double LACC;
+            public double Period;
+            public double ParallelData;
+            public double AUX1;
+            public double AUX2;
+            public double AUX3;
+            public double AUX4;
         }
 
-        private void gravityChartToolStripMenuItem_Click(object sender, EventArgs e)
+        public void UpdateChartThreadSafe(myData d)
         {
-            if (GravityChartForm != null)
+            //      UPDATE MAIN GRAVITY CHART
+            GravityChart.Series["Digital Gravity"].Points.AddXY(d.Date, d.Gravity);
+            GravityChart.Series["Spring Tension"].Points.AddXY(d.Date, d.SpringTension);
+            GravityChart.Series["Cross Coupling"].Points.AddXY(d.Date, d.CrossCoupling);
+            GravityChart.Series["Raw Beam"].Points.AddXY(d.Date, d.RawBeam);
+            GravityChart.Series["Total Correction"].Points.AddXY(d.Date, d.TotalCorrection);
+            GravityChart.Update();
+
+            //  crossCouplingChart.Series["Raw Gravity"].Points.AddXY(d.Date, d.ra);
+            crossCouplingChart.Series["AL"].Points.AddXY(d.Date, d.AL);
+            crossCouplingChart.Series["AX"].Points.AddXY(d.Date, d.AX);
+            crossCouplingChart.Series["VE"].Points.AddXY(d.Date, d.VE);
+            crossCouplingChart.Series["AX2"].Points.AddXY(d.Date, d.AX2);
+            crossCouplingChart.Series["LACC"].Points.AddXY(d.Date, d.LACC);
+            crossCouplingChart.Series["XACC"].Points.AddXY(d.Date, d.XACC);
+            crossCouplingChart.Update();
+        }
+
+        private void AddDataPoint(myData d)// this will be the new update chart etc.
+        {
+            //    DateTime firstDateTime = new DateTime(2015, 1, 1, d.Hour, d.Minute, d.Second);
+            //    DateTime myDateTime = firstDateTime.AddDays(d.Days - 1);
+            //  firstDateTime.AddDays(d.Days - 1);
+
+            if (this.InvokeRequired)
             {
-                GravityChartForm.Show();
+                this.Invoke(new Action<myData>(this.AddDataPoint), new object[] { d });
             }
             else
             {
-                GravityChartForm.Hide();
+                // Chart1.Series[0].Points.AddXY(d.X, d.Y);
+
+                UpdateChartThreadSafe(d);
+                AddDataToGridThreadSafe(d);
             }
         }
 
-        private void crossCouplingChartToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ArrayDataWorker(object obj)
         {
-            if (CrossCouplingChartForm != null)
+            MeterData MeterData = new MeterData();
+            MeterData Class1 = new MeterData();
+            Orders myOrders = new Orders();
+            var _delegate = (Action<myData>)obj;
+            DataGridView dataGridView1 = new DataGridView();
+
+            int arrayLength = mySimData.simData.GetLength(1);
+            int arrayWidth = mySimData.simData.GetLength(0);
+            byte[] byteArray = new byte[arrayWidth];
+
+            if (surveyName == "dude")
             {
-                CrossCouplingChartForm.Show();
+                // MessageBox.Show("Survey name cannot be empty.");
             }
+            //////////////////////////////////////////////////////////
             else
             {
-                CrossCouplingChartForm.Hide();
+                //    recordingTextBox.Visible = true;
+
+                for (int ii = 0; ii < arrayWidth; ii++)
+                {
+                    for (int i = 0; i < arrayLength; i++)
+                    {
+                        byteArray[i] = mySimData.simData[ii, i];
+                    }
+
+                    Class1.CheckMeterData(byteArray);
+                    DateTime firstDateTime = new DateTime(2015, 1, 1, MeterData.Hour, MeterData.Min, MeterData.Sec);
+                    DateTime myDateTime = firstDateTime.AddDays(MeterData.day - 1);
+                    oneSecStuff();
+                    _delegate(new myData
+                    {
+                        Date = myDateTime,
+                        Year = MeterData.year,
+                        Days = MeterData.day,
+                        Hour = MeterData.Hour,
+                        Minute = MeterData.Min,
+                        Second = MeterData.Sec,
+                        Gravity = MeterData.data4[2],
+                        CrossCoupling = MeterData.data4[4],
+                        SpringTension = MeterData.data1[3],
+                        RawBeam = MeterData.data1[5],
+                        TotalCorrection = MeterData.totalCorrection,
+                        RawGravity = MeterData.data4[2],
+                        AL = MeterData.data4[7],
+                        AX = MeterData.data4[8],
+                        VE = MeterData.data4[9],
+                        XACC = MeterData.data4[13],
+                        LACC = MeterData.data4[14]
+                    });
+                    Thread.Sleep(1000);
+                    //   AddDataToGrid();
+                    //   UpdateChart();
+                    //  FileClass.RecordDataToFile("Append");
+
+                    // Thread.Sleep(1000);
+                }
+                //      FileClass.RecordDataToFile("Append");
             }
         }
 
-        private void gravityDataToolStripMenuItem_Click(object sender, EventArgs e)
+        private void worker(object obj)// this method will get data from Marine Data File
         {
-            if (GravityDataForm != null)
+            Orders myOrders = new Orders();
+
+            var _delegate = (Action<myData>)obj;
+
+            var engine = new FileHelperEngine<Orders>();
+            var records = engine.ReadFile("C:\\Users\\User\\Desktop\\ChartBinding\\Marine data.csv");
+            foreach (var record in records)
             {
-                GravityDataForm.Show();
-            }
-            else
-            {
-                GravityDataForm.Hide();
+                DateTime firstDateTime = new DateTime(2015, 1, 1, record.Hour, record.Minute, record.Second);
+                DateTime myDateTime = firstDateTime.AddDays(record.Days - 1);
+
+                _delegate(new myData { Date = myDateTime, Year = record.Year, Days = record.Days, Hour = record.Hour, Minute = record.Minute, Second = record.Second, Gravity = record.Gravity, CrossCoupling = record.CrossCoupling, SpringTension = record.SpringTension, RawBeam = record.AvgBeam, AL = record.AL, AX = record.AX, VE = record.VE, XACC = record.XACC, LACC = record.LACC });
+                //   Console.WriteLine(record.Days);
+                //   Console.WriteLine(record.Gravity);
+                //   Console.WriteLine(record.CrossCoupling);
+                Thread.Sleep(1000);
             }
         }
 
-        private void crossCouplingDataToolStripMenuItem_Click(object sender, EventArgs e)
+        private void AddDataToGridThreadSafe(myData d)
         {
-            if (CrossCouplingDataForm != null)
+            bool normalGravity = true;
+            string date = Convert.ToString(d.Date);
+            string digitalGravity = d.Gravity.ToString("F4");
+            string springTension = d.SpringTension.ToString("F4");
+            string crossCoupling = d.CrossCoupling.ToString("F4");
+            string rawBeam = d.Gravity.ToString("F4");
+            string totalCorrection = MeterData.totalCorrection.ToString("F4");
+            string rawGravity = MeterData.data4[2].ToString("F4");
+            string AL = d.AL.ToString("F4");
+            string AX = d.AX.ToString("F4");
+            string VE = MeterData.data4[9].ToString("F4");
+            string AX2 = MeterData.data4[10].ToString("F4");
+            string LACC = MeterData.data4[13].ToString("F4");
+            string XACC = MeterData.data4[14].ToString("F4");
+
+            if (normalGravity)
             {
-                CrossCouplingDataForm.Show();
+                //                    line id,                 date/time,                  digital gravity,                            st,                               cross coupling                raw beam,                    tc(total correction
+                string[] row1 = new string[] { date, digitalGravity, springTension, crossCoupling, rawBeam, totalCorrection, rawGravity, AL, AX, VE, AX2, LACC, XACC };
+
+                this.dataGridView1.Rows.Add(row1);
             }
-            else
+            this.dataGridView1.Update();
+        }
+
+        private void ReadMarineDataFile()
+        {
+            var engine = new FileHelperEngine<Orders>();
+            var records = engine.ReadFile("C:\\Users\\User\\Desktop\\ChartBinding\\Marine data.csv");
+            foreach (var record in records)
             {
-                CrossCouplingDataForm.Hide();
+                //   Console.WriteLine(record.Year);
+                //   Console.WriteLine(record.Gravity);
+                //   Console.WriteLine(record.SpringTension);
             }
         }
 
-        private void allToolStripMenuItem_Click(object sender, EventArgs e)
+        private void startButton_Click(object sender, EventArgs e)
         {
-            GravityChartForm.Show();
-            GravityDataForm.Show();
-            CrossCouplingChartForm.Show();
-            CrossCouplingDataForm.Hide();
+            //    ArrayData();
+            //      GetFileData();
+
+            //   ReadMarineDataFile();
+            new Thread(new ParameterizedThreadStart(ArrayDataWorker)).Start(new Action<myData>(this.AddDataPoint));
+
+            //  new Thread(new ParameterizedThreadStart(worker)).Start(new Action<myData>(this.AddDataPoint));
         }
 
         private void exitProgramToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (System.Windows.Forms.Application.MessageLoop)
             {
-                // WinForms app
+                // WinForms
                 System.Windows.Forms.Application.Exit();
             }
             else
@@ -1164,12 +1218,6 @@ namespace ChartBinding
         {
             crossCouplingChart.Printing.PageSetup();
             crossCouplingChart.Printing.PrintPreview();
-        }
-
-        private void gravityChartToolStripMenuItem1_Click(object sender, EventArgs e)
-        {
-            GravityChartOptionsForm myForm = new GravityChartOptionsForm();
-            myForm.Show();
         }
 
         private void printGravityChartToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1267,9 +1315,7 @@ namespace ChartBinding
 
         private void traceTrackBar_Scroll(object sender, EventArgs e)
         {
-
             SetChartBorderWidth(traceTrackBar.Value);
-
         }
 
         private void traceVisibilityComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -1415,6 +1461,7 @@ namespace ChartBinding
             }
             SetChartVisibility();
         }
+
         public void SetChartBorderWidth(int width)
         {
             this.GravityChart.Series["Digital Gravity"].BorderWidth = width;
@@ -1430,6 +1477,7 @@ namespace ChartBinding
             this.crossCouplingChart.Series["AX"].BorderWidth = width;
             this.crossCouplingChart.Series["AL"].BorderWidth = width;
         }
+
         public void SetChartVisibility()
         {
             if (ChartVisibility.digitalGravity == false)
@@ -1667,24 +1715,16 @@ namespace ChartBinding
 
         private void saveConfigFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            
         }
-
-        
-
-
-
 
         protected void btnExportPDF_Click(object sender, EventArgs e)
         {
-           
         }
 
         private void printGravityChartToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
-
             ChartMarkers(true);
-            iTextSharp.text.Document pdfDoc = new Document(PageSize.A4,  10f, 10f, 10f, 0f);
+            iTextSharp.text.Document pdfDoc = new Document(PageSize.A4, 10f, 10f, 10f, 0f);
             pdfDoc.SetPageSize(iTextSharp.text.PageSize.A4.Rotate());
 
             iTextSharp.text.Font font16Normal = FontFactory.GetFont("Arial", 16, iTextSharp.text.Font.NORMAL, BaseColor.BLACK);
@@ -1693,44 +1733,30 @@ namespace ChartBinding
             pdfDoc.Open();//Open Document to write
             pdfDoc.Add(new Paragraph("         Meter # " + Form1.meterNumber + "                            Survey: " + surveyName, font16Normal));
 
-
             using (MemoryStream stream = new MemoryStream())
             {
                 GravityChart.SaveImage(stream, ChartImageFormat.Png);
                 Image chartImage = Image.GetInstance(stream.GetBuffer());
                 chartImage.ScalePercent(55f);// Scale to 70%
-                //doc.PageSize.Width gives the width in points of the document, 
-                //remove the margin (36 points) and the width of the image (?? points) 
-                //for the X-axis co-ordinate, and the margin and height of the image from the 
+                //doc.PageSize.Width gives the width in points of the document,
+                //remove the margin (36 points) and the width of the image (?? points)
+                //for the X-axis co-ordinate, and the margin and height of the image from the
                 //total height of the document for the Y-axis co-ordinate.
-                chartImage.SetAbsolutePosition(pdfDoc.PageSize.Width - 72f - 750f,pdfDoc.PageSize.Height - 36f - 200f);
-
+                chartImage.SetAbsolutePosition(pdfDoc.PageSize.Width - 72f - 750f, pdfDoc.PageSize.Height - 36f - 200f);
 
                 crossCouplingChart.SaveImage(stream, ChartImageFormat.Png);
                 Image chartImage2 = Image.GetInstance(stream.GetBuffer());
-                chartImage2.ScalePercent(55f);// Scale to 55%       
+                chartImage2.ScalePercent(55f);// Scale to 55%
                 chartImage.SetAbsolutePosition(pdfDoc.PageSize.Width - 72f - 750f, pdfDoc.PageSize.Height - 36f - 400f);
-
 
                 pdfDoc.Add(chartImage);
                 pdfDoc.Add(chartImage2);
                 pdfDoc.Close();
 
-
-              Process.Start("C:\\LCT stuff\\GravityChart.pdf"); 
-
-            
-
-
+                Process.Start("C:\\LCT stuff\\GravityChart.pdf");
             }
             ChartMarkers(false);
         }
-
-
-
-
-
-
 
         private void surveyTextBox_TextChanged(object sender, EventArgs e)
         {
@@ -1742,20 +1768,13 @@ namespace ChartBinding
             ChartMarkers(markersCheckBox.Checked);
         }
 
-
-
         public void LoadUserPreferences()
         {
-
             // file name format
             // file format
             // chart config (background, line colors, enabled traces, markers, line width)
             // auto startup?
-
-
-
         }
-
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
     }

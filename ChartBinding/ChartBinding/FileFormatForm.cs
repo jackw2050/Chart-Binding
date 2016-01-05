@@ -6,7 +6,7 @@ namespace ChartBinding
     public partial class FileFormatForm : Form
     {
 
-        Form1 mainForm = new Form1();
+   //     Form1 mainForm = new Form1();
         public FileFormatForm()
         {
             InitializeComponent();

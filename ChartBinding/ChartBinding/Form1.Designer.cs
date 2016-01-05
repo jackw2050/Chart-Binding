@@ -28,24 +28,24 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series7 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series13 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series14 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series15 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series16 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series17 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series18 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series19 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series8 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series9 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series10 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series11 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series12 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            this.button4 = new System.Windows.Forms.Button();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend4 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series20 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series21 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series22 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series23 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series24 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            this.startButton = new System.Windows.Forms.Button();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveConfigFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -54,12 +54,6 @@
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.surveyInformationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.fileFormatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.gravityChartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.crossCouplingChartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.gravityDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.crossCouplingDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.allToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tempToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setDateTimeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.manualStartupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -71,8 +65,6 @@
             this.helpToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.configureToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.gravityChartToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.crossCouplingChartToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.crossCouplingChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.label1 = new System.Windows.Forms.Label();
@@ -103,6 +95,7 @@
             this.label10 = new System.Windows.Forms.Label();
             this.traceVisibilityComboBox = new System.Windows.Forms.ComboBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.markersCheckBox = new System.Windows.Forms.CheckBox();
             this.traceColorComboBox = new System.Windows.Forms.ComboBox();
             this.chartOptionsButton = new System.Windows.Forms.Button();
             this.surveyTextBox = new System.Windows.Forms.TextBox();
@@ -110,7 +103,7 @@
             this.label11 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
             this.pageSetupDialog1 = new System.Windows.Forms.PageSetupDialog();
-            this.markersCheckBox = new System.Windows.Forms.CheckBox();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.crossCouplingChart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
@@ -119,22 +112,21 @@
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // button4
+            // startButton
             // 
-            this.button4.Location = new System.Drawing.Point(1293, 1);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(75, 23);
-            this.button4.TabIndex = 7;
-            this.button4.Text = "Start";
-            this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.button4_Click_1);
+            this.startButton.Location = new System.Drawing.Point(1293, 1);
+            this.startButton.Name = "startButton";
+            this.startButton.Size = new System.Drawing.Size(75, 23);
+            this.startButton.TabIndex = 7;
+            this.startButton.Text = "Start";
+            this.startButton.UseVisualStyleBackColor = true;
+            this.startButton.Click += new System.EventHandler(this.startButton_Click);
             // 
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.editToolStripMenuItem,
-            this.viewToolStripMenuItem,
             this.tempToolStripMenuItem,
             this.exitProgramToolStripMenuItem,
             this.helpToolStripMenuItem,
@@ -198,53 +190,6 @@
             this.fileFormatToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
             this.fileFormatToolStripMenuItem.Text = "File format";
             this.fileFormatToolStripMenuItem.Click += new System.EventHandler(this.fileFormatToolStripMenuItem_Click);
-            // 
-            // viewToolStripMenuItem
-            // 
-            this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.gravityChartToolStripMenuItem,
-            this.crossCouplingChartToolStripMenuItem,
-            this.gravityDataToolStripMenuItem,
-            this.crossCouplingDataToolStripMenuItem,
-            this.allToolStripMenuItem});
-            this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
-            this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
-            this.viewToolStripMenuItem.Text = "View";
-            // 
-            // gravityChartToolStripMenuItem
-            // 
-            this.gravityChartToolStripMenuItem.Name = "gravityChartToolStripMenuItem";
-            this.gravityChartToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
-            this.gravityChartToolStripMenuItem.Text = "Gravity Chart";
-            this.gravityChartToolStripMenuItem.Click += new System.EventHandler(this.gravityChartToolStripMenuItem_Click);
-            // 
-            // crossCouplingChartToolStripMenuItem
-            // 
-            this.crossCouplingChartToolStripMenuItem.Name = "crossCouplingChartToolStripMenuItem";
-            this.crossCouplingChartToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
-            this.crossCouplingChartToolStripMenuItem.Text = "Cross Coupling Chart";
-            this.crossCouplingChartToolStripMenuItem.Click += new System.EventHandler(this.crossCouplingChartToolStripMenuItem_Click);
-            // 
-            // gravityDataToolStripMenuItem
-            // 
-            this.gravityDataToolStripMenuItem.Name = "gravityDataToolStripMenuItem";
-            this.gravityDataToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
-            this.gravityDataToolStripMenuItem.Text = "Gravity Data";
-            this.gravityDataToolStripMenuItem.Click += new System.EventHandler(this.gravityDataToolStripMenuItem_Click);
-            // 
-            // crossCouplingDataToolStripMenuItem
-            // 
-            this.crossCouplingDataToolStripMenuItem.Name = "crossCouplingDataToolStripMenuItem";
-            this.crossCouplingDataToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
-            this.crossCouplingDataToolStripMenuItem.Text = "Cross Coupling Data";
-            this.crossCouplingDataToolStripMenuItem.Click += new System.EventHandler(this.crossCouplingDataToolStripMenuItem_Click);
-            // 
-            // allToolStripMenuItem
-            // 
-            this.allToolStripMenuItem.Name = "allToolStripMenuItem";
-            this.allToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
-            this.allToolStripMenuItem.Text = "All";
-            this.allToolStripMenuItem.Click += new System.EventHandler(this.allToolStripMenuItem_Click);
             // 
             // tempToolStripMenuItem
             // 
@@ -326,76 +271,60 @@
             // 
             // configureToolStripMenuItem
             // 
-            this.configureToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.gravityChartToolStripMenuItem1,
-            this.crossCouplingChartToolStripMenuItem1});
             this.configureToolStripMenuItem.Name = "configureToolStripMenuItem";
             this.configureToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.configureToolStripMenuItem.Text = "Options";
-            // 
-            // gravityChartToolStripMenuItem1
-            // 
-            this.gravityChartToolStripMenuItem1.Name = "gravityChartToolStripMenuItem1";
-            this.gravityChartToolStripMenuItem1.Size = new System.Drawing.Size(187, 22);
-            this.gravityChartToolStripMenuItem1.Text = "Gravity Chart";
-            this.gravityChartToolStripMenuItem1.Click += new System.EventHandler(this.gravityChartToolStripMenuItem1_Click);
-            // 
-            // crossCouplingChartToolStripMenuItem1
-            // 
-            this.crossCouplingChartToolStripMenuItem1.Name = "crossCouplingChartToolStripMenuItem1";
-            this.crossCouplingChartToolStripMenuItem1.Size = new System.Drawing.Size(187, 22);
-            this.crossCouplingChartToolStripMenuItem1.Text = "Cross Coupling Chart";
             // 
             // crossCouplingChart
             // 
             this.crossCouplingChart.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.crossCouplingChart.BackColor = System.Drawing.Color.WhiteSmoke;
-            chartArea1.AlignmentOrientation = ((System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations)((System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Vertical | System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Horizontal)));
-            chartArea1.Name = "ChartArea1";
-            this.crossCouplingChart.ChartAreas.Add(chartArea1);
-            legend1.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
-            legend1.Name = "Legend1";
-            this.crossCouplingChart.Legends.Add(legend1);
+            chartArea3.AlignmentOrientation = ((System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations)((System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Vertical | System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Horizontal)));
+            chartArea3.Name = "ChartArea1";
+            this.crossCouplingChart.ChartAreas.Add(chartArea3);
+            legend3.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
+            legend3.Name = "Legend1";
+            this.crossCouplingChart.Legends.Add(legend3);
             this.crossCouplingChart.Location = new System.Drawing.Point(0, 426);
             this.crossCouplingChart.Name = "crossCouplingChart";
             this.crossCouplingChart.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Fire;
-            series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series1.Legend = "Legend1";
-            series1.Name = "Raw Gravity";
-            series2.ChartArea = "ChartArea1";
-            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series2.Legend = "Legend1";
-            series2.Name = "AL";
-            series2.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
-            series3.ChartArea = "ChartArea1";
-            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series3.Legend = "Legend1";
-            series3.Name = "AX";
-            series4.ChartArea = "ChartArea1";
-            series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series4.Legend = "Legend1";
-            series4.Name = "VE";
-            series5.ChartArea = "ChartArea1";
-            series5.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series5.Legend = "Legend1";
-            series5.Name = "AX2";
-            series6.ChartArea = "ChartArea1";
-            series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series6.Legend = "Legend1";
-            series6.Name = "LACC";
-            series7.ChartArea = "ChartArea1";
-            series7.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series7.Legend = "Legend1";
-            series7.Name = "XACC";
-            this.crossCouplingChart.Series.Add(series1);
-            this.crossCouplingChart.Series.Add(series2);
-            this.crossCouplingChart.Series.Add(series3);
-            this.crossCouplingChart.Series.Add(series4);
-            this.crossCouplingChart.Series.Add(series5);
-            this.crossCouplingChart.Series.Add(series6);
-            this.crossCouplingChart.Series.Add(series7);
+            series13.ChartArea = "ChartArea1";
+            series13.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series13.Legend = "Legend1";
+            series13.Name = "Raw Gravity";
+            series14.ChartArea = "ChartArea1";
+            series14.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series14.Legend = "Legend1";
+            series14.Name = "AL";
+            series14.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
+            series15.ChartArea = "ChartArea1";
+            series15.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series15.Legend = "Legend1";
+            series15.Name = "AX";
+            series16.ChartArea = "ChartArea1";
+            series16.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series16.Legend = "Legend1";
+            series16.Name = "VE";
+            series17.ChartArea = "ChartArea1";
+            series17.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series17.Legend = "Legend1";
+            series17.Name = "AX2";
+            series18.ChartArea = "ChartArea1";
+            series18.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series18.Legend = "Legend1";
+            series18.Name = "LACC";
+            series19.ChartArea = "ChartArea1";
+            series19.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series19.Legend = "Legend1";
+            series19.Name = "XACC";
+            this.crossCouplingChart.Series.Add(series13);
+            this.crossCouplingChart.Series.Add(series14);
+            this.crossCouplingChart.Series.Add(series15);
+            this.crossCouplingChart.Series.Add(series16);
+            this.crossCouplingChart.Series.Add(series17);
+            this.crossCouplingChart.Series.Add(series18);
+            this.crossCouplingChart.Series.Add(series19);
             this.crossCouplingChart.Size = new System.Drawing.Size(1368, 226);
             this.crossCouplingChart.TabIndex = 20;
             this.crossCouplingChart.Text = "chart1";
@@ -612,45 +541,45 @@
             this.GravityChart.BackImageTransparentColor = System.Drawing.Color.Black;
             this.GravityChart.BackSecondaryColor = System.Drawing.Color.Black;
             this.GravityChart.BorderSkin.PageColor = System.Drawing.Color.Black;
-            chartArea2.AlignmentOrientation = ((System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations)((System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Vertical | System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Horizontal)));
-            chartArea2.AxisY.MajorGrid.LineColor = System.Drawing.Color.Gold;
-            chartArea2.BackColor = System.Drawing.Color.White;
-            chartArea2.Name = "ChartArea1";
-            this.GravityChart.ChartAreas.Add(chartArea2);
-            legend2.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
-            legend2.Name = "Default";
-            this.GravityChart.Legends.Add(legend2);
+            chartArea4.AlignmentOrientation = ((System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations)((System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Vertical | System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Horizontal)));
+            chartArea4.AxisY.MajorGrid.LineColor = System.Drawing.Color.Gold;
+            chartArea4.BackColor = System.Drawing.Color.White;
+            chartArea4.Name = "ChartArea1";
+            this.GravityChart.ChartAreas.Add(chartArea4);
+            legend4.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
+            legend4.Name = "Default";
+            this.GravityChart.Legends.Add(legend4);
             this.GravityChart.Location = new System.Drawing.Point(0, 133);
             this.GravityChart.Name = "GravityChart";
-            series8.ChartArea = "ChartArea1";
-            series8.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series8.LabelAngle = 45;
-            series8.Legend = "Default";
-            series8.Name = "Digital Gravity";
-            series8.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
-            series9.ChartArea = "ChartArea1";
-            series9.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series9.Legend = "Default";
-            series9.Name = "Spring Tension";
-            series9.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
-            series10.ChartArea = "ChartArea1";
-            series10.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series10.Legend = "Default";
-            series10.Name = "Cross Coupling";
-            series11.ChartArea = "ChartArea1";
-            series11.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series11.Legend = "Default";
-            series11.Name = "Raw Beam";
-            series11.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
-            series12.ChartArea = "ChartArea1";
-            series12.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series12.Legend = "Default";
-            series12.Name = "Total Correction";
-            this.GravityChart.Series.Add(series8);
-            this.GravityChart.Series.Add(series9);
-            this.GravityChart.Series.Add(series10);
-            this.GravityChart.Series.Add(series11);
-            this.GravityChart.Series.Add(series12);
+            series20.ChartArea = "ChartArea1";
+            series20.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series20.LabelAngle = 45;
+            series20.Legend = "Default";
+            series20.Name = "Digital Gravity";
+            series20.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
+            series21.ChartArea = "ChartArea1";
+            series21.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series21.Legend = "Default";
+            series21.Name = "Spring Tension";
+            series21.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
+            series22.ChartArea = "ChartArea1";
+            series22.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series22.Legend = "Default";
+            series22.Name = "Cross Coupling";
+            series23.ChartArea = "ChartArea1";
+            series23.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series23.Legend = "Default";
+            series23.Name = "Raw Beam";
+            series23.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
+            series24.ChartArea = "ChartArea1";
+            series24.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series24.Legend = "Default";
+            series24.Name = "Total Correction";
+            this.GravityChart.Series.Add(series20);
+            this.GravityChart.Series.Add(series21);
+            this.GravityChart.Series.Add(series22);
+            this.GravityChart.Series.Add(series23);
+            this.GravityChart.Series.Add(series24);
             this.GravityChart.Size = new System.Drawing.Size(1380, 271);
             this.GravityChart.TabIndex = 20;
             this.GravityChart.Text = "Gravity";
@@ -729,6 +658,17 @@
             this.groupBox1.TabIndex = 50;
             this.groupBox1.TabStop = false;
             // 
+            // markersCheckBox
+            // 
+            this.markersCheckBox.AutoSize = true;
+            this.markersCheckBox.Location = new System.Drawing.Point(483, 21);
+            this.markersCheckBox.Name = "markersCheckBox";
+            this.markersCheckBox.Size = new System.Drawing.Size(64, 17);
+            this.markersCheckBox.TabIndex = 51;
+            this.markersCheckBox.Text = "Markers";
+            this.markersCheckBox.UseVisualStyleBackColor = true;
+            this.markersCheckBox.CheckedChanged += new System.EventHandler(this.markersCheckBox_CheckedChanged);
+            // 
             // traceColorComboBox
             // 
             this.traceColorComboBox.FormattingEnabled = true;
@@ -798,17 +738,6 @@
             this.label12.TabIndex = 54;
             this.label12.Text = "Survey Information";
             // 
-            // markersCheckBox
-            // 
-            this.markersCheckBox.AutoSize = true;
-            this.markersCheckBox.Location = new System.Drawing.Point(483, 21);
-            this.markersCheckBox.Name = "markersCheckBox";
-            this.markersCheckBox.Size = new System.Drawing.Size(64, 17);
-            this.markersCheckBox.TabIndex = 51;
-            this.markersCheckBox.Text = "Markers";
-            this.markersCheckBox.UseVisualStyleBackColor = true;
-            this.markersCheckBox.CheckedChanged += new System.EventHandler(this.markersCheckBox_CheckedChanged);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -846,7 +775,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.crossCouplingChart);
-            this.Controls.Add(this.button4);
+            this.Controls.Add(this.startButton);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
@@ -870,16 +799,10 @@
 
         #endregion
 
-        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button startButton;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem gravityChartToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem crossCouplingChartToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem gravityDataToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem crossCouplingDataToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem allToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem tempToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitProgramToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem surveyInformationToolStripMenuItem;
@@ -920,8 +843,6 @@
         private System.Windows.Forms.PrintDialog printDialog1;
         private System.Windows.Forms.PrintPreviewDialog printPreviewDialog;
         private System.Windows.Forms.ToolStripMenuItem configureToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem gravityChartToolStripMenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem crossCouplingChartToolStripMenuItem1;
         public System.Windows.Forms.DataVisualization.Charting.Chart GravityChart;
         private System.Windows.Forms.ComboBox chartColorComboBox;
         private System.Windows.Forms.TrackBar traceTrackBar;
@@ -936,6 +857,7 @@
         public System.Windows.Forms.TextBox meterNumberTextBox;
         private System.Windows.Forms.PageSetupDialog pageSetupDialog1;
         private System.Windows.Forms.CheckBox markersCheckBox;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
     }
 }
 

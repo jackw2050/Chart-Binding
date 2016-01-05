@@ -80,24 +80,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConfigData.cs" />
-    <Compile Include="CrossCouplingDataForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="CrossCouplingDataForm.Designer.cs">
-      <DependentUpon>CrossCouplingDataForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="CrossCouplingForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="CrossCouplingForm.Designer.cs">
-      <DependentUpon>CrossCouplingForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="CrossCouplingOptionsForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="CrossCouplingOptionsForm.Designer.cs">
-      <DependentUpon>CrossCouplingOptionsForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="DateTimeForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -122,24 +104,6 @@
     </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GravityChartForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GravityChartForm.Designer.cs">
-      <DependentUpon>GravityChartForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GravityChartOptionsForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GravityChartOptionsForm.Designer.cs">
-      <DependentUpon>GravityChartOptionsForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GravityDataForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GravityDataForm.Designer.cs">
-      <DependentUpon>GravityDataForm.cs</DependentUpon>
     </Compile>
     <Compile Include="MeterData.cs" />
     <Compile Include="PasswordForm.cs">
@@ -168,12 +132,6 @@
     <Compile Include="SystemAuxForm.Designer.cs">
       <DependentUpon>SystemAuxForm.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="CrossCouplingDataForm.resx">
-      <DependentUpon>CrossCouplingDataForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="CrossCouplingForm.resx">
-      <DependentUpon>CrossCouplingForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="DateTimeForm.resx">
       <DependentUpon>DateTimeForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -185,15 +143,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GravityChartForm.resx">
-      <DependentUpon>GravityChartForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GravityChartOptionsForm.resx">
-      <DependentUpon>GravityChartOptionsForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GravityDataForm.resx">
-      <DependentUpon>GravityDataForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PasswordForm.resx">
       <DependentUpon>PasswordForm.cs</DependentUpon>
