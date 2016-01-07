@@ -38,12 +38,11 @@
             this.label2 = new System.Windows.Forms.Label();
             this.customFileNameRadioButton = new System.Windows.Forms.RadioButton();
             this.CustomNameTextBox = new System.Windows.Forms.TextBox();
-            this.openFileButton = new System.Windows.Forms.Button();
+            this.exitButton = new System.Windows.Forms.Button();
             this.sampleFileNamelabel = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.cancelButton = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -55,7 +54,7 @@
             this.dateFormatRadioButton1.Size = new System.Drawing.Size(139, 17);
             this.dateFormatRadioButton1.TabIndex = 0;
             this.dateFormatRadioButton1.TabStop = true;
-            this.dateFormatRadioButton1.Text = "2015-Jan-1 15-23-34";
+            this.dateFormatRadioButton1.Text = "2015-Jan-1-15-23-34";
             this.dateFormatRadioButton1.UseVisualStyleBackColor = true;
             this.dateFormatRadioButton1.CheckedChanged += new System.EventHandler(this.dateFormatRadioButton1_CheckedChanged);
             // 
@@ -66,7 +65,7 @@
             this.dateFormatRadioButton2.Size = new System.Drawing.Size(118, 17);
             this.dateFormatRadioButton2.TabIndex = 1;
             this.dateFormatRadioButton2.TabStop = true;
-            this.dateFormatRadioButton2.Text = "2015-1-1 15-23-34";
+            this.dateFormatRadioButton2.Text = "2015-1-1-15-23-34";
             this.dateFormatRadioButton2.UseVisualStyleBackColor = true;
             this.dateFormatRadioButton2.CheckedChanged += new System.EventHandler(this.dateFormatRadioButton2_CheckedChanged);
             // 
@@ -77,7 +76,7 @@
             this.dateFormatRadioButton3.Size = new System.Drawing.Size(128, 17);
             this.dateFormatRadioButton3.TabIndex = 2;
             this.dateFormatRadioButton3.TabStop = true;
-            this.dateFormatRadioButton3.Text = "2015-1 15-23-34";
+            this.dateFormatRadioButton3.Text = "2015-1-15-23-34";
             this.dateFormatRadioButton3.UseVisualStyleBackColor = true;
             this.dateFormatRadioButton3.CheckedChanged += new System.EventHandler(this.dateFormatRadioButton3_CheckedChanged);
             // 
@@ -152,15 +151,15 @@
             this.CustomNameTextBox.TabIndex = 11;
             this.CustomNameTextBox.TextChanged += new System.EventHandler(this.CustomNameTextBox_TextChanged);
             // 
-            // openFileButton
+            // exitButton
             // 
-            this.openFileButton.Location = new System.Drawing.Point(307, 289);
-            this.openFileButton.Name = "openFileButton";
-            this.openFileButton.Size = new System.Drawing.Size(151, 23);
-            this.openFileButton.TabIndex = 12;
-            this.openFileButton.Text = "Open file and exit";
-            this.openFileButton.UseVisualStyleBackColor = true;
-            this.openFileButton.Click += new System.EventHandler(this.openFileButton_Click);
+            this.exitButton.Location = new System.Drawing.Point(383, 300);
+            this.exitButton.Name = "exitButton";
+            this.exitButton.Size = new System.Drawing.Size(75, 23);
+            this.exitButton.TabIndex = 12;
+            this.exitButton.Text = "Exit";
+            this.exitButton.UseVisualStyleBackColor = true;
+            this.exitButton.Click += new System.EventHandler(this.exitButton_Click);
             // 
             // sampleFileNamelabel
             // 
@@ -206,27 +205,16 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Select a date format";
             // 
-            // cancelButton
-            // 
-            this.cancelButton.Location = new System.Drawing.Point(383, 342);
-            this.cancelButton.Name = "cancelButton";
-            this.cancelButton.Size = new System.Drawing.Size(75, 23);
-            this.cancelButton.TabIndex = 18;
-            this.cancelButton.Text = "Cancel";
-            this.cancelButton.UseVisualStyleBackColor = true;
-            this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
-            // 
             // FileFormatForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(481, 386);
             this.ControlBox = false;
-            this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.sampleFileNamelabel);
-            this.Controls.Add(this.openFileButton);
+            this.Controls.Add(this.exitButton);
             this.Controls.Add(this.CustomNameTextBox);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -253,11 +241,10 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.RadioButton customFileNameRadioButton;
         private System.Windows.Forms.TextBox CustomNameTextBox;
-        private System.Windows.Forms.Button openFileButton;
+        private System.Windows.Forms.Button exitButton;
         private System.Windows.Forms.Label sampleFileNamelabel;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.Button cancelButton;
     }
 }

@@ -10,17 +10,11 @@ using System.Windows.Forms;
 
 namespace ChartBinding
 {
-    public partial class SurveyForm : Form
+    public partial class About : Form
     {
-        public SurveyForm()
+        public About()
         {
             InitializeComponent();
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            Form1.surveyName = surveyTextBox.Text;
-            this.Hide();
         }
     }
 }

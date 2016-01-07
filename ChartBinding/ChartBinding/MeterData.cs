@@ -84,24 +84,21 @@ namespace ChartBinding
                 tempByte[2] = 0;
                 tempByte[3] = 0;
                 Min = BitConverter.ToInt32(tempByte, 0);
-                      Console.Write("Min\t" + Min + "\n");
 
                 tempByte[0] = meterBytes[8];
                 tempByte[1] = 0;
                 tempByte[2] = 0;
                 tempByte[3] = 0;
                 Sec = BitConverter.ToInt32(tempByte, 0);
-                        Console.Write("Second\t" + Sec + "\n");
+                      
 
                 tempByte[0] = meterBytes[4];
                 tempByte[1] = meterBytes[5];
                 day = BitConverter.ToInt32(tempByte, 0);
-                      Console.Write("Day\t" + day + "\n");
 
                 tempByte[0] = meterBytes[2];
                 tempByte[1] = meterBytes[3];
                 year = BitConverter.ToInt32(tempByte, 0);
-                     Console.Write("Year\t" + year + "\n");
 
                 tempByte[0] = meterBytes[9];
                 tempByte[1] = meterBytes[10];
@@ -109,7 +106,6 @@ namespace ChartBinding
                 tempByte[3] = meterBytes[12];
                 data1[3] = BitConverter.ToSingle(tempByte, 0);
                 //data1[3] = ST;
-                //    Console.Write("Spring Tension\t" + data1[3] + "\n");
 
 
                 dataTime = dataTime.AddYears(year - 2015);
@@ -125,7 +121,6 @@ namespace ChartBinding
                 tempByte[3] = meterBytes[16];
                 data1[5] = BitConverter.ToSingle(tempByte, 0);
                 //data1[5] = Beam;
-                // Console.Write("Beam\t" + data1[5] + "\n");
 
                 //GET VCC  ------------------------------------------------------------
                 tempByte[0] = meterBytes[17];

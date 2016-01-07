@@ -1,7 +1,33 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="ChartBinding.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="tracePalette" Type="System.String" Scope="User">
+      <Value Profile="(Default)">"Pastel"</Value>
+    </Setting>
+    <Setting Name="chartColor" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="traceWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">3</Value>
+    </Setting>
+    <Setting Name="meterNumber" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D01</Value>
+    </Setting>
+    <Setting Name="fileFormat" Type="System.String" Scope="User">
+      <Value Profile="(Default)">csv</Value>
+    </Setting>
+    <Setting Name="customerPassword" Type="System.String" Scope="User">
+      <Value Profile="(Default)">"zlsOnly"</Value>
+    </Setting>
+    <Setting Name="engineerPassword" Type="System.String" Scope="User">
+      <Value Profile="(Default)">"zlsEngineer"</Value>
+    </Setting>
+    <Setting Name="fileDateFormat" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="traceMarkers" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+  </Settings>
 </SettingsFile>

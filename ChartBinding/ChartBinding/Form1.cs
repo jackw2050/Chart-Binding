@@ -17,6 +17,8 @@ namespace ChartBinding
 {
     public partial class Form1 : Form
     {
+        #region Declarations
+
         public static DataTable dataTable = new DataTable();
         public static Boolean engineerDebug = false;
         public static double cper = 18;
@@ -27,8 +29,13 @@ namespace ChartBinding
         public static string meterNumber;
         public static string gravityFileName;
         public static bool firstTime = true;
+        public static DateTime fileStartTime;
+        public static Boolean surveyNameSet = false;
+        public static string customFileName;
+        public static string fileName = "";
+        public static string filePath = "c:\\Ultrasys\\data\\";
+
         public EngineeringForm EngineeringForm = new EngineeringForm();
-        public SwitchesForm SwitchesForm = new SwitchesForm();
         public FileClass FileClass = new FileClass();
 
         private delegate void SetChartCallback(object meterData);
@@ -59,6 +66,8 @@ namespace ChartBinding
         private byte[] freshData12 = { 0x4E, 0x00, 0xDF, 0x07, 0x1F, 0x01, 0x14, 0x2C, 0x02, 0x24, 0x3E, 0x9D, 0x45, 0xC0, 0xC8, 0xD3, 0xC4, 0xEE, 0xAB, 0xEB, 0xC0, 0x21, 0x85, 0xE8, 0xBD, 0x4B, 0x33, 0x58, 0x3D, 0x91, 0x32, 0xE5, 0x3D, 0xA4, 0x5A, 0x3E, 0xB9, 0x0C, 0xBA, 0x6F, 0x3C, 0x34, 0x18, 0x74, 0x3D, 0x94, 0x02, 0x4C, 0xC0, 0xD4, 0x55, 0x0B, 0x41, 0xC4, 0xFE, 0xBC, 0xFE, 0xD1, 0xFE, 0xC4, 0xFE, 0xFF, 0xFF, 0xFF, 0xB0, 0xB7, 0x95, 0x48, 0xFA, 0x95, 0x7E, 0xBF, 0x71, 0x40, 0x82, 0xBE, 0x00, 0xFF, 0xAA };
         public string[] traceName = { "Digital Gravity", "Spring Tension", "Cross Coupling", "Raw Beam", "Total Correction", "Raw Gravity", "AL", "AX", "VE", "AX2", "LACC", "XACC" };
 
+        #endregion Declarations
+
         #region Fields
 
         // Thread Add Data delegate
@@ -71,7 +80,7 @@ namespace ChartBinding
         public Form1()
         {
             InitializeComponent();
-
+            surveyName = surveyTextBox.Text;
             InitializedataGridView();
             DataRow myDataRow = dataTable.NewRow();
             ConfigData configData = new ConfigData();
@@ -83,52 +92,20 @@ namespace ChartBinding
         private void InitializedataGridView()
         {
             //  SETUP MAIN  DATA GRID
-            this.dataGridView1.ColumnCount = 13;
+            this.dataGridView1.ColumnCount = 12;
             this.dataGridView1.Columns[0].Name = "Date/ Time";
             this.dataGridView1.Columns[1].Name = "Digital Gravity";
             this.dataGridView1.Columns[2].Name = "Spring Tension";
             this.dataGridView1.Columns[3].Name = "Cross Coupling";
             this.dataGridView1.Columns[4].Name = "Raw Beam";
             this.dataGridView1.Columns[5].Name = "Total Correction";
-            this.dataGridView1.Columns[6].Name = "Raw Gravity";
-            this.dataGridView1.Columns[7].Name = "AL";
-            this.dataGridView1.Columns[8].Name = "AX";
-            this.dataGridView1.Columns[9].Name = "VE";
-            this.dataGridView1.Columns[10].Name = "AX2";
-            this.dataGridView1.Columns[11].Name = "LACC";
-            this.dataGridView1.Columns[12].Name = "XACC";
-        }
-
-        public static class ChartColors
-        {
-            public static System.Drawing.Color digitalGravity = System.Drawing.Color.SteelBlue;
-            public static System.Drawing.Color springTension = System.Drawing.Color.BlueViolet;
-            public static System.Drawing.Color crossCoupling = System.Drawing.Color.DarkOrange;
-            public static System.Drawing.Color rawBeam = System.Drawing.Color.DeepSkyBlue;
-            public static System.Drawing.Color totalCorrection = System.Drawing.Color.ForestGreen;
-            public static System.Drawing.Color rawGravity = System.Drawing.Color.RoyalBlue;
-            public static System.Drawing.Color AL = System.Drawing.Color.LightSeaGreen;
-            public static System.Drawing.Color AX = System.Drawing.Color.OrangeRed;
-            public static System.Drawing.Color VE = System.Drawing.Color.PaleVioletRed;
-            public static System.Drawing.Color AX2 = System.Drawing.Color.Red;
-            public static System.Drawing.Color LACC = System.Drawing.Color.Wheat;
-            public static System.Drawing.Color XACC = System.Drawing.Color.SteelBlue;
-        }
-
-        public static class ChartVisibility
-        {
-            public static Boolean digitalGravity = true;
-            public static Boolean springTension = true;
-            public static Boolean crossCoupling = true;
-            public static Boolean rawBeam = true;
-            public static Boolean totalCorrection = true;
-            public static Boolean rawGravity = true;
-            public static Boolean AL = true;
-            public static Boolean AX = true;
-            public static Boolean VE = true;
-            public static Boolean AX2 = true;
-            public static Boolean LACC = true;
-            public static Boolean XACC = true;
+            // this.dataGridView1.Columns[6].Name = "Raw Gravity";
+            this.dataGridView1.Columns[6].Name = "AL";
+            this.dataGridView1.Columns[7].Name = "AX";
+            this.dataGridView1.Columns[8].Name = "VE";
+            this.dataGridView1.Columns[9].Name = "AX2";
+            this.dataGridView1.Columns[10].Name = "LACC";
+            this.dataGridView1.Columns[11].Name = "XACC";
         }
 
         public static class mySimData
@@ -246,11 +223,29 @@ namespace ChartBinding
 };
         }
 
+        public class startupData
+        {
+            public string Status;
+        }
+
+        private void TimeWorker()
+        {
+            while (true)
+            {
+                this.Invoke(new UpdateTimeTextCallback(this.UpdateTimeText), new object[] { });
+                Thread.Sleep(1000);
+            }
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {
+            Thread TimeThread = new Thread(new ThreadStart(TimeWorker));
+            TimeThread.IsBackground = true;
+            TimeThread.Start();
+            traceVisibilityComboBox.Visible = false;
             SetupChart();
             SetupDataTable();
-            FileClass.ReadConfigFile();
+            ReadConfigFile();
             readCalibrationFile();// Read calibration table file  Meter#.tab
             DateTime nowDateTime = DateTime.Now;
             this.timeNowLabel.Text = Convert.ToString(nowDateTime);
@@ -262,201 +257,16 @@ namespace ChartBinding
             traceTrackBar.Maximum = 10;
             traceTrackBar.Value = 1;
             groupBox1.Visible = false;
-        }
+            auxGroupBox.Visible = false;
+            manualStartupGroupBox.Visible = false;
+            SwitchesTorqueMotorsCheckBox.Enabled = false;
+            SwitchesSpringTensionCheckBox.Enabled = false;
 
-        private void SetupChart()
-        {
-            BindingSource SBind = new BindingSource();
-            SetChartAreaColors(0);
-            // this.GravityChart.Series["Digital Gravity"].Label = "Y = #VALY\nX = #VALX"; sample
+            fileType = Properties.Settings.Default.fileFormat;
+            fileDateFormat = Properties.Settings.Default.fileDateFormat;
+            traceTrackBar.Value = Properties.Settings.Default.traceWidth;
 
-            //      SETUP MAIN PAGE GRAVITY CHART
-            traceTrackBar.Value = 2;
-            this.GravityChart.Series["Digital Gravity"].XValueMember = "dateTime";
-            this.GravityChart.Series["Digital Gravity"].XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
-            this.GravityChart.Series["Digital Gravity"].YValueMembers = "gravity";
-            this.GravityChart.Series["Digital Gravity"].ToolTip = "Time = #VALX\n#VALY";
-            this.GravityChart.DataSource = dataTable;
-            this.GravityChart.DataBind();
 
-            this.GravityChart.Series["Digital Gravity"].XValueType = ChartValueType.DateTime;
-
-            this.GravityChart.Series["Spring Tension"].XValueMember = "dateTime";
-            this.GravityChart.Series["Spring Tension"].YValueMembers = "springTension";
-            this.GravityChart.Series["Spring Tension"].ToolTip = "Time = #VALX\n#VALY";
-            this.GravityChart.DataSource = dataTable;
-            this.GravityChart.DataBind();
-
-            this.GravityChart.Series["Cross Coupling"].XValueMember = "dateTime";
-            this.GravityChart.Series["Cross Coupling"].YValueMembers = "crossCoupling";
-            this.GravityChart.Series["Cross Coupling"].ToolTip = "#VALY";
-            this.GravityChart.DataSource = dataTable;
-            this.GravityChart.DataBind();
-
-            this.GravityChart.Series["Raw Beam"].XValueMember = "dateTime";
-            this.GravityChart.Series["Raw Beam"].YValueMembers = "RawBeam";
-            this.GravityChart.Series["Raw Beam"].ToolTip = "#VALY";
-            this.GravityChart.DataSource = dataTable;
-            this.GravityChart.DataBind();
-
-            this.GravityChart.Series["Total Correction"].XValueMember = "dateTime";
-            this.GravityChart.Series["Total Correction"].YValueMembers = "TotalCorrection";
-            this.GravityChart.Series["Total Correction"].ToolTip = "#VALY";
-            this.GravityChart.DataSource = dataTable;
-            this.GravityChart.DataBind();
-
-            // this.GravityChart.Titles.Add("Gravity");
-            SetChartAreaColors(1);// white background
-
-            //      X AXIS
-
-            // this.GravityChart.ChartAreas["ChartArea1"].AxisX.Interval = 10;
-
-            // Set cursor interval properties
-            this.GravityChart.ChartAreas["ChartArea1"].CursorX.Interval = .001D;
-            this.GravityChart.ChartAreas["ChartArea1"].CursorX.IntervalType = DateTimeIntervalType.Seconds;
-            this.GravityChart.ChartAreas["ChartArea1"].CursorY.Interval = 1;
-            this.GravityChart.ChartAreas["ChartArea1"].AxisX.LabelStyle.Format = "hh:mm:ss";
-
-            // Set automatic zooming
-            GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoomable = true;
-            GravityChart.ChartAreas["ChartArea1"].AxisY.ScaleView.Zoomable = true;
-
-            // Set automatic scrolling
-            GravityChart.ChartAreas["ChartArea1"].CursorX.AutoScroll = true;
-            GravityChart.ChartAreas["ChartArea1"].CursorY.AutoScroll = true;
-
-            if (false)
-            {
-                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoom(2, 3);
-                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.ZoomReset(1);
-                this.GravityChart.ChartAreas["ChartArea1"].AxisX.LabelStyle.Angle = 0;// can vary from -90 to + 90
-
-                this.GravityChart.ChartAreas["ChartArea1"].CursorX.IsUserEnabled = true;
-                this.GravityChart.ChartAreas["ChartArea1"].CursorX.IsUserSelectionEnabled = true;
-                this.GravityChart.ChartAreas["ChartArea1"].CursorX.IntervalType = DateTimeIntervalType.Minutes;
-                this.GravityChart.ChartAreas["ChartArea1"].CursorX.Interval = .01;// .1D;
-
-                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollSizeType = DateTimeIntervalType.Minutes;
-                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollSize = .1D;
-                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoomable = true;
-
-                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.MinSizeType = DateTimeIntervalType.Minutes;
-                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.MinSize = .1D;
-
-                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollMinSizeType = DateTimeIntervalType.Minutes;
-                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollMinSize = .1D;
-                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.IsPositionedInside = false;
-
-                // Change scrollbar colors
-                GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.BackColor = System.Drawing.Color.LightGray;
-                GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.ButtonColor = System.Drawing.Color.Gray;
-                GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.LineColor = System.Drawing.Color.Black;
-            }
-
-            if (true)
-            {
-                // Set scrollbar size
-                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.Size = 12;
-                // show either just the center scroll button..
-                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.ButtonStyle = ScrollBarButtonStyles.SmallScroll;
-                // .. or include the left and right buttons:
-                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.ButtonStyle =
-                     ScrollBarButtonStyles.All ^ ScrollBarButtonStyles.ResetZoom;
-
-                // Scrollbars position
-                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.IsPositionedInside = true;
-                this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.Enabled = true;
-                // this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Size = 100;  // number (!) of data points visible
-            }
-            //  Y AXIS
-            //  this.GravityChart.ChartAreas["ChartArea1"].AxisY.ScaleView.ZoomReset(1);
-            this.GravityChart.ChartAreas["ChartArea1"].CursorY.IsUserEnabled = true;
-            this.GravityChart.ChartAreas["ChartArea1"].CursorY.IsUserSelectionEnabled = true;
-            this.GravityChart.ChartAreas["ChartArea1"].AxisY.ScaleView.Zoomable = true;
-
-            //      SETUP FLOATING CROSS COUPLING CHART
-            this.crossCouplingChart.Series["Raw Gravity"].XValueMember = "dateTime";
-            this.crossCouplingChart.Series["Raw Gravity"].XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
-            this.crossCouplingChart.ChartAreas["ChartArea1"].AxisX.LabelStyle.Format = "yyyy-MM-dd HH:mm:ss";
-            this.crossCouplingChart.ChartAreas["ChartArea1"].AxisX.LabelStyle.Format = "hh:mm:ss";
-            this.crossCouplingChart.ChartAreas["ChartArea1"].AxisX.LabelStyle.Angle = 0;
-            this.crossCouplingChart.Series["Raw Gravity"].YValueMembers = "gravity";
-            this.crossCouplingChart.DataSource = dataTable;
-            this.crossCouplingChart.DataBind();
-
-            this.crossCouplingChart.Series["AL"].XValueMember = "dateTime";
-            this.crossCouplingChart.Series["AL"].YValueMembers = "AL";
-            this.crossCouplingChart.DataSource = dataTable;
-            this.crossCouplingChart.DataBind();
-
-            this.crossCouplingChart.Series["AX"].XValueMember = "dateTime";
-            this.crossCouplingChart.Series["AX"].YValueMembers = "AX";
-            this.crossCouplingChart.DataSource = dataTable;
-            this.crossCouplingChart.DataBind();
-
-            this.crossCouplingChart.Series["VE"].XValueMember = "dateTime";
-            this.crossCouplingChart.Series["VE"].YValueMembers = "VE";
-            this.crossCouplingChart.DataSource = dataTable;
-            this.crossCouplingChart.DataBind();
-
-            this.crossCouplingChart.Series["AX2"].XValueMember = "dateTime";
-            this.crossCouplingChart.Series["AX2"].YValueMembers = "AX2";
-            this.crossCouplingChart.DataSource = dataTable;
-            this.crossCouplingChart.DataBind();
-
-            this.crossCouplingChart.Series["XACC"].XValueMember = "dateTime";
-            this.crossCouplingChart.Series["XACC"].YValueMembers = "XACC2";
-            this.crossCouplingChart.DataSource = dataTable;
-            this.crossCouplingChart.DataBind();
-
-            this.crossCouplingChart.Series["LACC"].XValueMember = "dateTime";
-            this.crossCouplingChart.Series["LACC"].YValueMembers = "LACC";
-            this.crossCouplingChart.DataSource = dataTable;
-            this.crossCouplingChart.DataBind();
-
-            //this.crossCouplingChart.Titles.Add("Cross Coupling");
-
-            this.crossCouplingChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoom(2, 3);
-            this.crossCouplingChart.ChartAreas["ChartArea1"].AxisX.ScaleView.ZoomReset(1);
-            this.crossCouplingChart.ChartAreas["ChartArea1"].AxisY.ScaleView.ZoomReset(1);
-            this.crossCouplingChart.ChartAreas["ChartArea1"].AxisX.LabelStyle.Angle = 0;// can vary from -90 to + 90
-            //Enable range selection and zooming end user interface
-
-            this.crossCouplingChart.ChartAreas["ChartArea1"].CursorX.IsUserEnabled = true;
-            this.crossCouplingChart.ChartAreas["ChartArea1"].CursorY.IsUserEnabled = true;
-            this.crossCouplingChart.ChartAreas["ChartArea1"].CursorX.IsUserSelectionEnabled = true;
-            this.crossCouplingChart.ChartAreas["ChartArea1"].CursorY.IsUserSelectionEnabled = true;
-            this.crossCouplingChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoomable = true;
-            this.crossCouplingChart.ChartAreas["ChartArea1"].AxisY.ScaleView.Zoomable = true;
-            this.crossCouplingChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.IsPositionedInside = true;
-            this.crossCouplingChart.ChartAreas["ChartArea1"].AxisY.ScrollBar.IsPositionedInside = true;
-
-            //SetChartColors();
-
-            this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.BrightPastel;
-            this.crossCouplingChart.ApplyPaletteColors();
-
-            this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.BrightPastel;
-            this.GravityChart.ApplyPaletteColors();
-        }
-
-        public void SetChartColors()
-        {
-            this.GravityChart.Series["Digital Gravity"].Color = ChartColors.digitalGravity;
-            this.GravityChart.Series["Spring Tension"].Color = ChartColors.springTension;
-            this.GravityChart.Series["Cross Coupling"].Color = ChartColors.crossCoupling;
-            this.GravityChart.Series["Raw Beam"].Color = ChartColors.rawBeam;
-            this.GravityChart.Series["Total Correction"].Color = ChartColors.totalCorrection;
-            this.crossCouplingChart.Series["Raw Gravity"].Color = ChartColors.rawGravity;
-            this.crossCouplingChart.Series["AL"].Color = ChartColors.AL;
-            this.crossCouplingChart.Series["AX"].Color = ChartColors.AX;
-            this.crossCouplingChart.Series["VE"].Color = ChartColors.VE;
-            this.crossCouplingChart.Series["AX2"].Color = ChartColors.AX2;
-            this.crossCouplingChart.Series["XACC"].Color = ChartColors.XACC;
-            this.crossCouplingChart.Series["LACC"].Color = ChartColors.LACC;
-            this.GravityChart.Update();
-            this.crossCouplingChart.Update();
         }
 
         public void SetupDataTable()
@@ -518,15 +328,15 @@ namespace ChartBinding
             // Add id column to the DataColumnCollection.
             dataTable.Columns.Add(dtColumn);
 
-            dtColumn = new DataColumn();
-            dtColumn.DataType = System.Type.GetType("System.Double");
-            dtColumn.ColumnName = "RawGravity";
-            dtColumn.Caption = "Raw Gravity";
-            dtColumn.ReadOnly = false;
-            dtColumn.Unique = false;
-            // Add id column to the DataColumnCollection.
-            dataTable.Columns.Add(dtColumn);
-
+            /*     dtColumn = new DataColumn();
+                 dtColumn.DataType = System.Type.GetType("System.Double");
+                 dtColumn.ColumnName = "RawGravity";
+                 dtColumn.Caption = "Raw Gravity";
+                 dtColumn.ReadOnly = false;
+                 dtColumn.Unique = false;
+                 // Add id column to the DataColumnCollection.
+                 dataTable.Columns.Add(dtColumn);
+     */
             dtColumn = new DataColumn();
             dtColumn.DataType = System.Type.GetType("System.Double");
             dtColumn.ColumnName = "AL";
@@ -592,106 +402,6 @@ namespace ChartBinding
             dtSet.Tables.Add(dataTable);
         }
 
-        public void ChartMarkers(bool enable)
-        {
-            if (enable == true)
-            {
-                this.GravityChart.Series["Digital Gravity"].MarkerStyle = MarkerStyle.Circle;
-                this.GravityChart.Series["Spring Tension"].MarkerStyle = MarkerStyle.Cross;
-                this.GravityChart.Series["Cross Coupling"].MarkerStyle = MarkerStyle.Diamond;
-                this.GravityChart.Series["Raw Beam"].MarkerStyle = MarkerStyle.Square;
-                this.GravityChart.Series["Total Correction"].MarkerStyle = MarkerStyle.Triangle;
-
-                this.crossCouplingChart.Series["Raw Gravity"].MarkerStyle = MarkerStyle.Circle;
-                this.crossCouplingChart.Series["AL"].MarkerStyle = MarkerStyle.Triangle;
-                this.crossCouplingChart.Series["AX"].MarkerStyle = MarkerStyle.Star5;
-                this.crossCouplingChart.Series["VE"].MarkerStyle = MarkerStyle.Square;
-                this.crossCouplingChart.Series["AX2"].MarkerStyle = MarkerStyle.Diamond;
-                this.crossCouplingChart.Series["LACC"].MarkerStyle = MarkerStyle.Cross;
-                this.crossCouplingChart.Series["XACC"].MarkerStyle = MarkerStyle.Star10;
-            }
-            else
-            {
-                this.GravityChart.Series["Digital Gravity"].MarkerStyle = MarkerStyle.None;
-                this.GravityChart.Series["Spring Tension"].MarkerStyle = MarkerStyle.None;
-                this.GravityChart.Series["Cross Coupling"].MarkerStyle = MarkerStyle.None;
-                this.GravityChart.Series["Raw Beam"].MarkerStyle = MarkerStyle.None;
-                this.GravityChart.Series["Total Correction"].MarkerStyle = MarkerStyle.None;
-
-                this.crossCouplingChart.Series["Raw Gravity"].MarkerStyle = MarkerStyle.None;
-                this.crossCouplingChart.Series["AL"].MarkerStyle = MarkerStyle.None;
-                this.crossCouplingChart.Series["AX"].MarkerStyle = MarkerStyle.None;
-                this.crossCouplingChart.Series["VE"].MarkerStyle = MarkerStyle.None;
-                this.crossCouplingChart.Series["AX2"].MarkerStyle = MarkerStyle.None;
-                this.crossCouplingChart.Series["LACC"].MarkerStyle = MarkerStyle.None;
-                this.crossCouplingChart.Series["XACC"].MarkerStyle = MarkerStyle.None;
-            }
-        }
-
-        public void UpdateChart()
-        {
-            //   DataTable dataTable = new DataTable();
-            DataRow myDataRow = dataTable.NewRow();
-            DateTime firstDateTime = new DateTime(2015, 1, 1, MeterData.Hour, MeterData.Min, MeterData.Sec);
-            DateTime myDateTime = firstDateTime.AddDays(MeterData.day - 1);
-
-            //      UPDATE MAIN GRAVITY CHART
-            this.GravityChart.Series["Digital Gravity"].Points.AddXY(myDateTime, MeterData.data4[2]);
-            this.GravityChart.Series["Spring Tension"].Points.AddXY(myDateTime, MeterData.data1[3]);
-            this.GravityChart.Series["Cross Coupling"].Points.AddXY(myDateTime, MeterData.data4[4]);
-            this.GravityChart.Series["Raw Beam"].Points.AddXY(myDateTime, MeterData.data1[5]);
-            this.GravityChart.Series["Total Correction"].Points.AddXY(myDateTime, MeterData.totalCorrection);
-
-            if (firstTime)
-            {
-                //  this.GravityChart.ChartAreas[0].AxisX.Maximum = myDateTime.AddMinutes(1).ToOADate();
-                this.GravityChart.ChartAreas[0].AxisX.IntervalType = DateTimeIntervalType.Seconds;
-                this.GravityChart.ChartAreas[0].AxisX.Interval = 10;
-                //  this.GravityChart.ChartAreas[0].AxisX.Maximum = myDateTime.AddMinutes(10).Date.ToOADate();
-
-                long ticks = myDateTime.Ticks;
-                this.GravityChart.ChartAreas[0].AxisX.Minimum = myDateTime.ToOADate();//42291.863;
-                firstTime = false;
-            }
-
-            this.GravityChart.Update();
-
-            //      UPDATE MAIN CROSS COUPLING CHART
-
-            this.crossCouplingChart.Series["Raw Gravity"].Points.AddXY(myDateTime, MeterData.data4[2]);
-            this.crossCouplingChart.Series["AL"].Points.AddXY(myDateTime, MeterData.data4[7]);
-            this.crossCouplingChart.Series["AX"].Points.AddXY(myDateTime, MeterData.data4[8]);
-            this.crossCouplingChart.Series["VE"].Points.AddXY(myDateTime, MeterData.data4[9]);
-            this.crossCouplingChart.Series["AX2"].Points.AddXY(myDateTime, MeterData.data4[10]);
-            this.crossCouplingChart.Series["LACC"].Points.AddXY(myDateTime, MeterData.data4[13]);
-            this.crossCouplingChart.Series["XACC"].Points.AddXY(myDateTime, MeterData.data4[14]);
-            this.crossCouplingChart.Update();
-
-            this.SetChartBorderWidth(2);
-
-            if (false)
-            {
-                if (this.GravityChart.ChartAreas[0].AxisX.ScaleView.IsZoomed)
-                {
-                    double offset = this.GravityChart.ChartAreas[0].AxisX.Minimum - this.GravityChart.ChartAreas[0].AxisX.ScaleView.Position;
-
-                    this.GravityChart.ChartAreas[0].AxisX.LabelStyle.IntervalOffset = offset;
-                    this.GravityChart.ChartAreas[0].AxisX.MajorGrid.IntervalOffset = offset;
-                    this.GravityChart.ChartAreas[0].AxisX.MajorTickMark.IntervalOffset = offset;
-                    this.GravityChart.ChartAreas[0].AxisX.MinorGrid.IntervalOffset = offset;
-                    this.GravityChart.ChartAreas[0].AxisX.MinorTickMark.IntervalOffset = offset;
-                }
-                else
-                {
-                    this.GravityChart.ChartAreas[0].AxisX.LabelStyle.IntervalOffset = 0;
-                    this.GravityChart.ChartAreas[0].AxisX.MajorGrid.IntervalOffset = 0;
-                    this.GravityChart.ChartAreas[0].AxisX.MajorTickMark.IntervalOffset = 0;
-                    this.GravityChart.ChartAreas[0].AxisX.MinorGrid.IntervalOffset = 0;
-                    this.GravityChart.ChartAreas[0].AxisX.MinorTickMark.IntervalOffset = 0;
-                }
-            }
-        }
-
         private void oneSecStuff()// change to array    double[] data1, double[] data2, double[] data3, double ccFact
         {
             ConfigData ConfigData = new ConfigData();
@@ -729,7 +439,7 @@ namespace ChartBinding
             // CALIBRATION TABLE MUST BE CREATED USING MKTABLE.
             int ind;
             double upLook;
-            ind = Convert.ToInt32(Math.Abs(gVal/100)) ;;
+            ind = Convert.ToInt32(Math.Abs(gVal / 100)); ;
 
             if (ind > 60)
             {
@@ -802,7 +512,7 @@ namespace ChartBinding
             string crossCoupling = MeterData.data4[4].ToString("F4");
             string rawBeam = MeterData.data1[5].ToString("F4");
             string totalCorrection = MeterData.totalCorrection.ToString("F4");
-            string rawGravity = MeterData.data4[2].ToString("F4");
+            //     string rawGravity = MeterData.data4[2].ToString("F4");
             string AL = MeterData.data4[7].ToString("F4");
             string AX = MeterData.data4[8].ToString("F4");
             string VE = MeterData.data4[9].ToString("F4");
@@ -813,9 +523,8 @@ namespace ChartBinding
             if (normalGravity)
             {
                 //                    line id,                 date/time,                  digital gravity,                            st,                               cross coupling                raw beam,                    tc(total correction
-                // string[] row1 = new string[] { Convert.ToString(myDateTime), Convert.ToString(MeterData.data4[2]), Convert.ToString(MeterData.data1[3]), Convert.ToString(MeterData.data4[4]), Convert.ToString(MeterData.data1[5]), Convert.ToString(MeterData.totalCorrection) };
-                //string[] row1 = new string[] { Convert.ToString(myDateTime), digitalGravity, springTension, crossCoupling, rawBeam, totalCorrection };
-                string[] row1 = new string[] { Convert.ToString(myDateTime), digitalGravity, springTension, crossCoupling, rawBeam, totalCorrection, rawGravity, AL, AX, VE, AX2, LACC, XACC };
+                // string[] row1 = new string[] { Convert.ToString(myDateTime), digitalGravity, springTension, crossCoupling, rawBeam, totalCorrection, rawGravity, AL, AX, VE, AX2, LACC, XACC };
+                string[] row1 = new string[] { Convert.ToString(myDateTime), digitalGravity, springTension, crossCoupling, totalCorrection, AL, AX, VE, AX2, LACC, XACC };
 
                 this.dataGridView1.Rows.Add(row1);
             }
@@ -919,46 +628,48 @@ namespace ChartBinding
             //  public double AUX4;
         }
 
-        private void ArrayData()
-        {
-            MeterData MeterData = new MeterData();
-            MeterData Class1 = new MeterData();
-
-            DataGridView dataGridView1 = new DataGridView();
-
-            int arrayLength = mySimData.simData.GetLength(1);
-            int arrayWidth = mySimData.simData.GetLength(0);
-            byte[] byteArray = new byte[arrayWidth];
-
-            if (surveyName == "dude")
-            {
-                // MessageBox.Show("Survey name cannot be empty.");
-            }
-            //////////////////////////////////////////////////////////
-            else
-            {
-                //  recordingTextBox.Visible = true;
-
-                // start new thread here GetMeterData();
-
-                for (int ii = 0; ii < arrayWidth; ii++)
+        /*
+                private void ArrayData()
                 {
-                    for (int i = 0; i < arrayLength; i++)
+                    MeterData MeterData = new MeterData();
+                    MeterData Class1 = new MeterData();
+
+                    DataGridView dataGridView1 = new DataGridView();
+
+                    int arrayLength = mySimData.simData.GetLength(1);
+                    int arrayWidth = mySimData.simData.GetLength(0);
+                    byte[] byteArray = new byte[arrayWidth];
+
+                    if (surveyName == "dude")
                     {
-                        byteArray[i] = mySimData.simData[ii, i];
+                        // MessageBox.Show("Survey name cannot be empty.");
                     }
+                    //////////////////////////////////////////////////////////
+                    else
+                    {
+                        //  recordingTextBox.Visible = true;
 
-                    Class1.CheckMeterData(byteArray);
-                    oneSecStuff();
-                    AddDataToGrid();
-                    UpdateChart();
-                    FileClass.RecordDataToFile("Append");
+                        // start new thread here GetMeterData();
 
-                    // Thread.Sleep(1000);
+                        for (int ii = 0; ii < arrayWidth; ii++)
+                        {
+                            for (int i = 0; i < arrayLength; i++)
+                            {
+                                byteArray[i] = mySimData.simData[ii, i];
+                            }
+
+                            Class1.CheckMeterData(byteArray);
+                            oneSecStuff();
+                            AddDataToGrid();
+                            UpdateChart();
+                            RecordDataToFile("Append", d);
+
+                            // Thread.Sleep(1000);
+                        }
+                        //      FileClass.RecordDataToFile("Append");
+                    }
                 }
-                //      FileClass.RecordDataToFile("Append");
-            }
-        }
+        */
 
         public class myData//  set this up so all chart data in in one class.  Maybe not needed use MeterData
         {
@@ -1002,7 +713,7 @@ namespace ChartBinding
             GravityChart.Series["Total Correction"].Points.AddXY(d.Date, d.TotalCorrection);
             GravityChart.Update();
 
-            //  crossCouplingChart.Series["Raw Gravity"].Points.AddXY(d.Date, d.ra);
+            // crossCouplingChart.Series["Raw Gravity"].Points.AddXY(d.Date, d.RawGravity);
             crossCouplingChart.Series["AL"].Points.AddXY(d.Date, d.AL);
             crossCouplingChart.Series["AX"].Points.AddXY(d.Date, d.AX);
             crossCouplingChart.Series["VE"].Points.AddXY(d.Date, d.VE);
@@ -1010,6 +721,11 @@ namespace ChartBinding
             crossCouplingChart.Series["LACC"].Points.AddXY(d.Date, d.LACC);
             crossCouplingChart.Series["XACC"].Points.AddXY(d.Date, d.XACC);
             crossCouplingChart.Update();
+
+            var runningTime = TimeSpan.FromTicks(DateTime.Now.Ticks - fileStartTime.Ticks);
+            // new DateTime(runningTime.Ticks).ToString("HH:mm");
+
+            recordingDurationLabel.Text = "Duration: " + new DateTime(runningTime.Ticks).ToString("HH:mm:ss");
         }
 
         private void AddDataPoint(myData d)// this will be the new update chart etc.
@@ -1024,11 +740,37 @@ namespace ChartBinding
             }
             else
             {
-                // Chart1.Series[0].Points.AddXY(d.X, d.Y);
-
                 UpdateChartThreadSafe(d);
                 AddDataToGridThreadSafe(d);
+                // addDataToFileThreadSafe(d);
+
+                RecordDataToFile("Append", d);  // need threadsafe version
             }
+        }
+
+        public delegate void UpdateRecordBoxCallback(Boolean i);
+
+        public delegate void UpdateFileNameLabelCallback(string fileName);
+
+        public delegate void UpdateTimeTextCallback();
+
+        private void UpdateRecordBox(Boolean i)
+        {
+            recordingTextBox.Visible = i;
+            DateTime nowDateTime = DateTime.Now;
+            fileStartTime = nowDateTime;
+            fileStartTimeLabel.Text = "File start time:  " + Convert.ToString(nowDateTime);
+        }
+
+        private void UpdateNameLabel(string fileName)
+        {
+            fileLabel.Text = fileName;
+        }
+
+        private void UpdateTimeText()
+        {
+            DateTime nowDateTime = DateTime.Now;
+            timeNowLabel.Text = Convert.ToString(nowDateTime);
         }
 
         private void ArrayDataWorker(object obj)
@@ -1043,53 +785,79 @@ namespace ChartBinding
             int arrayWidth = mySimData.simData.GetLength(0);
             byte[] byteArray = new byte[arrayWidth];
 
-            if (surveyName == "dude")
+            DateTime now = DateTime.Now;
+
+            if (Form1.fileDateFormat == 1)
             {
-                // MessageBox.Show("Survey name cannot be empty.");
+                fileName = filePath + ConfigData.meterNumber + "-" + surveyName + "-" + now.ToString("yyyy-MMM-dd-HH-mm-ss") + "." + fileType;
             }
-            //////////////////////////////////////////////////////////
-            else
+            else if (fileDateFormat == 2)
             {
-                //    recordingTextBox.Visible = true;
+                fileName = filePath + ConfigData.meterNumber + "-" + surveyName + "-" + now.ToString("yyyy-mm-dd-HH-mm-ss") + "." + fileType;
+            }
+            else if (Form1.fileDateFormat == 3)
+            {
+                fileName = filePath + ConfigData.meterNumber + "-" + surveyName + "-" + now.ToString("yyyy-dd-HH-mm-ss") + "." + fileType;
+            }
+            else if (fileDateFormat == 4)
+            {
+                fileName = filePath + customFileName + "." + fileType;
+            }
+            Properties.Settings.Default.fileDateFormat = fileDateFormat;
 
-                for (int ii = 0; ii < arrayWidth; ii++)
+            this.Invoke(new UpdateFileNameLabelCallback(this.UpdateNameLabel), new object[] { fileName });
+            FileClass FileClass = new FileClass();
+            //  Form1.gravityFileName = sampleFileNamelabel.Text;
+            RecordDataToFile("Open");
+
+            this.Invoke(new UpdateRecordBoxCallback(this.UpdateRecordBox), new object[] { true });
+
+            for (int ii = 0; ii < arrayWidth; ii++)
+            {
+                for (int i = 0; i < arrayLength; i++)
                 {
-                    for (int i = 0; i < arrayLength; i++)
-                    {
-                        byteArray[i] = mySimData.simData[ii, i];
-                    }
-
-                    Class1.CheckMeterData(byteArray);
-                    DateTime firstDateTime = new DateTime(2015, 1, 1, MeterData.Hour, MeterData.Min, MeterData.Sec);
-                    DateTime myDateTime = firstDateTime.AddDays(MeterData.day - 1);
-                    oneSecStuff();
-                    _delegate(new myData
-                    {
-                        Date = myDateTime,
-                        Year = MeterData.year,
-                        Days = MeterData.day,
-                        Hour = MeterData.Hour,
-                        Minute = MeterData.Min,
-                        Second = MeterData.Sec,
-                        Gravity = MeterData.data4[2],
-                        CrossCoupling = MeterData.data4[4],
-                        SpringTension = MeterData.data1[3],
-                        RawBeam = MeterData.data1[5],
-                        TotalCorrection = MeterData.totalCorrection,
-                        RawGravity = MeterData.data4[2],
-                        AL = MeterData.data4[7],
-                        AX = MeterData.data4[8],
-                        VE = MeterData.data4[9],
-                        XACC = MeterData.data4[13],
-                        LACC = MeterData.data4[14]
-                    });
-                    Thread.Sleep(1000);
-                    //   AddDataToGrid();
-                    //   UpdateChart();
-                    //  FileClass.RecordDataToFile("Append");
-
-                    // Thread.Sleep(1000);
+                    byteArray[i] = mySimData.simData[ii, i];
                 }
+                /*        if (ii == arrayWidth - 1)
+                        {
+                            foreach (var series in GravityChart.Series)
+                            {
+                                series.Points.Clear();
+                            }
+                            foreach (var series in crossCouplingChart.Series)
+                            {
+                                series.Points.Clear();
+                            }
+                            ii = 0;
+                        }*/
+                Class1.CheckMeterData(byteArray);
+                DateTime firstDateTime = new DateTime(2015, 1, 1, MeterData.Hour, MeterData.Min, MeterData.Sec);
+                DateTime myDateTime = firstDateTime.AddDays(MeterData.day - 1);
+                oneSecStuff();
+                _delegate(new myData
+                {
+                    Date = myDateTime,
+                    Year = MeterData.year,
+                    Days = MeterData.day,
+                    Hour = MeterData.Hour,
+                    Minute = MeterData.Min,
+                    Second = MeterData.Sec,
+                    Gravity = MeterData.data4[2],
+                    CrossCoupling = MeterData.data4[4],
+                    SpringTension = MeterData.data1[3],
+                    RawBeam = MeterData.data1[5],
+                    TotalCorrection = MeterData.totalCorrection,
+                    RawGravity = MeterData.data4[2],
+                    AL = MeterData.data4[7],
+                    AX = MeterData.data4[8],
+                    AX2 = MeterData.data4[10],
+                    VE = MeterData.data4[9],
+                    XACC = MeterData.data4[14],
+                    LACC = MeterData.data4[13]
+                });
+
+                Thread.Sleep(1000);
+
                 //      FileClass.RecordDataToFile("Append");
             }
         }
@@ -1115,6 +883,10 @@ namespace ChartBinding
             }
         }
 
+        private void addDataToFileThreadSafe(myData d)
+        {
+        }
+
         private void AddDataToGridThreadSafe(myData d)
         {
             bool normalGravity = true;
@@ -1122,9 +894,9 @@ namespace ChartBinding
             string digitalGravity = d.Gravity.ToString("F4");
             string springTension = d.SpringTension.ToString("F4");
             string crossCoupling = d.CrossCoupling.ToString("F4");
-            string rawBeam = d.Gravity.ToString("F4");
+            string rawBeam = d.RawBeam.ToString("F4");
             string totalCorrection = MeterData.totalCorrection.ToString("F4");
-            string rawGravity = MeterData.data4[2].ToString("F4");
+            // string rawGravity = MeterData.data4[2].ToString("F4");
             string AL = d.AL.ToString("F4");
             string AX = d.AX.ToString("F4");
             string VE = MeterData.data4[9].ToString("F4");
@@ -1135,9 +907,12 @@ namespace ChartBinding
             if (normalGravity)
             {
                 //                    line id,                 date/time,                  digital gravity,                            st,                               cross coupling                raw beam,                    tc(total correction
-                string[] row1 = new string[] { date, digitalGravity, springTension, crossCoupling, rawBeam, totalCorrection, rawGravity, AL, AX, VE, AX2, LACC, XACC };
+                //  string[] row1 = new string[] { date, digitalGravity, springTension, crossCoupling, rawBeam, totalCorrection, rawGravity, AL, AX, VE, AX2, LACC, XACC };
+                string[] row1 = new string[] { date, digitalGravity, springTension, crossCoupling, rawBeam, totalCorrection, AL, AX, VE, AX2, LACC, XACC };
 
-                this.dataGridView1.Rows.Add(row1);
+                //  this.dataGridView1.Rows.Add(row1);
+
+                dataGridView1.Rows.Insert(0, row1);
             }
             this.dataGridView1.Update();
         }
@@ -1158,36 +933,36 @@ namespace ChartBinding
         {
             //    ArrayData();
             //      GetFileData();
+            Boolean okToRun = false;
 
-            //   ReadMarineDataFile();
-            new Thread(new ParameterizedThreadStart(ArrayDataWorker)).Start(new Action<myData>(this.AddDataPoint));
+            if (surveyNameSet == false)
+            {
+                MessageBox.Show("Warning! \nNo survey information was entered.");
+                surveyNameSet = true;
+            }
+            else
+            {
+                okToRun = true;
+            }
 
-            //  new Thread(new ParameterizedThreadStart(worker)).Start(new Action<myData>(this.AddDataPoint));
+            if (okToRun)
+            {
+                Thread WorkerThread = new Thread(new ParameterizedThreadStart(ArrayDataWorker));
+                WorkerThread.IsBackground = true;
+                WorkerThread.Start(new Action<myData>(this.AddDataPoint));
+            }
+            okToRun = true;
         }
 
         private void exitProgramToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (System.Windows.Forms.Application.MessageLoop)
-            {
-                // WinForms
-                System.Windows.Forms.Application.Exit();
-            }
-            else
-            {
-                // Console app
-                System.Environment.Exit(1);
-            }
+           
         }
 
         private void engineeringPanelToolStripMenuItem_Click(object sender, EventArgs e)
         {
             PasswordForm myPassword = new PasswordForm();
             myPassword.Show();
-        }
-
-        private void manualStartupToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SwitchesForm.Show();
         }
 
         private void setDateTimeToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1198,20 +973,14 @@ namespace ChartBinding
 
         private void systemAuxToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SystemAuxForm myForm = new SystemAuxForm();
-            myForm.Show();
-        }
-
-        private void surveyInformationToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SurveyForm mySurveyForm = new SurveyForm();
-            mySurveyForm.Show();
-        }
-
-        private void fileFormatToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            FileFormatForm myFileForm = new FileFormatForm();
-            myFileForm.Show();
+            if (auxGroupBox.Visible == true)
+            {
+                auxGroupBox.Visible = false;
+            }
+            else
+            {
+                auxGroupBox.Visible = true;
+            }
         }
 
         private void printPreviewCrossCouplingChartToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1227,83 +996,6 @@ namespace ChartBinding
             GravityChart.Printing.PrintPreview();
         }
 
-        public void SetChartAreaColors(int scheme)
-        {
-            if (scheme == 0)// Light background
-            {
-                //  GRAVITY
-                this.GravityChart.ChartAreas["ChartArea1"].BackColor = System.Drawing.Color.White;
-                this.GravityChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Black;
-                this.GravityChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Black;
-                this.GravityChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Black;
-                this.GravityChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Black;
-
-                // CROSS COUPLING
-                this.crossCouplingChart.ChartAreas["ChartArea1"].BackColor = System.Drawing.Color.White;
-                this.crossCouplingChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Black;
-                this.crossCouplingChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Black;
-                this.crossCouplingChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Black;
-                this.crossCouplingChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Black;
-            }
-            if (scheme == 1)// gray background
-            {
-                //  GRAVITY
-                this.GravityChart.ChartAreas["ChartArea1"].BackColor = System.Drawing.Color.Gray;
-                this.GravityChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Black;
-                this.GravityChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Black;
-                this.GravityChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Black;
-                this.GravityChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Black;
-
-                // CROSS COUPLING
-                this.crossCouplingChart.ChartAreas["ChartArea1"].BackColor = System.Drawing.Color.Gray;
-                this.crossCouplingChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Black;
-                this.crossCouplingChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Black;
-                this.crossCouplingChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Black;
-                this.crossCouplingChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Black;
-            }
-            if (scheme == 2)// black background
-            {
-                //  GRAVITY
-                this.GravityChart.ChartAreas["ChartArea1"].BackColor = System.Drawing.Color.Black;
-                this.GravityChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Gray;
-                this.GravityChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Gray;
-                this.GravityChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Gray;
-                this.GravityChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Gray;
-
-                // CROSS COUPLING
-                this.crossCouplingChart.ChartAreas["ChartArea1"].BackColor = System.Drawing.Color.Black;
-                this.crossCouplingChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Gray;
-                this.crossCouplingChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Gray;
-                this.crossCouplingChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Gray;
-                this.crossCouplingChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Gray;
-            }
-        }
-
-        private void chart1_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-            HitTestResult result = this.GravityChart.HitTest(e.X, e.Y);
-            if (result != null && result.Object != null)
-            {
-                // When user hits the LegendItem
-                if (result.Object is LegendItem)
-                {
-                    // Legend item result
-                    LegendItem legendItem = (LegendItem)result.Object;
-
-                    // series item selected
-                    Series selectedSeries = (Series)legendItem.Tag;
-
-                    if (selectedSeries != null)
-                    {
-                        if (selectedSeries.Enabled)
-                            selectedSeries.Enabled = false;
-                        else
-                            selectedSeries.Enabled = true;
-                    }
-                }
-            }
-        }
-
         private void chartColorComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
         }
@@ -1316,6 +1008,7 @@ namespace ChartBinding
         private void traceTrackBar_Scroll(object sender, EventArgs e)
         {
             SetChartBorderWidth(traceTrackBar.Value);
+            Properties.Settings.Default.traceWidth = traceTrackBar.Value;
         }
 
         private void traceVisibilityComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -1376,17 +1069,6 @@ namespace ChartBinding
                     else
                     {
                         ChartVisibility.totalCorrection = true;
-                    }
-                    break;
-
-                case "Raw Gravity":
-                    if (ChartVisibility.rawGravity == true)
-                    {
-                        ChartVisibility.rawGravity = false;
-                    }
-                    else
-                    {
-                        ChartVisibility.rawGravity = true;
                     }
                     break;
 
@@ -1462,137 +1144,6 @@ namespace ChartBinding
             SetChartVisibility();
         }
 
-        public void SetChartBorderWidth(int width)
-        {
-            this.GravityChart.Series["Digital Gravity"].BorderWidth = width;
-            this.GravityChart.Series["Spring Tension"].BorderWidth = width;
-            this.GravityChart.Series["Raw Beam"].BorderWidth = width;
-            this.GravityChart.Series["Cross Coupling"].BorderWidth = width;
-            this.GravityChart.Series["Total Correction"].BorderWidth = width;
-            this.crossCouplingChart.Series["Raw Gravity"].BorderWidth = width;
-            this.crossCouplingChart.Series["LACC"].BorderWidth = width;
-            this.crossCouplingChart.Series["XACC"].BorderWidth = width;
-            this.crossCouplingChart.Series["AX2"].BorderWidth = width;
-            this.crossCouplingChart.Series["VE"].BorderWidth = width;
-            this.crossCouplingChart.Series["AX"].BorderWidth = width;
-            this.crossCouplingChart.Series["AL"].BorderWidth = width;
-        }
-
-        public void SetChartVisibility()
-        {
-            if (ChartVisibility.digitalGravity == false)
-            {
-                this.GravityChart.Series["Digital Gravity"].Color = System.Drawing.Color.Transparent;
-                // this.GravityChart.Series["Digital Gravity"].Enabled = true;
-            }
-            else
-            {
-                this.GravityChart.Series["Digital Gravity"].Color = ChartColors.digitalGravity;
-                //  this.GravityChart.Series["Digital Gravity"].Enabled = false;
-            }
-
-            if (ChartVisibility.springTension == false)
-            {
-                this.GravityChart.Series["Spring Tension"].Color = System.Drawing.Color.Transparent;
-            }
-            else
-            {
-                this.GravityChart.Series["Spring Tension"].Color = ChartColors.springTension;
-            }
-
-            if (ChartVisibility.crossCoupling == false)
-            {
-                this.GravityChart.Series["Cross Coupling"].Color = System.Drawing.Color.Transparent;
-            }
-            else
-            {
-                this.GravityChart.Series["Cross Coupling"].Color = ChartColors.crossCoupling;
-            }
-
-            if (ChartVisibility.rawBeam == false)
-            {
-                this.GravityChart.Series["Raw Beam"].Color = System.Drawing.Color.Transparent;
-            }
-            else
-            {
-                this.GravityChart.Series["Raw Beam"].Color = ChartColors.rawBeam;
-            }
-
-            if (ChartVisibility.totalCorrection == false)
-            {
-                this.GravityChart.Series["Total Correction"].Color = System.Drawing.Color.Transparent;
-            }
-            else
-            {
-                this.GravityChart.Series["Total Correction"].Color = ChartColors.totalCorrection;
-            }
-
-            if (ChartVisibility.rawGravity == false)
-            {
-                this.crossCouplingChart.Series["Raw Gravity"].Color = System.Drawing.Color.Transparent;
-            }
-            else
-            {
-                this.crossCouplingChart.Series["Raw Gravity"].Color = ChartColors.rawGravity;
-            }
-            if (ChartVisibility.AL == false)
-            {
-                this.crossCouplingChart.Series["AL"].Color = System.Drawing.Color.Transparent;
-            }
-            else
-            {
-                this.crossCouplingChart.Series["AL"].Color = ChartColors.AL;
-            }
-
-            if (ChartVisibility.AX == false)
-            {
-                this.crossCouplingChart.Series["AX"].Color = System.Drawing.Color.Transparent;
-            }
-            else
-            {
-                this.crossCouplingChart.Series["AX"].Color = ChartColors.AX;
-            }
-
-            if (ChartVisibility.VE == false)
-            {
-                this.crossCouplingChart.Series["VE"].Color = System.Drawing.Color.Transparent;
-            }
-            else
-            {
-                this.crossCouplingChart.Series["VE"].Color = ChartColors.VE;
-            }
-
-            if (ChartVisibility.AX2 == false)
-            {
-                this.crossCouplingChart.Series["AX2"].Color = System.Drawing.Color.Transparent;
-            }
-            else
-            {
-                this.crossCouplingChart.Series["AX2"].Color = ChartColors.AX2;
-            }
-
-            if (ChartVisibility.LACC == false)
-            {
-                this.crossCouplingChart.Series["LACC"].Color = System.Drawing.Color.Transparent;
-            }
-            else
-            {
-                this.crossCouplingChart.Series["LACC"].Color = ChartColors.LACC;
-            }
-
-            if (ChartVisibility.XACC == false)
-            {
-                this.crossCouplingChart.Series["XACC"].Color = System.Drawing.Color.Transparent;
-            }
-            else
-            {
-                this.crossCouplingChart.Series["XACC"].Color = ChartColors.XACC;
-            }
-
-            //    this.GravityChart.Update();
-            //   this.crossCouplingChart.Update();
-        }
-
         private void chartOptionsButton_Click(object sender, EventArgs e)
         {
             if (chartOptionsButton.Text == "Chart Options")
@@ -1607,110 +1158,21 @@ namespace ChartBinding
             }
         }
 
-        private void recordingTextBox_TextChanged(object sender, EventArgs e)
-        {
-        }
-
         private void traceColorComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            //Object traceSelect = traceColorComboBox.SelectedIndex;
-            string palettSelect = Convert.ToString(traceColorComboBox.SelectedItem);
-
-            switch (palettSelect)
-            {
-                case "None":
-                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.None;
-                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.None;
-
-                    break;
-
-                case "Bright":
-                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Bright;
-                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Bright;
-
-                    break;
-
-                case "Grayscale":
-                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Grayscale;
-                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Grayscale;
-
-                    break;
-
-                case "Excel":
-                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Excel;
-                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Excel;
-
-                    break;
-
-                case "Light":
-                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Light;
-                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Light;
-
-                    break;
-
-                case "Pastel":
-                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Pastel;
-                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Pastel;
-
-                    break;
-
-                case "EarthTones":
-                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.EarthTones;
-                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.EarthTones;
-
-                    break;
-
-                case "SemiTransparant":
-                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.SemiTransparent;
-                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.SemiTransparent;
-
-                    break;
-
-                case "Berry":
-                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Berry;
-                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Berry;
-
-                    break;
-
-                case "Chocolate":
-                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Chocolate;
-                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Chocolate;
-
-                    break;
-
-                case "Fire":
-                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Fire;
-                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Fire;
-
-                    break;
-
-                case "SeaGreen":
-                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.SeaGreen;
-                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.SeaGreen;
-
-                    break;
-
-                case "BrightPastel":
-                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.BrightPastel;
-                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.BrightPastel;
-
-                    break;
-
-                default:
-                    break;
-            }
-            this.crossCouplingChart.ApplyPaletteColors();
-            this.GravityChart.ApplyPaletteColors();
+            string paletteSelect = Convert.ToString(traceColorComboBox.SelectedItem);
+            SetTraceColor(paletteSelect);
         }
 
         private void printConfigFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            FileClass.LogConfigDataToFileTable();
+            LogConfigDataToFileTable();
         }
 
         private void meterNumberTextBox_TextChanged(object sender, EventArgs e)
         {
             meterNumber = meterNumberTextBox.Text;
+            Properties.Settings.Default.meterNumber = meterNumberTextBox.Text;
         }
 
         private void saveConfigFileToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1761,6 +1223,7 @@ namespace ChartBinding
         private void surveyTextBox_TextChanged(object sender, EventArgs e)
         {
             surveyName = surveyTextBox.Text;
+            surveyNameSet = true;
         }
 
         private void markersCheckBox_CheckedChanged(object sender, EventArgs e)
@@ -1768,13 +1231,1678 @@ namespace ChartBinding
             ChartMarkers(markersCheckBox.Checked);
         }
 
-        public void LoadUserPreferences()
+        private void stopButton_Click(object sender, EventArgs e)
         {
-            // file name format
-            // file format
-            // chart config (background, line colors, enabled traces, markers, line width)
-            // auto startup?
+            // Close file
+
+            recordingTextBox.Visible = false;
         }
+
+        private void StartupWorker(object obj)
+        {
+            var _delegate = (Action<startupData>)obj;
+
+            _delegate(new startupData { Status = "Starting gyros..." });
+            Thread.Sleep(5000);
+            _delegate(new startupData { Status = "Gyro status OK" });
+            Thread.Sleep(1500);
+            _delegate(new startupData { Status = "Startuing torque motors" });
+            Thread.Sleep(1500);
+            _delegate(new startupData { Status = "This will take a while...please be patient..." });
+            Thread.Sleep(10000);
+            _delegate(new startupData { Status = "Startup complete" });
+            Thread.Sleep(3000);
+            _delegate(new startupData { Status = "" });
+        }
+
+        private void autoStartupCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (autoStartupCheckBox.Checked)
+            {
+                // start thread to sumulate startup
+                Thread StartupThread = new Thread(new ParameterizedThreadStart(StartupWorker));
+                StartupThread.IsBackground = true;
+                StartupThread.Start(new Action<startupData>(this.UpdateStartupStatus));
+            }
+        }
+
+        private void UpdateStartupStatus(startupData d)// this will be the new update chart etc.
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action<startupData>(this.UpdateStartupStatus), new object[] { d });
+            }
+            else
+            {
+                if (d.Status == "")
+                {
+                    startupLabel.Visible = false;
+                    autoStartupCheckBox.Visible = false;
+                }
+                startupLabel.Text = d.Status;
+            }
+        }
+
+        private void SaveSettings()
+        {
+            Properties.Settings.Default.Save();
+        }
+
+        #region Chart Methods
+
+        //*****************************************************************************
+        //                       Chart Methods
+        //*****************************************************************************
+        public static class ChartColors
+        {
+            public static System.Drawing.Color digitalGravity = System.Drawing.Color.SteelBlue;
+            public static System.Drawing.Color springTension = System.Drawing.Color.BlueViolet;
+            public static System.Drawing.Color crossCoupling = System.Drawing.Color.DarkOrange;
+            public static System.Drawing.Color rawBeam = System.Drawing.Color.DeepSkyBlue;
+            public static System.Drawing.Color totalCorrection = System.Drawing.Color.ForestGreen;
+
+            //   public static System.Drawing.Color rawGravity = System.Drawing.Color.RoyalBlue;
+            public static System.Drawing.Color AL = System.Drawing.Color.LightSeaGreen;
+
+            public static System.Drawing.Color AX = System.Drawing.Color.OrangeRed;
+            public static System.Drawing.Color VE = System.Drawing.Color.PaleVioletRed;
+            public static System.Drawing.Color AX2 = System.Drawing.Color.Red;
+            public static System.Drawing.Color LACC = System.Drawing.Color.Wheat;
+            public static System.Drawing.Color XACC = System.Drawing.Color.SteelBlue;
+        }
+
+        public static class ChartVisibility
+        {
+            public static Boolean digitalGravity = true;
+            public static Boolean springTension = true;
+            public static Boolean crossCoupling = true;
+            public static Boolean rawBeam = true;
+            public static Boolean totalCorrection = true;
+
+            //   public static Boolean rawGravity = true;
+            public static Boolean AL = true;
+
+            public static Boolean AX = true;
+            public static Boolean VE = true;
+            public static Boolean AX2 = true;
+            public static Boolean LACC = true;
+            public static Boolean XACC = true;
+        }
+
+        public void SetChartBorderWidth(int width)
+        {
+            GravityChart.Series["Digital Gravity"].BorderWidth = width;
+            GravityChart.Series["Spring Tension"].BorderWidth = width;
+            GravityChart.Series["Raw Beam"].BorderWidth = width;
+            GravityChart.Series["Cross Coupling"].BorderWidth = width;
+            GravityChart.Series["Total Correction"].BorderWidth = width;
+            //  crossCouplingChart.Series["Raw Gravity"].BorderWidth = width;
+            crossCouplingChart.Series["LACC"].BorderWidth = width;
+            crossCouplingChart.Series["XACC"].BorderWidth = width;
+            crossCouplingChart.Series["AX2"].BorderWidth = width;
+            crossCouplingChart.Series["VE"].BorderWidth = width;
+            crossCouplingChart.Series["AX"].BorderWidth = width;
+            crossCouplingChart.Series["AL"].BorderWidth = width;
+        }
+
+        public void SetChartVisibility()
+        {
+            if (ChartVisibility.digitalGravity == false)
+            {
+                GravityChart.Series["Digital Gravity"].Color = System.Drawing.Color.Transparent;
+                // this.GravityChart.Series["Digital Gravity"].Enabled = true;
+            }
+            else
+            {
+                GravityChart.Series["Digital Gravity"].Color = ChartColors.digitalGravity;
+                //  this.GravityChart.Series["Digital Gravity"].Enabled = false;
+            }
+
+            if (ChartVisibility.springTension == false)
+            {
+                GravityChart.Series["Spring Tension"].Color = System.Drawing.Color.Transparent;
+            }
+            else
+            {
+                GravityChart.Series["Spring Tension"].Color = ChartColors.springTension;
+            }
+
+            if (ChartVisibility.crossCoupling == false)
+            {
+                GravityChart.Series["Cross Coupling"].Color = System.Drawing.Color.Transparent;
+            }
+            else
+            {
+                GravityChart.Series["Cross Coupling"].Color = ChartColors.crossCoupling;
+            }
+
+            if (ChartVisibility.rawBeam == false)
+            {
+                GravityChart.Series["Raw Beam"].Color = System.Drawing.Color.Transparent;
+            }
+            else
+            {
+                GravityChart.Series["Raw Beam"].Color = ChartColors.rawBeam;
+            }
+
+            if (ChartVisibility.totalCorrection == false)
+            {
+                GravityChart.Series["Total Correction"].Color = System.Drawing.Color.Transparent;
+            }
+            else
+            {
+                GravityChart.Series["Total Correction"].Color = ChartColors.totalCorrection;
+            }
+
+            if (ChartVisibility.AL == false)
+            {
+                crossCouplingChart.Series["AL"].Color = System.Drawing.Color.Transparent;
+            }
+            else
+            {
+                crossCouplingChart.Series["AL"].Color = ChartColors.AL;
+            }
+
+            if (ChartVisibility.AX == false)
+            {
+                crossCouplingChart.Series["AX"].Color = System.Drawing.Color.Transparent;
+            }
+            else
+            {
+                crossCouplingChart.Series["AX"].Color = ChartColors.AX;
+            }
+
+            if (ChartVisibility.VE == false)
+            {
+                crossCouplingChart.Series["VE"].Color = System.Drawing.Color.Transparent;
+            }
+            else
+            {
+                crossCouplingChart.Series["VE"].Color = ChartColors.VE;
+            }
+
+            if (ChartVisibility.AX2 == false)
+            {
+                crossCouplingChart.Series["AX2"].Color = System.Drawing.Color.Transparent;
+            }
+            else
+            {
+                crossCouplingChart.Series["AX2"].Color = ChartColors.AX2;
+            }
+
+            if (ChartVisibility.LACC == false)
+            {
+                crossCouplingChart.Series["LACC"].Color = System.Drawing.Color.Transparent;
+            }
+            else
+            {
+                crossCouplingChart.Series["LACC"].Color = ChartColors.LACC;
+            }
+
+            if (ChartVisibility.XACC == false)
+            {
+                crossCouplingChart.Series["XACC"].Color = System.Drawing.Color.Transparent;
+            }
+            else
+            {
+                crossCouplingChart.Series["XACC"].Color = ChartColors.XACC;
+            }
+
+            //    this.GravityChart.Update();
+            //   this.crossCouplingChart.Update();
+        }
+
+        private void SetupChart()
+        {
+            BindingSource SBind = new BindingSource();
+
+            // this.GravityChart.Series["Digital Gravity"].Label = "Y = #VALY\nX = #VALX"; sample
+
+            //      SETUP MAIN PAGE GRAVITY CHART
+            traceTrackBar.Value = 2;
+            GravityChart.Series["Digital Gravity"].XValueMember = "dateTime";
+            GravityChart.Series["Digital Gravity"].XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
+            GravityChart.Series["Digital Gravity"].YValueMembers = "gravity";
+            GravityChart.Series["Digital Gravity"].ToolTip = "Time = #VALX\n#VALY";
+            GravityChart.DataSource = dataTable;
+            GravityChart.DataBind();
+
+            GravityChart.Series["Digital Gravity"].XValueType = ChartValueType.DateTime;
+
+            GravityChart.Series["Spring Tension"].XValueMember = "dateTime";
+            GravityChart.Series["Spring Tension"].YValueMembers = "springTension";
+            GravityChart.Series["Spring Tension"].ToolTip = "Time = #VALX\n#VALY";
+            GravityChart.DataSource = dataTable;
+            GravityChart.DataBind();
+
+            GravityChart.Series["Cross Coupling"].XValueMember = "dateTime";
+            GravityChart.Series["Cross Coupling"].YValueMembers = "crossCoupling";
+            GravityChart.Series["Cross Coupling"].ToolTip = "#VALY";
+            GravityChart.DataSource = dataTable;
+            GravityChart.DataBind();
+
+            GravityChart.Series["Raw Beam"].XValueMember = "dateTime";
+            GravityChart.Series["Raw Beam"].YValueMembers = "RawBeam";
+            GravityChart.Series["Raw Beam"].ToolTip = "#VALY";
+            GravityChart.DataSource = dataTable;
+            GravityChart.DataBind();
+
+            GravityChart.Series["Total Correction"].XValueMember = "dateTime";
+            GravityChart.Series["Total Correction"].YValueMembers = "TotalCorrection";
+            GravityChart.Series["Total Correction"].ToolTip = "#VALY";
+            GravityChart.DataSource = dataTable;
+            GravityChart.DataBind();
+
+            // this.GravityChart.Titles.Add("Gravity");
+
+            //      X AXIS
+
+            // this.GravityChart.ChartAreas["ChartArea1"].AxisX.Interval = 10;
+
+            // Set cursor interval properties
+            GravityChart.ChartAreas["ChartArea1"].CursorX.Interval = .001D;
+            GravityChart.ChartAreas["ChartArea1"].CursorX.IntervalType = DateTimeIntervalType.Seconds;
+            GravityChart.ChartAreas["ChartArea1"].CursorY.Interval = 1;
+            GravityChart.ChartAreas["ChartArea1"].AxisX.LabelStyle.Format = "hh:mm:ss";
+
+            // Set automatic zooming
+            GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoomable = true;
+            GravityChart.ChartAreas["ChartArea1"].AxisY.ScaleView.Zoomable = true;
+
+            // Set automatic scrolling
+            GravityChart.ChartAreas["ChartArea1"].CursorX.AutoScroll = true;
+            GravityChart.ChartAreas["ChartArea1"].CursorY.AutoScroll = true;
+
+            if (false)
+            {
+                GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoom(2, 3);
+                GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.ZoomReset(1);
+                GravityChart.ChartAreas["ChartArea1"].AxisX.LabelStyle.Angle = 0;// can vary from -90 to + 90
+
+                GravityChart.ChartAreas["ChartArea1"].CursorX.IsUserEnabled = true;
+                GravityChart.ChartAreas["ChartArea1"].CursorX.IsUserSelectionEnabled = true;
+                GravityChart.ChartAreas["ChartArea1"].CursorX.IntervalType = DateTimeIntervalType.Minutes;
+                GravityChart.ChartAreas["ChartArea1"].CursorX.Interval = .01;// .1D;
+
+                GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollSizeType = DateTimeIntervalType.Minutes;
+                GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollSize = .1D;
+                GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoomable = true;
+
+                GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.MinSizeType = DateTimeIntervalType.Minutes;
+                GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.MinSize = .1D;
+
+                GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollMinSizeType = DateTimeIntervalType.Minutes;
+                GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollMinSize = .1D;
+                GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.IsPositionedInside = false;
+
+                // Change scrollbar colors
+                GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.BackColor = System.Drawing.Color.LightGray;
+                GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.ButtonColor = System.Drawing.Color.Gray;
+                GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.LineColor = System.Drawing.Color.Black;
+            }
+
+            if (true)
+            {
+                // Set scrollbar size
+                GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.Size = 12;
+                // show either just the center scroll button..
+                GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.ButtonStyle = ScrollBarButtonStyles.SmallScroll;
+                // .. or include the left and right buttons:
+                GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.ButtonStyle =
+                     ScrollBarButtonStyles.All ^ ScrollBarButtonStyles.ResetZoom;
+
+                // Scrollbars position
+                GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.IsPositionedInside = true;
+                GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.Enabled = true;
+                // this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Size = 100;  // number (!) of data points visible
+            }
+            //  Y AXIS
+            //  this.GravityChart.ChartAreas["ChartArea1"].AxisY.ScaleView.ZoomReset(1);
+            GravityChart.ChartAreas["ChartArea1"].CursorY.IsUserEnabled = true;
+            GravityChart.ChartAreas["ChartArea1"].CursorY.IsUserSelectionEnabled = true;
+            GravityChart.ChartAreas["ChartArea1"].AxisY.ScaleView.Zoomable = true;
+
+            crossCouplingChart.ChartAreas["ChartArea1"].AxisX.LabelStyle.Format = "yyyy-MM-dd HH:mm:ss";
+            crossCouplingChart.ChartAreas["ChartArea1"].AxisX.LabelStyle.Format = "hh:mm:ss";
+            crossCouplingChart.ChartAreas["ChartArea1"].AxisX.LabelStyle.Angle = 0;
+            crossCouplingChart.Series["AL"].XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
+
+            // Setup chart series
+
+            crossCouplingChart.Series["AL"].XValueMember = "dateTime";
+            crossCouplingChart.Series["AL"].YValueMembers = "AL";
+            crossCouplingChart.DataSource = dataTable;
+            crossCouplingChart.DataBind();
+
+            crossCouplingChart.Series["AX"].XValueMember = "dateTime";
+            crossCouplingChart.Series["AX"].YValueMembers = "AX";
+            crossCouplingChart.DataSource = dataTable;
+            crossCouplingChart.DataBind();
+
+            crossCouplingChart.Series["VE"].XValueMember = "dateTime";
+            crossCouplingChart.Series["VE"].YValueMembers = "VE";
+            crossCouplingChart.DataSource = dataTable;
+            crossCouplingChart.DataBind();
+
+            crossCouplingChart.Series["AX2"].XValueMember = "dateTime";
+            crossCouplingChart.Series["AX2"].YValueMembers = "AX2";
+            crossCouplingChart.DataSource = dataTable;
+            crossCouplingChart.DataBind();
+
+            crossCouplingChart.Series["XACC"].XValueMember = "dateTime";
+            crossCouplingChart.Series["XACC"].YValueMembers = "XACC2";
+            crossCouplingChart.DataSource = dataTable;
+            crossCouplingChart.DataBind();
+
+            crossCouplingChart.Series["LACC"].XValueMember = "dateTime";
+            crossCouplingChart.Series["LACC"].YValueMembers = "LACC";
+            crossCouplingChart.DataSource = dataTable;
+            crossCouplingChart.DataBind();
+
+            //this.crossCouplingChart.Titles.Add("Cross Coupling");
+
+            crossCouplingChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoom(2, 3);
+            crossCouplingChart.ChartAreas["ChartArea1"].AxisX.ScaleView.ZoomReset(1);
+            crossCouplingChart.ChartAreas["ChartArea1"].AxisY.ScaleView.ZoomReset(1);
+            crossCouplingChart.ChartAreas["ChartArea1"].AxisX.LabelStyle.Angle = 0;// can vary from -90 to + 90
+            //Enable range selection and zooming end user interface
+
+            crossCouplingChart.ChartAreas["ChartArea1"].CursorX.IsUserEnabled = true;
+            crossCouplingChart.ChartAreas["ChartArea1"].CursorY.IsUserEnabled = true;
+            crossCouplingChart.ChartAreas["ChartArea1"].CursorX.IsUserSelectionEnabled = true;
+            crossCouplingChart.ChartAreas["ChartArea1"].CursorY.IsUserSelectionEnabled = true;
+            crossCouplingChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoomable = true;
+            crossCouplingChart.ChartAreas["ChartArea1"].AxisY.ScaleView.Zoomable = true;
+            crossCouplingChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.IsPositionedInside = true;
+            crossCouplingChart.ChartAreas["ChartArea1"].AxisY.ScrollBar.IsPositionedInside = true;
+
+            // Get default values and apply
+
+            SetTraceColor(Properties.Settings.Default.tracePalette);//     Set trace color palette
+            SetChartAreaColors(Properties.Settings.Default.chartColor);//  Set chart background color
+            SetChartBorderWidth(Properties.Settings.Default.traceWidth);// Set trace width
+            ChartMarkers(Properties.Settings.Default.traceMarkers);//      Enable/ disable trace markers
+           
+        }
+
+        public void SetChartColors()
+        {
+            GravityChart.Series["Digital Gravity"].Color = ChartColors.digitalGravity;
+            GravityChart.Series["Spring Tension"].Color = ChartColors.springTension;
+            GravityChart.Series["Cross Coupling"].Color = ChartColors.crossCoupling;
+            GravityChart.Series["Raw Beam"].Color = ChartColors.rawBeam;
+            GravityChart.Series["Total Correction"].Color = ChartColors.totalCorrection;
+            //  crossCouplingChart.Series["Raw Gravity"].Color = ChartColors.rawGravity;
+            crossCouplingChart.Series["AL"].Color = ChartColors.AL;
+            crossCouplingChart.Series["AX"].Color = ChartColors.AX;
+            crossCouplingChart.Series["VE"].Color = ChartColors.VE;
+            crossCouplingChart.Series["AX2"].Color = ChartColors.AX2;
+            crossCouplingChart.Series["XACC"].Color = ChartColors.XACC;
+            crossCouplingChart.Series["LACC"].Color = ChartColors.LACC;
+            GravityChart.Update();
+            crossCouplingChart.Update();
+        }
+
+        public void ChartMarkers(bool enable)
+        {
+            if (enable == true)
+            {
+                GravityChart.Series["Digital Gravity"].MarkerStyle = MarkerStyle.Circle;
+                GravityChart.Series["Spring Tension"].MarkerStyle = MarkerStyle.Cross;
+                GravityChart.Series["Cross Coupling"].MarkerStyle = MarkerStyle.Diamond;
+                GravityChart.Series["Raw Beam"].MarkerStyle = MarkerStyle.Square;
+                GravityChart.Series["Total Correction"].MarkerStyle = MarkerStyle.Triangle;
+
+                //  crossCouplingChart.Series["Raw Gravity"].MarkerStyle = MarkerStyle.Circle;
+                crossCouplingChart.Series["AL"].MarkerStyle = MarkerStyle.Triangle;
+                crossCouplingChart.Series["AX"].MarkerStyle = MarkerStyle.Star5;
+                crossCouplingChart.Series["VE"].MarkerStyle = MarkerStyle.Square;
+                crossCouplingChart.Series["AX2"].MarkerStyle = MarkerStyle.Diamond;
+                crossCouplingChart.Series["LACC"].MarkerStyle = MarkerStyle.Cross;
+                crossCouplingChart.Series["XACC"].MarkerStyle = MarkerStyle.Star10;
+            }
+            else
+            {
+                GravityChart.Series["Digital Gravity"].MarkerStyle = MarkerStyle.None;
+                GravityChart.Series["Spring Tension"].MarkerStyle = MarkerStyle.None;
+                GravityChart.Series["Cross Coupling"].MarkerStyle = MarkerStyle.None;
+                GravityChart.Series["Raw Beam"].MarkerStyle = MarkerStyle.None;
+                GravityChart.Series["Total Correction"].MarkerStyle = MarkerStyle.None;
+
+                // crossCouplingChart.Series["Raw Gravity"].MarkerStyle = MarkerStyle.None;
+                crossCouplingChart.Series["AL"].MarkerStyle = MarkerStyle.None;
+                crossCouplingChart.Series["AX"].MarkerStyle = MarkerStyle.None;
+                crossCouplingChart.Series["VE"].MarkerStyle = MarkerStyle.None;
+                crossCouplingChart.Series["AX2"].MarkerStyle = MarkerStyle.None;
+                crossCouplingChart.Series["LACC"].MarkerStyle = MarkerStyle.None;
+                crossCouplingChart.Series["XACC"].MarkerStyle = MarkerStyle.None;
+            }
+        }
+
+        public void UpdateChart()
+        {
+            //   DataTable dataTable = new DataTable();
+            DataRow myDataRow = dataTable.NewRow();
+            DateTime firstDateTime = new DateTime(2015, 1, 1, MeterData.Hour, MeterData.Min, MeterData.Sec);
+            DateTime myDateTime = firstDateTime.AddDays(MeterData.day - 1);
+
+            //      UPDATE MAIN GRAVITY CHART
+            this.GravityChart.Series["Digital Gravity"].Points.AddXY(myDateTime, MeterData.data4[2]);
+            this.GravityChart.Series["Spring Tension"].Points.AddXY(myDateTime, MeterData.data1[3]);
+            this.GravityChart.Series["Cross Coupling"].Points.AddXY(myDateTime, MeterData.data4[4]);
+            this.GravityChart.Series["Raw Beam"].Points.AddXY(myDateTime, MeterData.data1[5]);
+            this.GravityChart.Series["Total Correction"].Points.AddXY(myDateTime, MeterData.totalCorrection);
+
+            if (firstTime)
+            {
+                long ticks = myDateTime.Ticks;
+
+                GravityChart.ChartAreas[0].AxisX.IntervalType = DateTimeIntervalType.Seconds;
+                GravityChart.ChartAreas[0].AxisX.Interval = 10;
+                GravityChart.ChartAreas[0].AxisX.Minimum = myDateTime.ToOADate();//42291.863;
+                firstTime = false;
+            }
+
+            GravityChart.Update();
+
+            //      UPDATE MAIN CROSS COUPLING CHART
+
+            //  crossCouplingChart.Series["Raw Gravity"].Points.AddXY(myDateTime, MeterData.data4[2]);
+            crossCouplingChart.Series["AL"].Points.AddXY(myDateTime, MeterData.data4[7]);
+            crossCouplingChart.Series["AX"].Points.AddXY(myDateTime, MeterData.data4[8]);
+            crossCouplingChart.Series["VE"].Points.AddXY(myDateTime, MeterData.data4[9]);
+            crossCouplingChart.Series["AX2"].Points.AddXY(myDateTime, MeterData.data4[10]);
+            crossCouplingChart.Series["LACC"].Points.AddXY(myDateTime, MeterData.data4[13]);
+            crossCouplingChart.Series["XACC"].Points.AddXY(myDateTime, MeterData.data4[14]);
+            crossCouplingChart.Update();
+
+            if (false)
+            {
+                if (GravityChart.ChartAreas[0].AxisX.ScaleView.IsZoomed)
+                {
+                    double offset = this.GravityChart.ChartAreas[0].AxisX.Minimum - this.GravityChart.ChartAreas[0].AxisX.ScaleView.Position;
+
+                    GravityChart.ChartAreas[0].AxisX.LabelStyle.IntervalOffset = offset;
+                    GravityChart.ChartAreas[0].AxisX.MajorGrid.IntervalOffset = offset;
+                    GravityChart.ChartAreas[0].AxisX.MajorTickMark.IntervalOffset = offset;
+                    GravityChart.ChartAreas[0].AxisX.MinorGrid.IntervalOffset = offset;
+                    GravityChart.ChartAreas[0].AxisX.MinorTickMark.IntervalOffset = offset;
+                }
+                else
+                {
+                    GravityChart.ChartAreas[0].AxisX.LabelStyle.IntervalOffset = 0;
+                    GravityChart.ChartAreas[0].AxisX.MajorGrid.IntervalOffset = 0;
+                    GravityChart.ChartAreas[0].AxisX.MajorTickMark.IntervalOffset = 0;
+                    GravityChart.ChartAreas[0].AxisX.MinorGrid.IntervalOffset = 0;
+                    GravityChart.ChartAreas[0].AxisX.MinorTickMark.IntervalOffset = 0;
+                }
+            }
+        }
+
+        public void SetChartAreaColors(int scheme)
+        {
+            if (scheme == 0)// Light background
+            {
+                //  GRAVITY
+                GravityChart.ChartAreas["ChartArea1"].BackColor = System.Drawing.Color.White;
+                GravityChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Black;
+                GravityChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Black;
+                GravityChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Black;
+                GravityChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Black;
+
+                // CROSS COUPLING
+                crossCouplingChart.ChartAreas["ChartArea1"].BackColor = System.Drawing.Color.White;
+                crossCouplingChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Black;
+                crossCouplingChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Black;
+                crossCouplingChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Black;
+                crossCouplingChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Black;
+                Properties.Settings.Default.chartColor = 0;
+            }
+            if (scheme == 1)// gray background
+            {
+                //  GRAVITY
+                GravityChart.ChartAreas["ChartArea1"].BackColor = System.Drawing.Color.Gray;
+                GravityChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Black;
+                GravityChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Black;
+                GravityChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Black;
+                GravityChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Black;
+
+                // CROSS COUPLING
+                crossCouplingChart.ChartAreas["ChartArea1"].BackColor = System.Drawing.Color.Gray;
+                crossCouplingChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Black;
+                crossCouplingChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Black;
+                crossCouplingChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Black;
+                crossCouplingChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Black;
+                Properties.Settings.Default.chartColor = 1;
+            }
+            if (scheme == 2)// black background
+            {
+                //  GRAVITY
+                GravityChart.ChartAreas["ChartArea1"].BackColor = System.Drawing.Color.Black;
+                GravityChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                GravityChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                GravityChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                GravityChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Gray;
+
+                // CROSS COUPLING
+                crossCouplingChart.ChartAreas["ChartArea1"].BackColor = System.Drawing.Color.Black;
+                crossCouplingChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                crossCouplingChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                crossCouplingChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                crossCouplingChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                Properties.Settings.Default.chartColor = 2;
+            }
+        }
+
+        private void chart1_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            HitTestResult result = this.GravityChart.HitTest(e.X, e.Y);
+            if (result != null && result.Object != null)
+            {
+                // When user hits the LegendItem
+                if (result.Object is LegendItem)
+                {
+                    // Legend item result
+                    LegendItem legendItem = (LegendItem)result.Object;
+
+                    // series item selected
+                    Series selectedSeries = (Series)legendItem.Tag;
+
+                    if (selectedSeries != null)
+                    {
+                        if (selectedSeries.Enabled)
+                            selectedSeries.Enabled = false;
+                        else
+                            selectedSeries.Enabled = true;
+                    }
+                }
+            }
+        }
+
+        private void SetTraceColor(string colorPalette)
+        {
+            switch (colorPalette)
+            {
+                case "None":
+                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.None;
+                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.None;
+                    Properties.Settings.Default.tracePalette = "None";
+                    break;
+
+                case "Bright":
+                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Bright;
+                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Bright;
+                    Properties.Settings.Default.tracePalette = "Bright";
+                    break;
+
+                case "Grayscale":
+                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Grayscale;
+                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Grayscale;
+                    Properties.Settings.Default.tracePalette = "Grayscale";
+                    break;
+
+                case "Excel":
+                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Excel;
+                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Excel;
+                    Properties.Settings.Default.tracePalette = "Excel";
+                    break;
+
+                case "Light":
+                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Light;
+                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Light;
+                    Properties.Settings.Default.tracePalette = "Light";
+                    break;
+
+                case "Pastel":
+                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Pastel;
+                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Pastel;
+                    Properties.Settings.Default.tracePalette = "Pastel";
+                    break;
+
+                case "EarthTones":
+                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.EarthTones;
+                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.EarthTones;
+                    Properties.Settings.Default.tracePalette = "EarthTones";
+                    break;
+
+                case "SemiTransparant":
+                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.SemiTransparent;
+                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.SemiTransparent;
+                    Properties.Settings.Default.tracePalette = "SemiTransparant";
+                    break;
+
+                case "Berry":
+                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Berry;
+                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Berry;
+                    Properties.Settings.Default.tracePalette = "Berry";
+                    break;
+
+                case "Chocolate":
+                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Chocolate;
+                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Chocolate;
+                    Properties.Settings.Default.tracePalette = "Chocolate";
+                    break;
+
+                case "Fire":
+                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Fire;
+                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.Fire;
+                    Properties.Settings.Default.tracePalette = "Fire";
+                    break;
+
+                case "SeaGreen":
+                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.SeaGreen;
+                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.SeaGreen;
+                    Properties.Settings.Default.tracePalette = "SeaGreen";
+                    break;
+
+                case "BrightPastel":
+                    this.GravityChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.BrightPastel;
+                    this.crossCouplingChart.Palette = this.crossCouplingChart.Palette = ChartColorPalette.BrightPastel;
+                    Properties.Settings.Default.tracePalette = "BrightPastel";
+                    break;
+
+                default:
+                    break;
+            }
+            this.crossCouplingChart.ApplyPaletteColors();
+            this.GravityChart.ApplyPaletteColors();
+        }
+
+        #endregion Chart Methods
+
+        #region Meter Startup
+
+        private void manualStartupCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            manualStartupGroupBox.Visible = true;
+        }
+
+        private void switchesGyroCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            Thread StartupThread = new Thread(new ParameterizedThreadStart(GyroWorker));
+            StartupThread.IsBackground = true;
+            StartupThread.Start(new Action<startupData>(this.UpdateManualStartupStatus));
+        }
+
+        private void GyroWorker(object obj)
+        {
+            var _delegate = (Action<startupData>)obj;
+            _delegate(new startupData { Status = "Gyro delay" });
+            Thread.Sleep(5000);
+            _delegate(new startupData { Status = "Gyro (200Hz) ON" });
+            Thread.Sleep(1500);
+        }
+
+        private void TorqueWorker(object obj)
+        {
+            var _delegate = (Action<startupData>)obj;
+            _delegate(new startupData { Status = "Torque delay" });
+            Thread.Sleep(2000);
+            _delegate(new startupData { Status = "Torque Motors ON" });
+            Thread.Sleep(1500);
+        }
+
+        private void SpringTensionWorker(object obj)
+        {
+            var _delegate = (Action<startupData>)obj;
+            _delegate(new startupData { Status = "Spring tension delay" });
+            Thread.Sleep(2000);
+            _delegate(new startupData { Status = "Spring Tension ON" });
+            Thread.Sleep(1500);
+            _delegate(new startupData { Status = "" });
+        }
+
+        private void UpdateManualStartupStatus(startupData d)// this will be the new update chart etc.
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action<startupData>(this.UpdateManualStartupStatus), new object[] { d });
+            }
+            else
+            {
+                if (d.Status == "")
+                {
+                    startupLabel.Visible = false;
+                    autoStartupCheckBox.Visible = false;
+                    manualStartupGroupBox.Visible = false;
+                    manualStartupCheckBox.Visible = false;
+                }
+                else if (d.Status == "Gyro (200Hz) ON")
+                {
+                    switchesGyroCheckBox.Text = "Gyro (200Hz) ON";
+                    SwitchesTorqueMotorsCheckBox.Enabled = true;
+                    startupLabel.Text = "Gyro status OK";
+                }
+                else if (d.Status == "Gyro delay")
+                {
+                    startupLabel.Text = "Gyros spinning up.  Please wait...";
+                }
+                else if (d.Status == "Torque Motors ON")
+                {
+                    SwitchesTorqueMotorsCheckBox.Text = d.Status;
+                    SwitchesSpringTensionCheckBox.Enabled = true;
+                    startupLabel.Text = "Torque motors engaged";
+                }
+                else if (d.Status == "Torque delay")
+                {
+                    startupLabel.Text = "Engaging torque motors";
+                }
+                else if (d.Status == "Spring tension delay")
+                {
+                    startupLabel.Text = "Enabling spring tension";
+                }
+                else if (d.Status == "Spring Tension ON")
+                {
+                    startupLabel.Text = "Spring tension enabled";
+                }
+                else
+                {
+                    startupLabel.Text = d.Status;
+                }
+            }
+        }
+
+        private void SwitchesTorqueMotorsCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            Thread TorqueMotorStartupThread = new Thread(new ParameterizedThreadStart(TorqueWorker));
+            TorqueMotorStartupThread.IsBackground = true;
+            TorqueMotorStartupThread.Start(new Action<startupData>(this.UpdateManualStartupStatus));
+        }
+
+        private void SwitchesSpringTensionCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            Thread STStartupThread = new Thread(new ParameterizedThreadStart(SpringTensionWorker));
+            STStartupThread.IsBackground = true;
+            STStartupThread.Start(new Action<startupData>(this.UpdateManualStartupStatus));
+        }
+
+        #endregion Meter Startup
+
+        #region File Class
+
+        public void ReadConfigFile()
+        {
+            //  NEED TO ADD ERROR CHECKING FOR END OF FILE
+            //  NEED TO ADD OPEN FILE DIALOG ONLY IF FILE IS (MISSING OR MANUAL BOX IS CHECKED - ENGINEERING ONLY)
+            ConfigData ConfigData = new ConfigData();
+            FileStream myStream;
+            //    double[] CCFACT = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            //    double[] AFILT = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            byte[] tempByte = { 0, 0, 0, 0 };
+            byte[] byte2 = new byte[2];
+            byte[] byte4 = new byte[4];
+            byte[] byte10 = new byte[10];
+
+            try
+            {
+                myStream = new FileStream("C:\\LCT stuff\\CONFIG20.ref", FileMode.Open);
+                BinaryReader readBinary = new BinaryReader(myStream);
+
+                readBinary.Read(byte2, 0, 2);
+                readBinary.Read(byte4, 0, 4);
+
+                ConfigData.beamScale = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("BEAM SCALE FACTOR-------------------- \t{0:n6}.", ConfigData.beamScale);
+
+                readBinary.Read(byte2, 0, 2);
+                ConfigData.numAuxChan = BitConverter.ToInt16(byte2, 0);
+                if (Form1.engineerDebug) Console.WriteLine("NUMBER OF AUXILIARY ANALOG CHANNELS-- \t" + Convert.ToString(ConfigData.numAuxChan));
+
+                readBinary.Read(byte10, 0, 10);
+                ConfigData.meterNumber = System.Text.Encoding.Default.GetString(byte10).Trim();
+                // ConfigData.meterNumber.Trim();
+                if (Form1.engineerDebug) Console.WriteLine("Meter number is---------------------- \t" + ConfigData.meterNumber);
+
+                readBinary.Read(byte2, 0, 2);
+                ConfigData.linePrinterSwitch = BitConverter.ToInt16(byte2, 0);
+                if (Form1.engineerDebug) Console.WriteLine("LINE PRINTER SWITCH------------------ \t" + Convert.ToString(ConfigData.linePrinterSwitch));
+
+                readBinary.Read(byte2, 0, 2);
+                ConfigData.fileNameSwitch = BitConverter.ToInt16(byte2, 0);
+                if (Form1.engineerDebug) Console.WriteLine("FILE NAME SWITCH--------------------- \t" + Convert.ToString(ConfigData.fileNameSwitch));
+
+                readBinary.Read(byte2, 0, 2);
+                ConfigData.hardDiskSwitch = BitConverter.ToInt16(byte2, 0); ;
+                if (Form1.engineerDebug) Console.WriteLine("HARD DISK SWITCH--------------------- \t" + Convert.ToString(ConfigData.hardDiskSwitch));
+
+                readBinary.Read(byte10, 0, 10);
+                ConfigData.engPassword = System.Text.Encoding.Default.GetString(byte10);
+                if (Form1.engineerDebug) Console.WriteLine("Magic value is ---------------------- \t" + ConfigData.engPassword);
+
+                readBinary.Read(byte2, 0, 2);
+                ConfigData.monitorDisplaySwitch = BitConverter.ToInt16(byte2, 0);
+                if (Form1.engineerDebug) Console.WriteLine("MONITOR DISPLAY SWITCH--------------- \t" + Convert.ToString(ConfigData.monitorDisplaySwitch));
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.crossPeriod = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("CROSS-AXIS PERIOD-------------------- \t{0:e4}", ConfigData.crossPeriod);
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.longPeriod = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("LONG-AXIS PERIOD-------------------- \t{0:e4}", ConfigData.longPeriod);
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.crossDampFactor = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("CROSS-AXIS DAMPING------------------- \t{0:e4}", ConfigData.crossDampFactor);
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.longDampFactor = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("LONG-AXIS DAMPING------------------- \t{0:e4}", ConfigData.longDampFactor);
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.crossGain = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("CROSS-AXIS GAIN---------------------- \t" + Convert.ToString(ConfigData.crossGain));
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.longGain = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("LONG-AXIS GAIN---------------------- \t" + Convert.ToString(ConfigData.longGain));
+
+                readBinary.Read(byte2, 0, 2);
+                ConfigData.serialPortSwitch = BitConverter.ToInt16(byte2, 0);
+                if (Form1.engineerDebug) Console.WriteLine("SERIAL PORT FORMAT SWITCH------------ \t" + Convert.ToString(ConfigData.serialPortSwitch));
+
+                readBinary.Read(byte2, 0, 2);
+                ConfigData.digitalInputSwitch = BitConverter.ToInt16(byte2, 0);
+                if (Form1.engineerDebug) Console.WriteLine("DIGITAL INPUT SWITCH----------------- \t" + Convert.ToString(ConfigData.digitalInputSwitch));
+
+                readBinary.Read(byte2, 0, 2);
+                ConfigData.printerEmulationSwitch = BitConverter.ToInt16(byte2, 0);
+                if (ConfigData.printerEmulationSwitch == 2)
+                {
+                    if (Form1.engineerDebug) Console.WriteLine("PRINTER EMULATION-------------------- \t" + "ESC_P");
+                }
+                if (ConfigData.printerEmulationSwitch == 3)
+                {
+                    if (Form1.engineerDebug) Console.WriteLine("PRINTER EMULATION-------------------- \t" + "ESC_P2");
+                }
+                else
+                {
+                    if (Form1.engineerDebug) Console.WriteLine("PRINTER EMULATION-------------------- \t" + "DPL24C");
+                }
+
+                readBinary.Read(byte2, 0, 2);
+                ConfigData.serialPortOutputSwitch = BitConverter.ToInt16(byte2, 0);
+                if (Form1.engineerDebug) Console.WriteLine("SERIAL PORT OUTPUT SWITCH------------ \t" + Convert.ToString(ConfigData.serialPortOutputSwitch));
+
+                readBinary.Read(byte2, 0, 2);
+                ConfigData.alarmSwitch = BitConverter.ToInt16(byte2, 0);
+                if (Form1.engineerDebug) Console.WriteLine("ALARM SWITCH------------------------- \t" + Convert.ToString(ConfigData.alarmSwitch));
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.crossLead = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("CROSS-AXIS LEAD---------------------- \t" + Convert.ToString(ConfigData.crossLead));
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.longLead = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("LONG-AXIS LEAD---------------------- \t" + Convert.ToString(ConfigData.longLead));
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.springTensionMax = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("MAXIMUM SPRING TENSION VALUE--------- \t" + Convert.ToString(ConfigData.springTensionMax));
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.modeSwitch = BitConverter.ToInt16(byte4, 0);
+                if (ConfigData.modeSwitch == 0)
+                {
+                    if (Form1.engineerDebug) Console.WriteLine("MODE SWITCH-------------------------- \t" + "Marine");
+                }
+                else
+                {
+                    if (Form1.engineerDebug) Console.WriteLine("MODE SWITCH-------------------------- \t" + "Hires");
+                }
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.iAuxGain = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("I aux gain value is --------------- \t" + Convert.ToString(ConfigData.iAuxGain));
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.crossBias = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("CROSS-AXIS BIAS---------------------- \t" + Convert.ToString(ConfigData.crossBias));
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.longBias = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("LONG-AXIS BIAS---------------------- \t" + Convert.ToString(ConfigData.longBias));
+
+                readBinary.Read(byte2, 0, 2);// extra read for alignment.  need to find out why
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.crossCouplingFactors[6] = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("VCC---------------------------------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[6]));
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.crossCouplingFactors[7] = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("AL----------------------------------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[7]));
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.crossCouplingFactors[8] = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("AX----------------------------------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[8]));
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.crossCouplingFactors[9] = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("VE----------------------------------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[9]));
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.crossCouplingFactors[10] = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("AX2---------------------------------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[10]));
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.crossCouplingFactors[11] = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("XACC**2------------------------------ \t" + Convert.ToString(ConfigData.crossCouplingFactors[11]));
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.crossCouplingFactors[12] = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("LACC**2------------------------------ \t" + Convert.ToString(ConfigData.crossCouplingFactors[12]));
+
+                readBinary.Read(byte2, 0, 2);
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.crossCouplingFactors[13] = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("CROSS-AXIS COMPENSATION (4)---------- \t{0:e4}.", ConfigData.crossCouplingFactors[13]);
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.crossCouplingFactors[14] = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("LONG-AXIS COMPENSATION (4)----------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[14]));
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.crossCouplingFactors[15] = BitConverter.ToSingle(byte4, 0);
+                if (ConfigData.crossCouplingFactors[15] == 1)
+                {
+                    if (Form1.engineerDebug) Console.WriteLine("CROSS-AXIS COMPENSATION (16)--------- \t" + "N/A");
+                }
+                else
+                {
+                    if (Form1.engineerDebug) Console.WriteLine("CROSS-AXIS COMPENSATION (16)--------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[15]));
+                }
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.crossCouplingFactors[16] = BitConverter.ToSingle(byte4, 0);
+                if (ConfigData.crossCouplingFactors[15] == 1)
+                {
+                    if (Form1.engineerDebug) Console.WriteLine("LONG-AXIS COMPENSATION (16)---------- \t" + "N/A");
+                }
+                else
+                {
+                    if (Form1.engineerDebug) Console.WriteLine("LONG-AXIS COMPENSATION (16)---------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[16]));
+                }
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.analogFilter[1] = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("AX PHASE----------------------------- \t" + Convert.ToString(ConfigData.analogFilter[1]));
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.analogFilter[2] = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("AL PHASE----------------------------- \t" + Convert.ToString(ConfigData.analogFilter[2]));
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.analogFilter[3] = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("AFILT[3]---------------------------- \t" + Convert.ToString(ConfigData.analogFilter[3]));
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.analogFilter[4] = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("VCC PHASE---------------------------- \t" + Convert.ToString(ConfigData.analogFilter[4]));
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.analogFilter[5] = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("CROSS-AXIS COMPENSATION PHASE (4)---- \t" + Convert.ToString(ConfigData.analogFilter[5]));
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.analogFilter[6] = BitConverter.ToSingle(byte4, 0);
+                if (Form1.engineerDebug) Console.WriteLine("LONG AXIS COMPENSATION PHASE (4)----- \t" + Convert.ToString(ConfigData.analogFilter[6]));
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.analogFilter[7] = BitConverter.ToSingle(byte4, 0);
+                if (ConfigData.crossCouplingFactors[15] == 1)
+                {
+                    if (Form1.engineerDebug) Console.WriteLine("CROSS-AXIS COMPENSATION PHASE (16)--- \t" + "N/A");
+                }
+                else
+                {
+                    if (Form1.engineerDebug) Console.WriteLine("CROSS-AXIS COMPENSATION PHASE (16)--- \t" + Convert.ToString(ConfigData.analogFilter[7]));
+                }
+
+                readBinary.Read(byte4, 0, 4);
+                ConfigData.analogFilter[8] = BitConverter.ToSingle(byte4, 0);
+                if (ConfigData.crossCouplingFactors[15] == 1)
+                {
+                    if (Form1.engineerDebug) Console.WriteLine("LONG-AXIS COMPENSATION PHASE (16)--- \t" + "N/A");
+                }
+                else
+                {
+                    if (Form1.engineerDebug) Console.WriteLine("LONG-AXIS COMPENSATION PHASE (16)--- \t" + Convert.ToString(ConfigData.analogFilter[7]));
+                }
+
+                Console.ReadLine();
+                readBinary.Close();
+
+                //LogConfigData(ConfigData);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
+        /*
+                public void LogConfigData(ConfigData ConfigData)
+                {
+                    // ConfigData ConfigData = new ConfigData();
+                    if (Form1.engineerDebug) Console.WriteLine("\n\nConfiguration data for meter number   \t" + ConfigData.meterNumber);
+                    if (Form1.engineerDebug) Console.WriteLine("\n\t User defined parameters\n");
+                    if (Form1.engineerDebug) Console.WriteLine("Number of auxillary analog channels-- \t" + Convert.ToString(ConfigData.numAuxChan));
+                    if (Form1.engineerDebug) Console.WriteLine("DIGITAL INPUT SWITCH----------------- \t" + Convert.ToString(ConfigData.digitalInputSwitch));
+                    if (Form1.engineerDebug) Console.WriteLine("MONITOR DISPLAY SWITCH--------------- \t" + Convert.ToString(ConfigData.monitorDisplaySwitch));
+                    if (Form1.engineerDebug) Console.WriteLine("LINE PRINTER SWITCH------------------ \t" + Convert.ToString(ConfigData.linePrinterSwitch));
+                    if (Form1.engineerDebug) Console.WriteLine("FILE NAME SWITCH--------------------- \t" + Convert.ToString(ConfigData.fileNameSwitch));
+                    if (Form1.engineerDebug) Console.WriteLine("HARD DISK SWITCH--------------------- \t" + Convert.ToString(ConfigData.hardDiskSwitch));
+                    if (Form1.engineerDebug) Console.WriteLine("SERIAL PORT FORMAT SWITCH------------ \t" + Convert.ToString(ConfigData.serialPortSwitch));
+                    if (Form1.engineerDebug) Console.WriteLine("SERIAL PORT OUTPUT SWITCH------------ \t" + Convert.ToString(ConfigData.serialPortOutputSwitch));
+                    if (Form1.engineerDebug) Console.WriteLine("ALARM SWITCH------------------------- \t" + Convert.ToString(ConfigData.alarmSwitch));
+                    if (ConfigData.printerEmulationSwitch == 2)
+                    {
+                        if (Form1.engineerDebug) Console.WriteLine("PRINTER EMULATION-------------------- \t" + "ESC_P");
+                    }
+                    if (ConfigData.printerEmulationSwitch == 3)
+                    {
+                        if (Form1.engineerDebug) Console.WriteLine("PRINTER EMULATION-------------------- \t" + "ESC_P2");
+                    }
+                    else
+                    {
+                        if (Form1.engineerDebug) Console.WriteLine("PRINTER EMULATION-------------------- \t" + "DPL24C");
+                    }
+                    if (ConfigData.modeSwitch == 0)
+                    {
+                        if (Form1.engineerDebug) Console.WriteLine("MODE SWITCH-------------------------- \t" + "Marine");
+                    }
+                    else
+                    {
+                        if (Form1.engineerDebug) Console.WriteLine("MODE SWITCH-------------------------- \t" + "Hires");
+                    }
+                    if (Form1.engineerDebug) Console.WriteLine("\n\tParameters defined by ZLS.\n");
+                    if (Form1.engineerDebug) Console.WriteLine("BEAM SCALE FACTOR-------------------- \t{0:n6}.", ConfigData.beamScale);
+                    if (Form1.engineerDebug) Console.WriteLine("CROSS-AXIS PERIOD-------------------- \t{0:e4}", ConfigData.crossPeriod);
+                    if (Form1.engineerDebug) Console.WriteLine("CROSS-AXIS DAMPING------------------- \t{0:e4}", ConfigData.crossDampFactor);
+                    if (Form1.engineerDebug) Console.WriteLine("CROSS-AXIS GAIN---------------------- \t" + Convert.ToString(ConfigData.crossGain));
+                    if (Form1.engineerDebug) Console.WriteLine("CROSS-AXIS LEAD---------------------- \t" + Convert.ToString(ConfigData.crossLead));
+                    if (Form1.engineerDebug) Console.WriteLine("CROSS-AXIS COMPENSATION (4)---------- \t{0:e4}.", ConfigData.crossCouplingFactors[13]);
+                    if (Form1.engineerDebug) Console.WriteLine("CROSS-AXIS COMPENSATION PHASE (4)---- \t" + Convert.ToString(ConfigData.analogFilter[5]));
+                    if (ConfigData.crossCouplingFactors[15] == 1)
+                    {
+                        if (Form1.engineerDebug) Console.WriteLine("CROSS-AXIS COMPENSATION (16)--------- \t" + "N/A");
+                    }
+                    else
+                    {
+                        if (Form1.engineerDebug) Console.WriteLine("CROSS-AXIS COMPENSATION (16)--------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[15]));
+                    }
+
+                    if (ConfigData.crossCouplingFactors[15] == 1)
+                    {
+                        if (Form1.engineerDebug) Console.WriteLine("CROSS-AXIS COMPENSATION PHASE (16)--- \t" + "N/A");
+                    }
+                    else
+                    {
+                        if (Form1.engineerDebug) Console.WriteLine("CROSS-AXIS COMPENSATION PHASE (16)--- \t" + Convert.ToString(ConfigData.analogFilter[7]));
+                    }
+                    if (Form1.engineerDebug) Console.WriteLine("CROSS-AXIS BIAS---------------------- \t" + Convert.ToString(ConfigData.crossBias));
+                    if (Form1.engineerDebug) Console.WriteLine("LONG-AXIS PERIOD-------------------- \t{0:e4}", ConfigData.longPeriod);
+                    if (Form1.engineerDebug) Console.WriteLine("LONG-AXIS DAMPING------------------- \t{0:e4}", ConfigData.longDampFactor);
+                    if (Form1.engineerDebug) Console.WriteLine("LONG-AXIS GAIN---------------------- \t{0:n4}", ConfigData.longGain);
+                    if (Form1.engineerDebug) Console.WriteLine("LONG-AXIS LEAD---------------------- \t" + Convert.ToString(ConfigData.longLead));
+                    if (Form1.engineerDebug) Console.WriteLine("LONG-AXIS COMPENSATION (4)----------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[14]));
+                    if (Form1.engineerDebug) Console.WriteLine("LONG AXIS COMPENSATION PHASE (4)----- \t" + Convert.ToString(ConfigData.analogFilter[6]));
+                    if (ConfigData.crossCouplingFactors[15] == 1)
+                    {
+                        if (Form1.engineerDebug) Console.WriteLine("LONG-AXIS COMPENSATION (16)---------- \t" + "N/A");
+                    }
+                    else
+                    {
+                        if (Form1.engineerDebug) Console.WriteLine("LONG-AXIS COMPENSATION (16)---------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[16]));
+                    }
+                    if (ConfigData.crossCouplingFactors[15] == 1)
+                    {
+                        if (Form1.engineerDebug) Console.WriteLine("LONG-AXIS COMPENSATION PHASE (16)---- \t" + "N/A");
+                    }
+                    else
+                    {
+                        if (Form1.engineerDebug) Console.WriteLine("LONG-AXIS COMPENSATION PHASE (16)--- \t" + Convert.ToString(ConfigData.analogFilter[7]));
+                    }
+                    if (Form1.engineerDebug) Console.WriteLine("LONG-AXIS BIAS---------------------- \t" + Convert.ToString(ConfigData.longBias));
+                    if (Form1.engineerDebug) Console.WriteLine("VCC---------------------------------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[6]));
+                    if (Form1.engineerDebug) Console.WriteLine("AL----------------------------------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[7]));
+                    if (Form1.engineerDebug) Console.WriteLine("AX----------------------------------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[8]));
+                    if (Form1.engineerDebug) Console.WriteLine("VE----------------------------------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[9]));
+                    if (Form1.engineerDebug) Console.WriteLine("AX2---------------------------------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[10]));
+                    if (Form1.engineerDebug) Console.WriteLine("XACC**2------------------------------ \t" + Convert.ToString(ConfigData.crossCouplingFactors[11]));
+                    if (Form1.engineerDebug) Console.WriteLine("LACC**2------------------------------ \t" + Convert.ToString(ConfigData.crossCouplingFactors[12]));
+                    if (Form1.engineerDebug) Console.WriteLine("AX PHASE----------------------------- \t" + Convert.ToString(ConfigData.analogFilter[1]));
+                    if (Form1.engineerDebug) Console.WriteLine("AL PHASE----------------------------- \t" + Convert.ToString(ConfigData.analogFilter[2]));
+                    if (Form1.engineerDebug) Console.WriteLine("VCC PHASE---------------------------- \t" + Convert.ToString(ConfigData.analogFilter[4]));
+                    if (Form1.engineerDebug) Console.WriteLine("MAXIMUM SPRING TENSION VALUE--------- \t" + Convert.ToString(ConfigData.springTensionMax));
+                }
+
+                //http://www.codeproject.com/Articles/686994/Create-Read-Advance-PDF-Report-using-iTextSharp-in#1
+        */
+
+        public void LogConfigDataToFile()
+        {
+            PdfPTable table = new PdfPTable(2);
+            PdfPCell cell = new PdfPCell(new Phrase("Header spanning 2 columns"));
+
+            cell.Colspan = 3;
+            cell.HorizontalAlignment = 1; //0=Left, 1=Centre, 2=Right
+            table.AddCell(cell);
+
+            //  Setup margins
+            //  Left Margin: 36pt => 0.5 inch
+            //  Right Margin: 72pt => 1 inch
+            //  Top Margin: 108pt => 1.5 inch
+            //  Bottom Margini: 180pt => 2.5 inch
+
+            BaseFont bfTimes = BaseFont.CreateFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, false);
+
+            Font times = new Font(bfTimes, 10);
+
+            //Create a System.IO.FileStream object:
+            FileStream fs = new FileStream("C:\\LCT stuff\\Meter Configuration.pdf", FileMode.Create, FileAccess.Write, FileShare.None);
+
+            //Step 2: Create a iTextSharp.text.Document object: with page size and margins
+            Document doc = new Document(PageSize.LETTER, 36, 72, 36, 36);
+
+            // Setting Document properties e.g.
+            // 1. Title
+            // 2. Subject
+            // 3. Keywords
+            // 4. Creator
+            // 5. Author
+            // 6. Header
+            doc.AddTitle("Configuration for meter #: " + Form1.meterNumber);
+            doc.AddSubject("Configuration data");
+            //  doc.AddKeywords("Metadata, iTextSharp 5.4.4, Chapter 1, Tutorial");
+            doc.AddCreator("ZLS");
+            doc.AddAuthor("Jack Walker");
+            doc.AddHeader("Nothing", "No Header");// Add creation date
+
+            //Step 3: Create a iTextSharp.text.pdf.PdfWriter object. It helps to write the Document to the Specified FileStream:
+            PdfWriter writer = PdfWriter.GetInstance(doc, fs);
+
+            //Step 4: Openning the Document:
+            doc.Open();
+
+            //Step 5: Adding a Paragraph by creating a iTextSharp.text.Paragraph object:
+
+            doc.Add(new Paragraph("\n\t User defined parameters\n", times));
+            doc.Add(new Paragraph("Number of auxillary analog channels \t\t" + Convert.ToString(ConfigData.numAuxChan)));
+            doc.Add(new Paragraph("DIGITAL INPUT SWITCH \t\t" + Convert.ToString(ConfigData.digitalInputSwitch)));
+            doc.Add(new Paragraph("MONITOR DISPLAY SWITCH \t\t" + Convert.ToString(ConfigData.monitorDisplaySwitch)));
+            doc.Add(new Paragraph("LINE PRINTER SWITCH \t\t" + Convert.ToString(ConfigData.linePrinterSwitch)));
+            doc.Add(new Paragraph("FILE NAME SWITCH \t\t" + Convert.ToString(ConfigData.fileNameSwitch)));
+            doc.Add(new Paragraph("HARD DISK SWITCH \t\t" + Convert.ToString(ConfigData.hardDiskSwitch)));
+            doc.Add(new Paragraph("SERIAL PORT FORMAT SWITCH \t\t" + Convert.ToString(ConfigData.serialPortSwitch)));
+            doc.Add(new Paragraph("SERIAL PORT OUTPUT SWITCH \t\t" + Convert.ToString(ConfigData.serialPortOutputSwitch)));
+            doc.Add(new Paragraph("ALARM SWITCH \t\t" + Convert.ToString(ConfigData.alarmSwitch)));
+            if (ConfigData.printerEmulationSwitch == 2)
+            {
+                doc.Add(new Paragraph("PRINTER EMULATION-------------------- \t" + "ESC_P"));
+            }
+            if (ConfigData.printerEmulationSwitch == 3)
+            {
+                doc.Add(new Paragraph("PRINTER EMULATION-------------------- \t" + "ESC_P2"));
+            }
+            else
+            {
+                doc.Add(new Paragraph("PRINTER EMULATION-------------------- \t" + "DPL24C"));
+            }
+            if (ConfigData.modeSwitch == 0)
+            {
+                doc.Add(new Paragraph("MODE SWITCH-------------------------- \t" + "Marine"));
+            }
+            else
+            {
+                doc.Add(new Paragraph("MODE SWITCH-------------------------- \t" + "Hires"));
+            }
+            doc.Add(new Paragraph("\n\tParameters defined by ZLS.\n"));
+            doc.Add(new Paragraph("BEAM SCALE FACTOR-------------------- \t" + Math.Round(ConfigData.beamScale, 6)));
+            doc.Add(new Paragraph("CROSS-AXIS PERIOD-------------------- \t" + Math.Round(ConfigData.crossPeriod, 4)));
+
+            doc.Add(new Paragraph("CROSS-AXIS DAMPING------------------- \t" + Math.Round(ConfigData.crossDampFactor, 4)));
+            doc.Add(new Paragraph("CROSS-AXIS GAIN---------------------- \t" + Convert.ToString(ConfigData.crossGain)));
+            doc.Add(new Paragraph("CROSS-AXIS LEAD---------------------- \t" + Convert.ToString(ConfigData.crossLead)));
+            doc.Add(new Paragraph("CROSS-AXIS COMPENSATION (4)---------- \t" + Math.Round(ConfigData.crossCouplingFactors[13], 4)));
+            doc.Add(new Paragraph("CROSS-AXIS COMPENSATION PHASE (4)---- \t" + Convert.ToString(ConfigData.analogFilter[5])));
+            if (ConfigData.crossCouplingFactors[15] == 1)
+            {
+                doc.Add(new Paragraph("CROSS-AXIS COMPENSATION (16)--------- \t" + "N/A"));
+            }
+            else
+            {
+                doc.Add(new Paragraph("CROSS-AXIS COMPENSATION (16)--------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[15])));
+            }
+
+            if (ConfigData.crossCouplingFactors[15] == 1)
+            {
+                doc.Add(new Paragraph("CROSS-AXIS COMPENSATION PHASE (16)--- \t" + "N/A"));
+            }
+            else
+            {
+                doc.Add(new Paragraph("CROSS-AXIS COMPENSATION PHASE (16)--- \t" + Convert.ToString(ConfigData.analogFilter[7])));
+            }
+            doc.Add(new Paragraph("CROSS-AXIS BIAS---------------------- \t" + Math.Round(ConfigData.crossBias, 4)));
+            doc.Add(new Paragraph("LONG-AXIS PERIOD-------------------- \t" + Math.Round(ConfigData.longPeriod)));
+            doc.Add(new Paragraph("LONG-AXIS DAMPING------------------- \t" + Math.Round(ConfigData.longDampFactor)));
+            doc.Add(new Paragraph("LONG-AXIS GAIN---------------------- \t" + Math.Round(ConfigData.longGain)));
+            doc.Add(new Paragraph("LONG-AXIS LEAD---------------------- \t" + Convert.ToString(ConfigData.longLead)));
+            doc.Add(new Paragraph("LONG-AXIS COMPENSATION (4)----------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[14])));
+            doc.Add(new Paragraph("LONG AXIS COMPENSATION PHASE (4)----- \t" + Convert.ToString(ConfigData.analogFilter[6])));
+            if (ConfigData.crossCouplingFactors[15] == 1)
+            {
+                doc.Add(new Paragraph("LONG-AXIS COMPENSATION (16)---------- \t" + "N/A"));
+            }
+            else
+            {
+                doc.Add(new Paragraph("LONG-AXIS COMPENSATION (16)---------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[16])));
+            }
+            if (ConfigData.crossCouplingFactors[15] == 1)
+            {
+                doc.Add(new Paragraph("LONG-AXIS COMPENSATION PHASE (16)---- \t" + "N/A"));
+            }
+            else
+            {
+                doc.Add(new Paragraph("LONG-AXIS COMPENSATION PHASE (16)--- \t" + Convert.ToString(ConfigData.analogFilter[7])));
+            }
+            doc.Add(new Paragraph("LONG-AXIS BIAS---------------------- \t" + Convert.ToString(ConfigData.longBias)));
+            doc.Add(new Paragraph("VCC---------------------------------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[6])));
+            doc.Add(new Paragraph("AL----------------------------------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[7])));
+            doc.Add(new Paragraph("AX----------------------------------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[8])));
+            doc.Add(new Paragraph("VE----------------------------------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[9])));
+            doc.Add(new Paragraph("AX2---------------------------------- \t" + Convert.ToString(ConfigData.crossCouplingFactors[10])));
+            doc.Add(new Paragraph("XACC**2------------------------------ \t" + Convert.ToString(ConfigData.crossCouplingFactors[11])));
+            doc.Add(new Paragraph("LACC**2------------------------------ \t" + Convert.ToString(ConfigData.crossCouplingFactors[12])));
+            doc.Add(new Paragraph("AX PHASE----------------------------- \t" + Convert.ToString(ConfigData.analogFilter[1])));
+            doc.Add(new Paragraph("AL PHASE----------------------------- \t" + Convert.ToString(ConfigData.analogFilter[2])));
+            doc.Add(new Paragraph("VCC PHASE---------------------------- \t" + Convert.ToString(ConfigData.analogFilter[4])));
+            doc.Add(new Paragraph("MAXIMUM SPRING TENSION VALUE--------- \t" + Convert.ToString(ConfigData.springTensionMax)));
+
+            //Step 6: Closing the Document:
+            doc.Close();
+        }
+
+        public void LogConfigDataToFileTable()
+        {
+            BaseFont bfTimes = BaseFont.CreateFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, false);
+            Font times = new Font(bfTimes, 10);
+
+            iTextSharp.text.Font fontTinyItalic = FontFactory.GetFont("Arial", 10, iTextSharp.text.Font.NORMAL, BaseColor.BLACK);
+            iTextSharp.text.Font font16Normal = FontFactory.GetFont("Arial", 16, iTextSharp.text.Font.NORMAL, BaseColor.BLACK);
+
+            PdfPTable table = new PdfPTable(2);
+            table.TotalWidth = 500f;
+
+            //fix the absolute width of the table
+            table.LockedWidth = true;
+
+            //relative col widths in proportions - 1/3 and 2/3
+            float[] widths = new float[] { 4f, 1f };
+            table.SetWidths(widths);
+            table.HorizontalAlignment = 0;
+
+            PdfPCell cell = new PdfPCell(new Phrase("User defined parameters"));
+            PdfPCell cell2 = new PdfPCell(new Phrase("ZLS defined parameters"));
+
+            //  PdfPCell theCell = new PdfPCell(new Paragraph("Configuration Data for " + meterNumber, font16Normal));
+            //   theCell.Colspan = 2;
+            //  theCell.HorizontalAlignment = 1; //0=Left, 1=Centre, 2=Right
+            //  table.AddCell(theCell);
+
+            //leave a gap before and after the table
+
+            table.SpacingBefore = 50f;
+            table.SpacingAfter = 50f;
+
+            //Create a System.IO.FileStream object:
+            FileStream fs = new FileStream("C:\\LCT stuff\\Meter Configuration.pdf", FileMode.Create, FileAccess.Write, FileShare.None);
+
+            //Step 2: Create a iTextSharp.text.Document object: with page size and margins
+            Document doc = new Document(PageSize.LETTER, 36, 36, 36, 36);
+
+            doc.AddTitle("Configuration for meter #: " + Form1.meterNumber);
+            doc.AddSubject("Configuration data");
+            //  doc.AddKeywords("Metadata, iTextSharp 5.4.4, Chapter 1, Tutorial");
+            doc.AddCreator("ZLS");
+            doc.AddAuthor("Jack Walker");
+            doc.AddHeader("Nothing", "No Header");// Add creation date
+
+            //Step 3: Create a iTextSharp.text.pdf.PdfWriter object. It helps to write the Document to the Specified FileStream:
+            PdfWriter writer = PdfWriter.GetInstance(doc, fs);
+
+            //Step 4: Openning the Document:
+            doc.Open();
+
+            doc.Add(new Paragraph("", fontTinyItalic));
+            doc.Add(new Paragraph("Configuration Data for " + Form1.meterNumber, font16Normal));
+            doc.Add(new Paragraph("", fontTinyItalic));
+
+            cell.Colspan = 2;
+            cell.HorizontalAlignment = 1; //0=Left, 1=Centre, 2=Right
+            table.AddCell(cell);
+
+            //Step 5: Adding a Paragraph by creating a iTextSharp.text.Paragraph object:
+
+            //  table.AddCell(new PdfPCell(new Paragraph(new PdfPCell(new Paragraph(Label1.Text, fontTinyItalic)));
+
+            //  table.AddCell(new PdfPCell(new Paragraph("User defined parameters", fontTinyItalic));
+            table.AddCell(new PdfPCell(new Paragraph("Number of auxillary analog channels", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(ConfigData.numAuxChan), fontTinyItalic)));
+
+            table.AddCell(new PdfPCell(new Paragraph("DIGITAL INPUT SWITCH", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(ConfigData.digitalInputSwitch), fontTinyItalic)));
+
+            table.AddCell(new PdfPCell(new Paragraph("MONITOR DISPLAY SWITCH", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(ConfigData.monitorDisplaySwitch), fontTinyItalic)));
+
+            table.AddCell(new PdfPCell(new Paragraph("LINE PRINTER SWITCH", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(ConfigData.linePrinterSwitch), fontTinyItalic)));
+
+            table.AddCell(new PdfPCell(new Paragraph("FILE NAME SWITCH", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(ConfigData.fileNameSwitch), fontTinyItalic)));
+
+            table.AddCell(new PdfPCell(new Paragraph("HARD DISK SWITCH", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(ConfigData.hardDiskSwitch), fontTinyItalic)));
+
+            table.AddCell(new PdfPCell(new Paragraph("SERIAL PORT FORMAT SWITCH", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(ConfigData.serialPortSwitch), fontTinyItalic)));
+
+            table.AddCell(new PdfPCell(new Paragraph("SERIAL PORT OUTPUT SWITCH", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(ConfigData.serialPortOutputSwitch), fontTinyItalic)));
+
+            table.AddCell(new PdfPCell(new Paragraph("ALARM SWITCH", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(ConfigData.alarmSwitch), fontTinyItalic)));
+
+            if (ConfigData.printerEmulationSwitch == 2)
+            {
+                table.AddCell(new PdfPCell(new Paragraph("PRINTER EMULATION", fontTinyItalic)));
+                table.AddCell(new PdfPCell(new Paragraph("ESC_P", fontTinyItalic)));
+            }
+            if (ConfigData.printerEmulationSwitch == 3)
+            {
+                table.AddCell(new PdfPCell(new Paragraph("PRINTER EMULATION", fontTinyItalic)));
+                table.AddCell(new PdfPCell(new Paragraph("ESC_P2", fontTinyItalic)));
+            }
+            else
+            {
+                table.AddCell(new PdfPCell(new Paragraph("PRINTER EMULATION", fontTinyItalic)));
+                table.AddCell(new PdfPCell(new Paragraph("DPL24C", fontTinyItalic)));
+            }
+            if (ConfigData.modeSwitch == 0)
+            {
+                table.AddCell(new PdfPCell(new Paragraph("MODE SWITCH", fontTinyItalic)));
+                table.AddCell(new PdfPCell(new Paragraph("Marine", fontTinyItalic)));
+            }
+            else
+            {
+                table.AddCell(new PdfPCell(new Paragraph("MODE SWITCH", fontTinyItalic)));
+                table.AddCell(new PdfPCell(new Paragraph("Hires", fontTinyItalic)));
+            }
+
+            // Items specified by ZLS
+            cell2.Colspan = 2;
+            cell2.HorizontalAlignment = 1; //0=Left, 1=Centre, 2=Right
+            table.AddCell(cell2);
+
+            table.AddCell(new PdfPCell(new Paragraph("BEAM SCALE FACTOR", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.beamScale, 6)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("CROSS-AXIS PERIOD", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.crossPeriod, 4)), fontTinyItalic)));
+
+            table.AddCell(new PdfPCell(new Paragraph("CROSS-AXIS DAMPING", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.crossDampFactor, 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("CROSS-AXIS GAIN", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.crossGain, 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("CROSS-AXIS LEAD", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.crossLead, 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("CROSS-AXIS COMPENSATION (4 inch)", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.crossCouplingFactors[13], 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("CROSS-AXIS COMPENSATION PHASE (4 inch)", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.analogFilter[5], 4)), fontTinyItalic)));
+            if (ConfigData.crossCouplingFactors[15] == 1)
+            {
+                table.AddCell(new PdfPCell(new Paragraph("CROSS-AXIS COMPENSATION (16 inch)", fontTinyItalic)));
+                table.AddCell(new PdfPCell(new Paragraph("N/A", fontTinyItalic)));
+            }
+            else
+            {
+                table.AddCell(new PdfPCell(new Paragraph("CROSS-AXIS COMPENSATION (16 inch)", fontTinyItalic)));
+                table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.crossCouplingFactors[15], 4)), fontTinyItalic)));
+            }
+
+            if (ConfigData.crossCouplingFactors[15] == 1)
+            {
+                table.AddCell(new PdfPCell(new Paragraph("CROSS-AXIS COMPENSATION PHASE 16 inch", fontTinyItalic)));
+                table.AddCell(new PdfPCell(new Paragraph("N/A", fontTinyItalic)));
+            }
+            else
+            {
+                table.AddCell(new PdfPCell(new Paragraph("CROSS-AXIS COMPENSATION PHASE 16 inch", fontTinyItalic)));
+                table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.analogFilter[7], 4)), fontTinyItalic)));
+            }
+            table.AddCell(new PdfPCell(new Paragraph("CROSS-AXIS BIAS ", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.crossBias, 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("LONG-AXIS PERIOD ", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.longPeriod, 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("LONG-AXIS DAMPING ", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.longDampFactor, 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("LONG-AXIS GAIN ", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.longGain, 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("LONG-AXIS LEAD ", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.longLead, 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("LONG-AXIS COMPENSATION (4 inch )", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.crossCouplingFactors[14], 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("LONG AXIS COMPENSATION PHASE (4 inch)", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.analogFilter[6])), fontTinyItalic)));
+
+            if (ConfigData.crossCouplingFactors[15] == 1)
+            {
+                table.AddCell(new PdfPCell(new Paragraph("LONG-AXIS COMPENSATION (16 inch)", fontTinyItalic)));
+                table.AddCell(new PdfPCell(new Paragraph("N/A", fontTinyItalic)));
+            }
+            else
+            {
+                table.AddCell(new PdfPCell(new Paragraph("LONG-AXIS COMPENSATION (16 inch) ", fontTinyItalic)));
+                table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.crossCouplingFactors[16], 4)), fontTinyItalic)));
+            }
+            if (ConfigData.crossCouplingFactors[15] == 1)
+            {
+                table.AddCell(new PdfPCell(new Paragraph("LONG-AXIS COMPENSATION PHASE (16 inch)", fontTinyItalic)));
+                table.AddCell(new PdfPCell(new Paragraph("N/A", fontTinyItalic)));
+            }
+            else
+            {
+                table.AddCell(new PdfPCell(new Paragraph("LONG-AXIS COMPENSATION PHASE (16 inch)", fontTinyItalic)));
+                table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.analogFilter[7], 4)), fontTinyItalic)));
+            }
+            table.AddCell(new PdfPCell(new Paragraph("LONG-AXIS BIAS", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.longBias, 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("VCC", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.crossCouplingFactors[6], 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("AL", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.crossCouplingFactors[7], 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("AX", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.crossCouplingFactors[8], 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("VE", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.crossCouplingFactors[9], 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("AX2", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.crossCouplingFactors[10], 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("XACC**2", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.crossCouplingFactors[11], 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("LACC**2", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.crossCouplingFactors[12], 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("AX PHASE", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.analogFilter[1], 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("AL PHASE", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.analogFilter[2], 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("VCC PHASE", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.analogFilter[4], 4)), fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph("MAXIMUM SPRING TENSION VALUE", fontTinyItalic)));
+            table.AddCell(new PdfPCell(new Paragraph(Convert.ToString(Math.Round(ConfigData.springTensionMax, 4)), fontTinyItalic)));
+            doc.Add(table);
+
+            //Step 6: Closing the Document:
+            doc.Close();
+        }
+
+        public void RecordDataToFile(string fileOperation)
+        {
+            string delimitor = ",";
+
+            switch (Form1.fileType)
+            {
+                case "csv":
+                    delimitor = ",";
+                    break;
+
+                case "tsv":
+                    delimitor = "\t";
+                    break;
+
+                case "txt":
+                    delimitor = " ";
+                    break;
+
+                default:
+                    break;
+            }
+
+            if (fileOperation == "Open")
+            {
+                using (StreamWriter writer = File.CreateText(Form1.fileName))
+                {
+                    string header = "Date" + delimitor + "Gravity" + delimitor + "Spring Tension" + delimitor
+                        + "Cross coupling" + delimitor + "Raw Beam" + delimitor + "VCC or CML" + delimitor + "AL"
+                        + delimitor + "AX" + delimitor + "VE" + delimitor + "AX2 or CMX" + delimitor + "XACC2" + delimitor
+                        + "LACC2" + delimitor + "XACC" + delimitor + "LACC" + delimitor + "Parallel Port" + delimitor
+                        + "Platform Period" + delimitor + "AUX1" + delimitor + "AUX2" + delimitor + "AUX3" + delimitor + "AUX4";
+                    writer.WriteLine(header);
+                }
+            }
+        }
+
+        public void RecordDataToFile(string fileOperation, myData d)
+        {
+            // fileOperation  0 - open,  1 - append, 2 - close
+            string delimitor = ",";
+
+            switch (Form1.fileType)
+            {
+                case "csv":
+                    delimitor = ",";
+                    break;
+
+                case "tsv":
+                    delimitor = "\t";
+                    break;
+
+                case "txt":
+                    delimitor = " ";
+                    break;
+
+                default:
+                    break;
+            }
+
+            string fileName;
+
+            if (Form1.gravityFileName == null)
+            {
+                DateTime now = DateTime.Now;
+                // String.Format("{0:dds}", now);
+                //  fileName = "C:\\Ultrasys\\Data\\" + "GravityData" + now.ToString("yyyyMMddHHmmsstt") + ".csv";
+                //  fileName = Form1.filePath;
+            }
+            else
+            {
+                //  fileName = "C:\\Ultrasys\\Data\\" + Form1.gravityFileName;
+            }
+
+            if (fileOperation == "Open")
+            {
+                using (StreamWriter writer = File.CreateText(Form1.fileName))
+                {
+                    string header = "Date" + delimitor + "Gravity" + delimitor + "Spring Tension" + delimitor
+                        + "Cross coupling" + delimitor + "Raw Beam" + delimitor + "VCC or CML" + delimitor + "AL"
+                        + delimitor + "AX" + delimitor + "VE" + delimitor + "AX2 or CMX" + delimitor + "XACC2" + delimitor
+                        + "LACC2" + delimitor + "XACC" + delimitor + "LACC" + delimitor + "Parallel Port" + delimitor
+                        + "Platform Period" + delimitor + "AUX1" + delimitor + "AUX2" + delimitor + "AUX3" + delimitor + "AUX4";
+                    writer.WriteLine(header);
+                }
+            }
+            else if (fileOperation == "Append")
+            {
+                string myString = Convert.ToString(d.Date) + delimitor + Convert.ToString(d.Gravity) + delimitor + Convert.ToString(d.SpringTension)
+                     + delimitor + Convert.ToString(d.CrossCoupling) + delimitor + Convert.ToString(d.RawBeam) + delimitor + Convert.ToString(d.VCC)
+                     + delimitor + Convert.ToString(d.AL) + delimitor + Convert.ToString(d.AX) + delimitor + Convert.ToString(d.VE)
+                     + delimitor + Convert.ToString(d.AX2) + delimitor + Convert.ToString(d.XACC2) + delimitor + Convert.ToString(d.LACC2)
+                     + delimitor + Convert.ToString(d.XACC) + delimitor + Convert.ToString(d.LACC) + delimitor + Convert.ToString(d.ParallelData)
+                     + delimitor + Convert.ToString(d.AUX1) + delimitor + Convert.ToString(d.AUX2) + delimitor + Convert.ToString(d.AUX3)
+                     + delimitor + Convert.ToString(d.AUX4);
+
+                /*    string myString = Convert.ToString(MeterData.dataTime) + delimitor + Convert.ToString(MeterData.data4[2] * ConfigData.beamScale)
+                   +delimitor + Convert.ToString(MeterData.data4[3]) + delimitor + Convert.ToString(MeterData.data4[4])
+                   + delimitor + Convert.ToString(MeterData.data1[5]) + delimitor + Convert.ToString(MeterData.data1[6])
+                   + delimitor + Convert.ToString(MeterData.data1[7]) + delimitor + Convert.ToString(MeterData.data1[8])
+                   + delimitor + Convert.ToString(MeterData.data1[9]) + delimitor + Convert.ToString(MeterData.data1[10])
+                   + delimitor + Convert.ToString(MeterData.data1[11]) + delimitor + Convert.ToString(MeterData.data1[12])
+                   + delimitor + Convert.ToString(MeterData.data1[13]) + delimitor + Convert.ToString(MeterData.data1[14])
+                   + delimitor + "I4PAR" + delimitor + "APERX * 1.0E6"
+
+                    + delimitor + Convert.ToString(MeterData.data1[15]) + delimitor + Convert.ToString(MeterData.data1[16])
+                    + delimitor + Convert.ToString(MeterData.data1[17]) + delimitor + Convert.ToString(MeterData.data1[18]);
+                   */
+                using (StreamWriter writer = File.AppendText(Form1.fileName))
+                {
+                    // writer.WriteLine("{0},{1},{2},{3},{4}, {5},{6}", MeterData.year, MeterData.day, MeterData.Hour, MeterData.Min, MeterData.Sec, MeterData.data4[2]);
+                    //  writer.WriteLine(Convert.ToString(MeterData.dataTime), ",",Convert.ToString(MeterData.data4[2]),",");
+                    writer.WriteLine(myString);
+                }
+            }
+        }
+
+        #endregion File Class
+
+
+
+        private void exitProgramToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            SaveSettings();
+            if (System.Windows.Forms.Application.MessageLoop)
+            {
+                // WinForms
+                System.Windows.Forms.Application.Exit();
+            }
+            else
+            {
+                // Console app
+                System.Environment.Exit(1);
+            }
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            About myAboutForm = new About();
+            myAboutForm.Show();
+        }
+
+        private void helpToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+                  string helpfile = "C:\\Ultrasys\\Dynamic Meter Help.chm";
+                 Help.ShowHelp(this, helpfile);
+
+              //   Help.ShowHelp(TextBox1, "file://c:\\charmap.chm");
+
+
+        }
+
+        private void fileFormatToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            FileFormatForm myFileForm = new FileFormatForm();
+            myFileForm.Show();
+        }
+
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
     }
