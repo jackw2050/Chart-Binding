@@ -18,16 +18,57 @@
       <Value Profile="(Default)">csv</Value>
     </Setting>
     <Setting Name="customerPassword" Type="System.String" Scope="User">
-      <Value Profile="(Default)">"zlsOnly"</Value>
+      <Value Profile="(Default)">zls</Value>
     </Setting>
     <Setting Name="engineerPassword" Type="System.String" Scope="User">
-      <Value Profile="(Default)">"zlsEngineer"</Value>
+      <Value Profile="(Default)">zlsEngineer</Value>
     </Setting>
     <Setting Name="fileDateFormat" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="traceMarkers" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="beamScale" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="numAuxChan" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="linePrinterSwitch" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="fileNameSwitch" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="configFilePath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\ZLS\</Value>
+    </Setting>
+    <Setting Name="calFilePath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\ZLS\</Value>
+    </Setting>
+    <Setting Name="configFileName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Config.30</Value>
+    </Setting>
+    <Setting Name="calFileName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">S91.TAB</Value>
+    </Setting>
+    <Setting Name="mode" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Marine</Value>
+    </Setting>
+    <Setting Name="chartType" Type="System.String" Scope="User">
+      <Value Profile="(Default)">FastLine</Value>
+    </Setting>
+    <Setting Name="chartLegendLocation" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Bottom</Value>
+    </Setting>
+    <Setting Name="DynamicDataConnectionString" Type="(Connection string)" Scope="Application">
+      <DesignTimeValue Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;SerializableConnectionString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+  &lt;ConnectionString&gt;Data Source=LAPTOPSERVER;Initial Catalog=DynamicData;Integrated Security=True&lt;/ConnectionString&gt;
+  &lt;ProviderName&gt;System.Data.SqlClient&lt;/ProviderName&gt;
+&lt;/SerializableConnectionString&gt;</DesignTimeValue>
+      <Value Profile="(Default)">Data Source=LAPTOPSERVER;Initial Catalog=DynamicData;Integrated Security=True</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -350,7 +350,7 @@ namespace ChartBinding
             byte[] byte10 = new byte[10];
             int dataLen, cmd;
 
-            myStream = new FileStream("C:\\LCT stuff\\meter data no  space.bin", FileMode.Open);
+            myStream = new FileStream("C:\\ZLS\\meter data no  space.bin", FileMode.Open);
             BinaryReader readBinary = new BinaryReader(myStream);
 
 

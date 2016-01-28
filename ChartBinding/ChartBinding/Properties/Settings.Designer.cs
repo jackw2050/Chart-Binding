@@ -85,7 +85,7 @@ namespace ChartBinding.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("\"zlsOnly\"")]
+        [global::System.Configuration.DefaultSettingValueAttribute("zls")]
         public string customerPassword {
             get {
                 return ((string)(this["customerPassword"]));
@@ -97,7 +97,7 @@ namespace ChartBinding.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("\"zlsEngineer\"")]
+        [global::System.Configuration.DefaultSettingValueAttribute("zlsEngineer")]
         public string engineerPassword {
             get {
                 return ((string)(this["engineerPassword"]));
@@ -128,6 +128,148 @@ namespace ChartBinding.Properties {
             }
             set {
                 this["traceMarkers"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double beamScale {
+            get {
+                return ((double)(this["beamScale"]));
+            }
+            set {
+                this["beamScale"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double numAuxChan {
+            get {
+                return ((double)(this["numAuxChan"]));
+            }
+            set {
+                this["numAuxChan"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string linePrinterSwitch {
+            get {
+                return ((string)(this["linePrinterSwitch"]));
+            }
+            set {
+                this["linePrinterSwitch"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string fileNameSwitch {
+            get {
+                return ((string)(this["fileNameSwitch"]));
+            }
+            set {
+                this["fileNameSwitch"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\ZLS\\")]
+        public string configFilePath {
+            get {
+                return ((string)(this["configFilePath"]));
+            }
+            set {
+                this["configFilePath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\ZLS\\")]
+        public string calFilePath {
+            get {
+                return ((string)(this["calFilePath"]));
+            }
+            set {
+                this["calFilePath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Config.30")]
+        public string configFileName {
+            get {
+                return ((string)(this["configFileName"]));
+            }
+            set {
+                this["configFileName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("S91.TAB")]
+        public string calFileName {
+            get {
+                return ((string)(this["calFileName"]));
+            }
+            set {
+                this["calFileName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Marine")]
+        public string mode {
+            get {
+                return ((string)(this["mode"]));
+            }
+            set {
+                this["mode"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("FastLine")]
+        public string chartType {
+            get {
+                return ((string)(this["chartType"]));
+            }
+            set {
+                this["chartType"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Bottom")]
+        public string chartLegendLocation {
+            get {
+                return ((string)(this["chartLegendLocation"]));
+            }
+            set {
+                this["chartLegendLocation"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
+        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=LAPTOPSERVER;Initial Catalog=DynamicData;Integrated Security=True")]
+        public string DynamicDataConnectionString {
+            get {
+                return ((string)(this["DynamicDataConnectionString"]));
             }
         }
     }

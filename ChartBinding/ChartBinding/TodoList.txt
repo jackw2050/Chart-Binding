@@ -1,0 +1,114 @@
+﻿Should we implement language support for Japanese , Chinese etc?
+
+Need open file dialog for config and cal files.  S/B via engineering menu
+
+Need save dialog for data file.  Sets path only
+
+
+Add SQL server to application.
+	Allow chart and data view of anything on database including realtime data
+
+Need full development for engineering form.
+
+Need automated tests via the engineering form.
+
+Should we add Goggle maps for the data.
+
+Add various filters for data
+
+http://www.infragistics.com/           Need to buy this to customize apps.  $1,900
+http://www.componentone.com													$895
+http://www.syncfusion.com/products/windows-forms							@31332e342e30nR8MunBTjHcnrO3DATxiYpiUMD8WhkjVkopjhVLqT90=
+
+http://www.infoq.com/research/dotnet-web-components
+
+
+Charts:
+	Option of accumulate or strip chart.
+	For strip chart user can set chart width in time (HH:mm)
+
+	Cross couping chart:  add AUX1 - 4 to be compatable with competitor?
+
+	Tool tips.
+	Fix selectable traces.  Check out clicking on chart legend to do this.
+	Or click on chart legend to highlight trace.
+	Popup box for trace statistics.  Windowed max, min, mean stdev
+
+	For demo mode use infinite loop and sine wave.  6 min = 360 deg.  so each second is 0.1 deg 
+	 Sin function takes radians.  1 cycle = 2pi radians   x = Math.Sin(value);
+
+	 3rd party:
+	 genlogic.com
+
+
+
+
+
+Other:
+	How to move chart to allow for statistical data on side.  Make auto for options etc.
+
+	Add Marine/ HiRes mode switch
+
+	Add tool tips for all buttons etc. as help.  Add selector to turn off help.
+
+	http://www.c-sharpcorner.com/uploadfile/mahesh/openfiledialog-in-C-Sharp/
+
+	http://csharp.net-informations.com/gui/cs-color-dialog-box.htm
+
+
+
+	Auto scale:
+
+	https://msdn.microsoft.com/en-us/library/ms951306.aspx
+
+
+
+
+
+
+Functional:
+	Send command functions.   Parse data and convert for transmission.
+	Verify all calculations.
+	Different filters.  Need to calculate coefficiants on the fly.  Investigate.
+	Add log file for errors etc.
+
+Catch:
+	Add try{} catch{} to all functions for errors
+	Add error statistics for error notices as well as log file.
+
+
+	Message SMS.  http://www.example-code.com/csharp/sms_send.asp
+				https://www.eztexting.com/developers/code-examples/rest-sms-api/c-sharp
+				http://www.smsco.it/tomcat/en/sms_tutorials/sms_from_c_sharp.jsp
+				http://www.strathweb.com/2012/10/send-text-messages-sms-from-web-api-using-azure-mobile-services/
+
+
+
+
+
+Threads:
+
+            Thread WorkerThread = new Thread(new ParameterizedThreadStart(DataWorker));
+            WorkerThread.IsBackground = true;
+            WorkerThread.Start(new Action<myData>(this.AddDataPoint));
+
+			WorkerThread - name of the thread.
+			DataWorker - The method the thread starts.
+			AddDataPoint - Invokes if needed and calls function to update control.
+			myData - Class with variables inside that will be used and passed as object.
+
+
+
+
+			Form Shape:
+			https://msdn.microsoft.com/en-us/library/aa287583%28v=vs.71%29.aspx
+
+			  protected override void OnPaint(System.Windows.Forms.PaintEventArgs e)
+        {
+            System.Drawing.Drawing2D.GraphicsPath shape = new System.Drawing.Drawing2D.GraphicsPath();
+            shape.AddEllipse(0, 0, this.Width, this.Height);
+            this.Region = new System.Drawing.Region(shape);
+        }
+
+			Issues:
+
