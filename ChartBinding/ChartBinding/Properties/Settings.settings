@@ -5,8 +5,8 @@
     <Setting Name="tracePalette" Type="System.String" Scope="User">
       <Value Profile="(Default)">"Pastel"</Value>
     </Setting>
-    <Setting Name="chartColor" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+    <Setting Name="chartColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">Silver</Value>
     </Setting>
     <Setting Name="traceWidth" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">3</Value>

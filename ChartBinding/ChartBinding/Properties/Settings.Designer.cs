@@ -37,10 +37,10 @@ namespace ChartBinding.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int chartColor {
+        [global::System.Configuration.DefaultSettingValueAttribute("Silver")]
+        public global::System.Drawing.Color chartColor {
             get {
-                return ((int)(this["chartColor"]));
+                return ((global::System.Drawing.Color)(this["chartColor"]));
             }
             set {
                 this["chartColor"] = value;

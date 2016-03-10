@@ -61,9 +61,6 @@
             this.crossCouplingChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.chartContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItemBackgroundColor = new System.Windows.Forms.ToolStripMenuItem();
-            this.whiteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.grayToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.blackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItemTraceWidth = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
@@ -116,6 +113,7 @@
             this.bottomToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.rightToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.leftToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.chartWindowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.temperatureLabel = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
@@ -190,6 +188,8 @@
             this.setConfigFIleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setCalFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setSpringTensionGroupBox = new System.Windows.Forms.GroupBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.curerntSpringTensionLabel = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -207,8 +207,13 @@
             this.startupToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.curerntSpringTensionLabel = new System.Windows.Forms.Label();
-            this.label10 = new System.Windows.Forms.Label();
+            this.chartWindowGroupBox = new System.Windows.Forms.GroupBox();
+            this.radioButton2 = new System.Windows.Forms.RadioButton();
+            this.viewAllDataRadioButton = new System.Windows.Forms.RadioButton();
+            this.windowSizeNumericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.button2 = new System.Windows.Forms.Button();
+            this.showAllDataCheckBox = new System.Windows.Forms.CheckBox();
+            this.label13 = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.crossCouplingChart)).BeginInit();
             this.chartContextMenuStrip.SuspendLayout();
@@ -223,6 +228,8 @@
             this.setSpringTensionGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.GravityChart)).BeginInit();
             this.emergencyStopGroupBox.SuspendLayout();
+            this.chartWindowGroupBox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.windowSizeNumericUpDown)).BeginInit();
             this.SuspendLayout();
             // 
             // startButton
@@ -405,36 +412,16 @@
             this.toolStripMenuItemTraceMarkers,
             this.markerSizeToolStripMenuItem,
             this.chartTypeToolStripMenuItem,
-            this.legendLocationToolStripMenuItem});
+            this.legendLocationToolStripMenuItem,
+            this.chartWindowToolStripMenuItem});
             this.chartContextMenuStrip.Name = "contextMenuStrip1";
             resources.ApplyResources(this.chartContextMenuStrip, "chartContextMenuStrip");
             // 
             // toolStripMenuItemBackgroundColor
             // 
-            this.toolStripMenuItemBackgroundColor.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.whiteToolStripMenuItem,
-            this.grayToolStripMenuItem1,
-            this.blackToolStripMenuItem});
             this.toolStripMenuItemBackgroundColor.Name = "toolStripMenuItemBackgroundColor";
             resources.ApplyResources(this.toolStripMenuItemBackgroundColor, "toolStripMenuItemBackgroundColor");
-            // 
-            // whiteToolStripMenuItem
-            // 
-            this.whiteToolStripMenuItem.Name = "whiteToolStripMenuItem";
-            resources.ApplyResources(this.whiteToolStripMenuItem, "whiteToolStripMenuItem");
-            this.whiteToolStripMenuItem.Click += new System.EventHandler(this.whiteToolStripMenuItem_Click);
-            // 
-            // grayToolStripMenuItem1
-            // 
-            this.grayToolStripMenuItem1.Name = "grayToolStripMenuItem1";
-            resources.ApplyResources(this.grayToolStripMenuItem1, "grayToolStripMenuItem1");
-            this.grayToolStripMenuItem1.Click += new System.EventHandler(this.grayToolStripMenuItem1_Click);
-            // 
-            // blackToolStripMenuItem
-            // 
-            this.blackToolStripMenuItem.Name = "blackToolStripMenuItem";
-            resources.ApplyResources(this.blackToolStripMenuItem, "blackToolStripMenuItem");
-            this.blackToolStripMenuItem.Click += new System.EventHandler(this.blackToolStripMenuItem_Click);
+            this.toolStripMenuItemBackgroundColor.Click += new System.EventHandler(this.toolStripMenuItemBackgroundColor_Click);
             // 
             // toolStripMenuItemTraceWidth
             // 
@@ -789,6 +776,12 @@
             this.leftToolStripMenuItem.Name = "leftToolStripMenuItem";
             resources.ApplyResources(this.leftToolStripMenuItem, "leftToolStripMenuItem");
             this.leftToolStripMenuItem.Click += new System.EventHandler(this.leftToolStripMenuItem_Click);
+            // 
+            // chartWindowToolStripMenuItem
+            // 
+            this.chartWindowToolStripMenuItem.Name = "chartWindowToolStripMenuItem";
+            resources.ApplyResources(this.chartWindowToolStripMenuItem, "chartWindowToolStripMenuItem");
+            this.chartWindowToolStripMenuItem.Click += new System.EventHandler(this.chartWindowToolStripMenuItem_Click);
             // 
             // dataGridView1
             // 
@@ -1271,10 +1264,20 @@
             this.setSpringTensionGroupBox.Controls.Add(this.label3);
             this.setSpringTensionGroupBox.Controls.Add(this.label2);
             this.setSpringTensionGroupBox.Controls.Add(this.label1);
-            this.setSpringTensionGroupBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             resources.ApplyResources(this.setSpringTensionGroupBox, "setSpringTensionGroupBox");
+            this.setSpringTensionGroupBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.setSpringTensionGroupBox.Name = "setSpringTensionGroupBox";
             this.setSpringTensionGroupBox.TabStop = false;
+            // 
+            // label10
+            // 
+            resources.ApplyResources(this.label10, "label10");
+            this.label10.Name = "label10";
+            // 
+            // curerntSpringTensionLabel
+            // 
+            resources.ApplyResources(this.curerntSpringTensionLabel, "curerntSpringTensionLabel");
+            this.curerntSpringTensionLabel.Name = "curerntSpringTensionLabel";
             // 
             // textBox1
             // 
@@ -1331,10 +1334,10 @@
             // 
             // emergencyStopGroupBox
             // 
-            resources.ApplyResources(this.emergencyStopGroupBox, "emergencyStopGroupBox");
             this.emergencyStopGroupBox.BackColor = System.Drawing.Color.Yellow;
             this.emergencyStopGroupBox.Controls.Add(this.button1);
             this.emergencyStopGroupBox.Controls.Add(this.richTextBox1);
+            resources.ApplyResources(this.emergencyStopGroupBox, "emergencyStopGroupBox");
             this.emergencyStopGroupBox.Name = "emergencyStopGroupBox";
             this.emergencyStopGroupBox.TabStop = false;
             // 
@@ -1351,6 +1354,7 @@
             this.richTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             resources.ApplyResources(this.richTextBox1, "richTextBox1");
             this.richTextBox1.Name = "richTextBox1";
+            this.richTextBox1.TextChanged += new System.EventHandler(this.richTextBox1_TextChanged);
             // 
             // gravityChartToolTip
             // 
@@ -1360,15 +1364,61 @@
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
-            // curerntSpringTensionLabel
+            // chartWindowGroupBox
             // 
-            resources.ApplyResources(this.curerntSpringTensionLabel, "curerntSpringTensionLabel");
-            this.curerntSpringTensionLabel.Name = "curerntSpringTensionLabel";
+            resources.ApplyResources(this.chartWindowGroupBox, "chartWindowGroupBox");
+            this.chartWindowGroupBox.Controls.Add(this.radioButton2);
+            this.chartWindowGroupBox.Controls.Add(this.viewAllDataRadioButton);
+            this.chartWindowGroupBox.Controls.Add(this.windowSizeNumericUpDown);
+            this.chartWindowGroupBox.Controls.Add(this.button2);
+            this.chartWindowGroupBox.Controls.Add(this.showAllDataCheckBox);
+            this.chartWindowGroupBox.Controls.Add(this.label13);
+            this.chartWindowGroupBox.Name = "chartWindowGroupBox";
+            this.chartWindowGroupBox.TabStop = false;
             // 
-            // label10
+            // radioButton2
             // 
-            resources.ApplyResources(this.label10, "label10");
-            this.label10.Name = "label10";
+            resources.ApplyResources(this.radioButton2, "radioButton2");
+            this.radioButton2.Name = "radioButton2";
+            this.radioButton2.TabStop = true;
+            this.radioButton2.UseVisualStyleBackColor = true;
+            // 
+            // viewAllDataRadioButton
+            // 
+            resources.ApplyResources(this.viewAllDataRadioButton, "viewAllDataRadioButton");
+            this.viewAllDataRadioButton.Name = "viewAllDataRadioButton";
+            this.viewAllDataRadioButton.TabStop = true;
+            this.viewAllDataRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // windowSizeNumericUpDown
+            // 
+            resources.ApplyResources(this.windowSizeNumericUpDown, "windowSizeNumericUpDown");
+            this.windowSizeNumericUpDown.Name = "windowSizeNumericUpDown";
+            this.windowSizeNumericUpDown.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.windowSizeNumericUpDown.ValueChanged += new System.EventHandler(this.windowSizeNumericUpDown_ValueChanged);
+            // 
+            // button2
+            // 
+            resources.ApplyResources(this.button2, "button2");
+            this.button2.Name = "button2";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
+            // showAllDataCheckBox
+            // 
+            resources.ApplyResources(this.showAllDataCheckBox, "showAllDataCheckBox");
+            this.showAllDataCheckBox.Name = "showAllDataCheckBox";
+            this.showAllDataCheckBox.UseVisualStyleBackColor = true;
+            this.showAllDataCheckBox.CheckedChanged += new System.EventHandler(this.showAllDataCheckBox_CheckedChanged);
+            // 
+            // label13
+            // 
+            resources.ApplyResources(this.label13, "label13");
+            this.label13.Name = "label13";
             // 
             // Form1
             // 
@@ -1378,8 +1428,8 @@
             this.ContextMenuStrip = this.setupContextMenuStrip1;
             this.ControlBox = false;
             this.Controls.Add(this.setSpringTensionGroupBox);
-            this.Controls.Add(this.shutDownGroupBox);
             this.Controls.Add(this.emergencyStopGroupBox);
+            this.Controls.Add(this.shutDownGroupBox);
             this.Controls.Add(this.emergencyShutdownButton);
             this.Controls.Add(this.GravityChart);
             this.Controls.Add(this.modeLabel);
@@ -1404,9 +1454,10 @@
             this.Controls.Add(this.fileStartTimeLabel);
             this.Controls.Add(this.recordingTextBox);
             this.Controls.Add(this.timeNowLabel);
-            this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.crossCouplingChart);
             this.Controls.Add(this.menuStrip1);
+            this.Controls.Add(this.chartWindowGroupBox);
+            this.Controls.Add(this.dataGridView1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
@@ -1433,6 +1484,9 @@
             this.setSpringTensionGroupBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.GravityChart)).EndInit();
             this.emergencyStopGroupBox.ResumeLayout(false);
+            this.chartWindowGroupBox.ResumeLayout(false);
+            this.chartWindowGroupBox.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.windowSizeNumericUpDown)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1526,9 +1580,6 @@
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemTraceMarkers;
         private System.Windows.Forms.ToolStripMenuItem onToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem offToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem whiteToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem grayToolStripMenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem blackToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem brightToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem excelToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem lightToolStripMenuItem;
@@ -1609,6 +1660,14 @@
         private System.Windows.Forms.RichTextBox richTextBox1;
         public System.Windows.Forms.Label curerntSpringTensionLabel;
         private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.ToolStripMenuItem chartWindowToolStripMenuItem;
+        private System.Windows.Forms.GroupBox chartWindowGroupBox;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.CheckBox showAllDataCheckBox;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.NumericUpDown windowSizeNumericUpDown;
+        private System.Windows.Forms.RadioButton radioButton2;
+        private System.Windows.Forms.RadioButton viewAllDataRadioButton;
 
 
        

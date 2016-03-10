@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Drawing;
 
 //using System.Net;
 //using System.Net.Mail;
@@ -51,6 +52,11 @@ namespace ChartBinding
         public static Boolean torqueMotorsEnabled = false;
         public static Boolean springTensionEnabled = false;
         public static Boolean alarmsEnabled = false;
+        public static Boolean showAllData = false;
+        public static int dataWindowSize = 1;// start chart window at 1 min
+        public static Boolean firstTimeData = true;
+        public static DateTime dataStartTime;
+        public static double minValue, minStartValue;
 
         public EngineeringForm EngineeringForm = new EngineeringForm();
         public FileClass FileClass = new FileClass();
@@ -97,15 +103,10 @@ namespace ChartBinding
         #region Callbacks
 
         public delegate void UpdateRecordBoxCallback(Boolean i);
-
         public delegate void UpdateFileNameLabelCallback();
-
         public delegate void UpdatedebugLabelCallback(string debugData);
-
         public delegate void UpdateTimeTextCallback();
-
         public delegate void UpdateFileTimeCallback();
-
         public delegate void ShutDownTextCallback();
 
         #endregion Callbacks
@@ -121,7 +122,14 @@ namespace ChartBinding
             recordingTextBox.Visible = false;
             this.crossCouplingChart.Palette = ChartColorPalette.Pastel;
         }
+        private void GetEnvironmentVariables()
+        {
+             string osVersion = Convert.ToString(Environment.OSVersion);
+             int processors = Environment.ProcessorCount;
+             string netVersion = Convert.ToString(Environment.Version);
 
+
+        }
         private void InitializedataGridView()
         {
             //  SETUP MAIN  DATA GRID
@@ -282,6 +290,7 @@ namespace ChartBinding
             TimeThread.Start();
             traceVisibilityComboBox.Visible = false;
             emergencyStopGroupBox.Visible = false;
+            chartWindowGroupBox.Visible = false;
             SetupChart();
             SetupDataTable();
 
@@ -307,7 +316,7 @@ namespace ChartBinding
             manualStartupGroupBox.Visible = false;
             SwitchesTorqueMotorsCheckBox.Enabled = false;
             SwitchesSpringTensionCheckBox.Enabled = false;
-
+            viewAllDataRadioButton.Checked = true;
             fileType = Properties.Settings.Default.fileFormat;
             fileDateFormat = Properties.Settings.Default.fileDateFormat;
 
@@ -998,7 +1007,7 @@ namespace ChartBinding
                 }
         */
 
-        public class myData//  set this up so all chart data in in one class.  Maybe not needed use MeterData
+        public class myData//  set this up so all chart data in in one class.  Maybe not need use MeterData
         {
             public DateTime Date;
             public string LineID;
@@ -1032,21 +1041,81 @@ namespace ChartBinding
 
         public void UpdateChartThreadSafe(myData d)
         {
-            DateTime minValue = d.Date;
-            DateTime maxValue = d.Date.AddSeconds(10);
+            
+            if (firstTimeData == true)
+            {
+               // dataStartTime = d.Date;
+            //    minValue = crossCouplingChart.ChartAreas[0].AxisX.Minimum;
+                minStartValue = d.Date.ToOADate(); 
+                firstTimeData = false;
+            }
 
+            if (viewAllDataRadioButton.Checked == true)
+            {
+                if (showAllDataCheckBox.Checked == true)
+                {
+                    minValue = minStartValue;
+                }
+                else
+                {
+                    minValue = d.Date.AddMinutes(-dataWindowSize).ToOADate();
+                }
+            }
+            else
+            {
+                if (fileRecording == true)
+                {
+                    dataStartTime = fileStartTime;
+                    if (showAllDataCheckBox.Checked == true)
+                    {
+                        minValue = dataStartTime.ToOADate();
+                    }
+                    else
+                    {
+                        minValue = minStartValue;
+                    }
+                }
+                else
+                {
+                    minValue = d.Date.AddMinutes(-dataWindowSize).ToOADate();
+
+                }
+            }
+
+
+
+
+
+
+            crossCouplingChart.ChartAreas[0].AxisX.Minimum = minValue; //d.Date.AddSeconds(-60).ToOADate();
+            GravityChart.ChartAreas[0].AxisX.Minimum = minValue; //d.Date.AddSeconds(-60).ToOADate();
+
+
+         //   DateTime maxValue = d.Date.AddSeconds(10);
+            
             // datatable order    "DateTime", "DigitalGravity" , "springTension", "Cross Coupling","RawBeam", "TotalCorrection", "AL", "AX", "VE", "AX2",  "LACC",  "XACC",
 
-            dataTable.Rows.Add(d.Date, d.Gravity, d.SpringTension, d.CrossCoupling, d.RawBeam, d.TotalCorrection, d.AL, d.AX, d.VE, d.AX2, d.LACC, d.XACC);
+      //      dataTable.Rows.Add(d.Date, d.Gravity, d.SpringTension, d.CrossCoupling, d.RawBeam, d.TotalCorrection, d.AL, d.AX, d.VE, d.AX2, d.LACC, d.XACC);
 
-            //     GravityChart.DataBind();
-            //crossCouplingChart.DataBind();
 
-            //   GravityChart.ChartAreas[0].AxisX.Minimum = d.Date.ToOADate();
-            //    GravityChart.ChartAreas[0].AxisX.Maximum = maxValue.ToOADate();
+            // Adjust X axis scale
+         //   GravityChart.ChartAreas["Default"].AxisX.Minimum = DateTime.Now.AddSeconds(-20);
+            //		GravityChart.ChartAreas["Default"].AxisX.Maximum
+
+            // var runningTime = TimeSpan.FromTicks(DateTime.Now.Ticks - fileStartTime.Ticks);
+            // new DateTime(runningTime.Ticks).ToString("HH:mm");
+
+
+       //     GravityChart.ChartAreas[0].AxisX.Maximum = maxValue.AddSeconds(60).ToOADate();
+
+
+                 GravityChart.DataBind();
+            crossCouplingChart.DataBind();
+
+
 
             //      UPDATE MAIN GRAVITY CHART
-
+/*
             GravityChart.Series["Digital Gravity"].Points.AddXY(d.Date, d.Gravity);
             GravityChart.Series["Spring Tension"].Points.AddXY(d.Date, d.SpringTension);
             GravityChart.Series["Cross Coupling"].Points.AddXY(d.Date, d.CrossCoupling);
@@ -1062,7 +1131,7 @@ namespace ChartBinding
             crossCouplingChart.Series["LACC"].Points.AddXY(d.Date, d.LACC);
             crossCouplingChart.Series["XACC"].Points.AddXY(d.Date, d.XACC);
             crossCouplingChart.Update();
-
+*/
             // Adjust X axis scale
             //		GravityChart.ChartAreas["Default"].AxisX.Minimum = pointIndex - numberOfPointsAfterRemoval;
             //		GravityChart.ChartAreas["Default"].AxisX.Maximum
@@ -1073,7 +1142,8 @@ namespace ChartBinding
                   if (fileRecording == true)
                   {
                       recordingDurationLabel.Text = "Duration: " + new DateTime(runningTime.Ticks).ToString("HH:mm:ss");
-                  }*/
+                  }
+             * */
         }
 
         private void AddDataPoint(myData d)// this will be the new update chart etc.
@@ -1267,19 +1337,19 @@ namespace ChartBinding
                         Minute = DateTime.Now.Minute,
                         Second = DateTime.Now.Second,
                         Gravity = Math.Sin(degrees) * 3500,
-                        CrossCoupling = Math.Sin(degrees + 25) * .125,
+                        CrossCoupling = Math.Sin(degrees + 25) * 125,
                         SpringTension = 5030.785,
                         RawBeam = Math.Sin(degrees + 75) * 2000,
                         TotalCorrection = Math.Sin(degrees + 100) * 1500,
                         RawGravity = Math.Sin(degrees + 125) * 3000,
-                        AL = Math.Abs(Math.Sin(degrees + 150) * .5),
-                        AX = Math.Sin(degrees + 175) * .1,
-                        AX2 = Math.Sin(degrees + 200) * .01,
-                        VE = Math.Sin(degrees + 225) * .001,
-                        XACC = Math.Sin(degrees + 250) * .1,
-                        LACC = Math.Sin(degrees + 275) * .1
+                        AL = Math.Abs(Math.Sin(degrees + 150) * 50),
+                        AX = Math.Sin(degrees + 175) * 25,
+                        AX2 = Math.Sin(degrees + 200) * 10,
+                        VE = Math.Sin(degrees + 225) * 100,
+                        XACC = Math.Sin(degrees + 250) * 100,
+                        LACC = Math.Sin(degrees + 275) * 100
                     });
-                    degrees = degrees + .025;
+                    degrees = degrees + .25;
                     Thread.Sleep(1000);
                 } while (true);
             }
@@ -1601,7 +1671,7 @@ namespace ChartBinding
             using (MemoryStream stream = new MemoryStream())
             {
                 GravityChart.SaveImage(stream, ChartImageFormat.Png);
-                Image chartImage = Image.GetInstance(stream.GetBuffer());
+                iTextSharp.text.Image chartImage = iTextSharp.text.Image.GetInstance(stream.GetBuffer());
                 chartImage.ScalePercent(55f);// Scale to 70%
                 //doc.PageSize.Width gives the width in points of the document,
                 //remove the margin (36 points) and the width of the image (?? points)
@@ -1610,7 +1680,7 @@ namespace ChartBinding
                 chartImage.SetAbsolutePosition(pdfDoc.PageSize.Width - 72f - 750f, pdfDoc.PageSize.Height - 36f - 200f);
 
                 crossCouplingChart.SaveImage(stream, ChartImageFormat.Png);
-                Image chartImage2 = Image.GetInstance(stream.GetBuffer());
+                iTextSharp.text.Image chartImage2 = iTextSharp.text.Image.GetInstance(stream.GetBuffer());
                 chartImage2.ScalePercent(55f);// Scale to 55%
                 chartImage.SetAbsolutePosition(pdfDoc.PageSize.Width - 72f - 750f, pdfDoc.PageSize.Height - 36f - 400f);
 
@@ -1905,24 +1975,22 @@ namespace ChartBinding
         private void SetChartCursors()
         {
             // Set cursor interval properties
-            GravityChart.ChartAreas["ChartArea1"].CursorX.Interval = .001D;
             GravityChart.ChartAreas["ChartArea1"].CursorX.IntervalType = DateTimeIntervalType.Seconds;
             GravityChart.ChartAreas["ChartArea1"].CursorY.Interval = 1;
-
             GravityChart.ChartAreas["ChartArea1"].CursorX.IsUserEnabled = true;
-            GravityChart.ChartAreas["ChartArea1"].CursorX.IsUserSelectionEnabled = true;
-            GravityChart.ChartAreas["ChartArea1"].CursorX.IntervalType = DateTimeIntervalType.Minutes;
-            GravityChart.ChartAreas["ChartArea1"].CursorX.Interval = .01;// .1D;
-
-            //  Y AXIS
-            //  this.GravityChart.ChartAreas["ChartArea1"].AxisY.ScaleView.ZoomReset(1);
             GravityChart.ChartAreas["ChartArea1"].CursorY.IsUserEnabled = true;
+            GravityChart.ChartAreas["ChartArea1"].CursorX.IsUserSelectionEnabled = true;
             GravityChart.ChartAreas["ChartArea1"].CursorY.IsUserSelectionEnabled = true;
 
+
+            crossCouplingChart.ChartAreas["ChartArea1"].CursorX.IntervalType = DateTimeIntervalType.Seconds;
+            crossCouplingChart.ChartAreas["ChartArea1"].CursorY.Interval = 1;
             crossCouplingChart.ChartAreas["ChartArea1"].CursorX.IsUserEnabled = true;
             crossCouplingChart.ChartAreas["ChartArea1"].CursorY.IsUserEnabled = true;
             crossCouplingChart.ChartAreas["ChartArea1"].CursorX.IsUserSelectionEnabled = true;
             crossCouplingChart.ChartAreas["ChartArea1"].CursorY.IsUserSelectionEnabled = true;
+
+
         }
 
         private void SetChartZoom()
@@ -1930,31 +1998,38 @@ namespace ChartBinding
             // Set automatic zooming
             GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoomable = true;
             GravityChart.ChartAreas["ChartArea1"].AxisY.ScaleView.Zoomable = true;
+            GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoom(0, 1);//Zoom(position, size);
+            GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.ZoomReset(100);
 
-            //            GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoom(2, 3);
-            //            GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.ZoomReset(1);
+            crossCouplingChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoomable = true;
+            crossCouplingChart.ChartAreas["ChartArea1"].AxisY.ScaleView.Zoomable = true;
+            crossCouplingChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoom(0, 1);
+            crossCouplingChart.ChartAreas["ChartArea1"].AxisX.ScaleView.ZoomReset(100);
         }
 
         private void SetChartScaleView()
         {
-            GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollSizeType = DateTimeIntervalType.Minutes;
-            GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollSize = .1D;
+           // GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollSizeType = DateTimeIntervalType.Minutes;
+            GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollSize = .1;
             GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoomable = true;
 
-            GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.MinSizeType = DateTimeIntervalType.Minutes;
-            GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.MinSize = .1D;
+           // GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.MinSizeType = DateTimeIntervalType.Minutes;
+            GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.MinSize = .1;
 
-            GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollMinSizeType = DateTimeIntervalType.Minutes;
-            GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollMinSize = .1D;
+           // GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollMinSizeType = DateTimeIntervalType.Minutes;
 
             GravityChart.ChartAreas["ChartArea1"].AxisY.ScaleView.Zoomable = true;
 
-            crossCouplingChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoom(2, 3);
-            crossCouplingChart.ChartAreas["ChartArea1"].AxisX.ScaleView.ZoomReset(1);
-            crossCouplingChart.ChartAreas["ChartArea1"].AxisY.ScaleView.ZoomReset(1);
 
-            crossCouplingChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoomable = true;
-            crossCouplingChart.ChartAreas["ChartArea1"].AxisY.ScaleView.Zoomable = true;
+            GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SizeType = DateTimeIntervalType.Seconds;
+            GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.MinSizeType = DateTimeIntervalType.Seconds;
+            GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollMinSizeType = DateTimeIntervalType.Seconds;
+            GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollSizeType = DateTimeIntervalType.Seconds;
+
+
+
+
+  
         }
 
         private void SetChartScroll()
@@ -1970,22 +2045,23 @@ namespace ChartBinding
             GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.BackColor = System.Drawing.Color.LightGray;
             GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.ButtonColor = System.Drawing.Color.Gray;
             GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.LineColor = System.Drawing.Color.Black;
-            GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.IsPositionedInside = false;
 
-            GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.Size = 12;
+            GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.Size = 30;
             // show either just the center scroll button..
-            GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.ButtonStyle = ScrollBarButtonStyles.SmallScroll;
+        //    GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.ButtonStyle = ScrollBarButtonStyles.ResetZoom;
             // .. or include the left and right buttons:
             GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.ButtonStyle =
                  ScrollBarButtonStyles.All ^ ScrollBarButtonStyles.ResetZoom;
 
             // Scrollbars position
-            GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.IsPositionedInside = true;
+            GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.IsPositionedInside = false;
+            GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.IsPositionedInside = false;
             GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.Enabled = true;
+            GravityChart.ChartAreas["ChartArea1"].AxisY.ScrollBar.Enabled = true;
             // this.GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Size = 100;  // number (!) of data points visible
 
-            crossCouplingChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.IsPositionedInside = true;
-            crossCouplingChart.ChartAreas["ChartArea1"].AxisY.ScrollBar.IsPositionedInside = true;
+            crossCouplingChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.IsPositionedInside = false;
+            crossCouplingChart.ChartAreas["ChartArea1"].AxisY.ScrollBar.IsPositionedInside = false;
         }
 
         private void SetupChartMenu()
@@ -2196,16 +2272,17 @@ namespace ChartBinding
             crossCouplingChart.Series["AX2"].YValueMembers = "AX2";
             crossCouplingChart.DataSource = dataTable;
             crossCouplingChart.DataBind();
-
+/*
             crossCouplingChart.Series["XACC"].XValueMember = "dateTime";
             crossCouplingChart.Series["XACC"].YValueMembers = "XACC2";
             crossCouplingChart.DataSource = dataTable;
             crossCouplingChart.DataBind();
-
+*/
             crossCouplingChart.Series["LACC"].XValueMember = "dateTime";
             crossCouplingChart.Series["LACC"].YValueMembers = "LACC";
             crossCouplingChart.DataSource = dataTable;
             crossCouplingChart.DataBind();
+
 
             //this.crossCouplingChart.Titles.Add("Cross Coupling");
 
@@ -2425,8 +2502,13 @@ namespace ChartBinding
             }
         }
 
-        public void SetChartAreaColors(int scheme)
+        public void SetChartAreaColors(System.Drawing.Color scheme)
         {
+            System.Drawing.Color myColor = System.Drawing.Color.DarkCyan;
+            GravityChart.ChartAreas["ChartArea1"].BackColor = scheme;
+            crossCouplingChart.ChartAreas["ChartArea1"].BackColor = scheme;
+/*
+
             if (scheme == 0)// Light background
             {
                 //  GRAVITY
@@ -2478,6 +2560,24 @@ namespace ChartBinding
                 crossCouplingChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Gray;
                 Properties.Settings.Default.chartColor = 2;
             }
+            if (scheme == 3)// black background
+            {
+                //  GRAVITY
+                GravityChart.ChartAreas["ChartArea1"].BackColor = myColor;
+                GravityChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                GravityChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                GravityChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                GravityChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Gray;
+
+                // CROSS COUPLING
+                crossCouplingChart.ChartAreas["ChartArea1"].BackColor = myColor;
+                crossCouplingChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                crossCouplingChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                crossCouplingChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                crossCouplingChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                Properties.Settings.Default.chartColor = 3;
+            }
+ * */
         }
 
         private void chart1_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -3189,7 +3289,7 @@ namespace ChartBinding
 
             BaseFont bfTimes = BaseFont.CreateFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, false);
 
-            Font times = new Font(bfTimes, 10);
+            iTextSharp.text.Font times = new iTextSharp.text.Font(bfTimes, 10);
 
             //Create a System.IO.FileStream object:
             FileStream fs = new FileStream("C:\\Ultrasys\\Meter Configuration.pdf", FileMode.Create, FileAccess.Write, FileShare.None);
@@ -3325,7 +3425,7 @@ namespace ChartBinding
         public void LogConfigDataToFileTable()
         {
             BaseFont bfTimes = BaseFont.CreateFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, false);
-            Font times = new Font(bfTimes, 10);
+            iTextSharp.text.Font times = new iTextSharp.text.Font(bfTimes, 10);
 
             iTextSharp.text.Font fontTinyItalic = FontFactory.GetFont("Arial", 10, iTextSharp.text.Font.NORMAL, BaseColor.BLACK);
             iTextSharp.text.Font font16Normal = FontFactory.GetFont("Arial", 16, iTextSharp.text.Font.NORMAL, BaseColor.BLACK);
@@ -3839,21 +3939,7 @@ namespace ChartBinding
             myFileForm.Show();
         }
 
-        private void whiteToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SetChartAreaColors(0);
-        }
-
-        private void grayToolStripMenuItem1_Click(object sender, EventArgs e)
-        {
-            SetChartAreaColors(1);
-        }
-
-        private void blackToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SetChartAreaColors(2);
-        }
-
+     
         private void toolStripMenuItem2_Click(object sender, EventArgs e)
         {
             int traceWidth = 0;
@@ -4305,6 +4391,50 @@ namespace ChartBinding
             //       {
             //       }
         }
+
+        private void chartWindowToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            chartWindowGroupBox.Show();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            chartWindowGroupBox.Visible = false;
+        }
+
+        private void showAllDataCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (showAllDataCheckBox.Checked == true)
+            {
+                windowSizeNumericUpDown.Enabled = false;
+            }
+            else
+            {
+                windowSizeNumericUpDown.Enabled = true;
+            }
+        }
+
+        private void windowSizeNumericUpDown_ValueChanged(object sender, EventArgs e)
+        {
+            dataWindowSize = (int)windowSizeNumericUpDown.Value;
+        }
+
+        private void toolStripMenuItemBackgroundColor_Click(object sender, EventArgs e)
+        {
+            // Show color dialog
+            DialogResult colorResult = colorDialog1.ShowDialog();
+            System.Drawing.Color BackColor = colorDialog1.Color;
+        //    string hexValue = ColorTranslator.ToHtml(colorDialog1.Color);
+        //   int decValue = int.Parse(hexValue, System.Globalization.NumberStyles.HexNumber);
+            SetChartAreaColors(BackColor);
+        }
+
+        private void richTextBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
     }
