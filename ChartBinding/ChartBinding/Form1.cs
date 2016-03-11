@@ -1,21 +1,26 @@
-﻿using FileHelpers;
+﻿#region Namespace Inclusions
+
+using FileHelpers;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
+using System.IO.Ports;
+using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Drawing;
-
-//using System.Net;
-//using System.Net.Mail;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 
 //  Delimited file operations using FileHelpers  http://www.filehelpers.net
 // iTextSharp  http://www.mikesdotnetting.com/article/89/itextsharp-page-layout-with-columns
+
+#endregion Namespace Inclusions
 
 namespace ChartBinding
 {
@@ -57,12 +62,13 @@ namespace ChartBinding
         public static Boolean firstTimeData = true;
         public static DateTime dataStartTime;
         public static double minValue, minStartValue;
-
+        public static Boolean isSimulated = false;
         public EngineeringForm EngineeringForm = new EngineeringForm();
         public FileClass FileClass = new FileClass();
-
+        public static Boolean checkMeterExistance = true;
+        public static Boolean meterExists = false;
+        public static Boolean simulatorRunning = false;
         private delegate void SetChartCallback(object meterData);
-
         public static double[] table1 = {
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -91,6 +97,14 @@ namespace ChartBinding
 
         #endregion Declarations
 
+        #region Public Enumerations
+
+        public enum DataMode { Text, Hex }
+
+        public enum LogMsgType { Incoming, Outgoing, Normal, Warning, Error };
+
+        #endregion Public Enumerations
+
         #region Fields
 
         // Thread Add Data delegate
@@ -103,33 +117,321 @@ namespace ChartBinding
         #region Callbacks
 
         public delegate void UpdateRecordBoxCallback(Boolean i);
+
         public delegate void UpdateFileNameLabelCallback();
+
         public delegate void UpdatedebugLabelCallback(string debugData);
+
         public delegate void UpdateTimeTextCallback();
+
         public delegate void UpdateFileTimeCallback();
+
         public delegate void ShutDownTextCallback();
 
+        public delegate void SetTextCallback(string text);
+
         #endregion Callbacks
+
+        #region Local Variables
+
+        // The main control for communicating through the RS-232 port
+        private SerialPort comport = new SerialPort();
+
+        // Various colors for logging info
+        private Color[] LogMsgTypeColor = { Color.Blue, Color.Green, Color.Black, Color.Orange, Color.Red };
+
+        // Temp holder for whether a key was pressed
+        private bool KeyHandled = false;
+
+        #endregion Local Variables
 
         public Form1()
         {
             InitializeComponent();
+            initializeForm();
+
+            // When data is recieved through the port, call this method
+            comport.DataReceived += new SerialDataReceivedEventHandler(port_DataReceived);
+            comport.PinChanged += new SerialPinChangedEventHandler(comport_PinChanged);
+
+            InitializeControlValues();
+        }
+
+        private void initializeForm()
+        {
             surveyName = surveyTextBox.Text;
             InitializedataGridView();
             DataRow myDataRow = dataTable.NewRow();
             ConfigData configData = new ConfigData();
+
             auxGroupBox.Visible = false;
             recordingTextBox.Visible = false;
+            serialPortGroupBox.Visible = false;
             this.crossCouplingChart.Palette = ChartColorPalette.Pastel;
+            traceVisibilityComboBox.Visible = false;
+            emergencyStopGroupBox.Visible = false;
+            chartWindowGroupBox.Visible = false;
+            SetupChart();
+            SetupDataTable();
+            configFilePath = Properties.Settings.Default.configFilePath;
+            configFileName = Properties.Settings.Default.configFileName;
+            calFilePath = Properties.Settings.Default.calFilePath;
+            calFileName = Properties.Settings.Default.calFileName;
+
+            ReadConfigFile(null);
+            // cal file path
+            // cal file name
+            string nullStr = null;
+            mode = Properties.Settings.Default.mode;
+            modeLabel.Text = mode + " mode";
+
+            readCalibrationFile(nullStr);// Read calibration table file  Meter#.tab
+            DateTime nowDateTime = DateTime.Now;
+            this.timeNowLabel.Text = Convert.ToString(nowDateTime);
+            this.meterNumberTextBox.Text = ConfigData.meterNumber;
+            calFileTextBox.Text = calFilePath + calFileName;
+            configurationFileTextBox.Text = configFilePath + configFileName;
+
+            manualStartupGroupBox.Visible = false;
+            SwitchesTorqueMotorsCheckBox.Enabled = false;
+            SwitchesSpringTensionCheckBox.Enabled = false;
+            viewAllDataRadioButton.Checked = true;
+            fileType = Properties.Settings.Default.fileFormat;
+            fileDateFormat = Properties.Settings.Default.fileDateFormat;
+
+            //create directories if they don't exist
+            System.IO.Directory.CreateDirectory("c:\\Ultrasys");
+            System.IO.Directory.CreateDirectory(filePath);
+            System.IO.Directory.CreateDirectory(programPath);
+            //   UpdateNameLabel(string fileName);
+
+            exitProgramToolStripMenuItem1.BackColor = System.Drawing.Color.Red;
+            shutDownGroupBox.Visible = false;
+
+            DynamicDataDataSet myDB = new DynamicDataDataSet();
+
+            //http://www.asp.net/web-forms/overview/data-access/accessing-the-database-directly-from-an-aspnet-page/inserting-updating-and-deleting-data-with-the-sqldatasource-cs
+
+            UpdateDataFileName();
+            UpdateNameLabel();
         }
+
+        #region Stuff from serial port terminal
+
+        private void InitializeControlValues()
+        {
+            //   CurrentDataMode = Properties.Settings.Default.DataMode;
+            CurrentDataMode = DataMode.Hex;
+
+            RefreshComPortList();
+
+            //     chkClearOnOpen.Checked = Properties.Settings.Default.ClearOnOpen;
+
+            // If it is still avalible, select the last com port used
+            if (cmbPortName.Items.Contains(Properties.Settings.Default.PortName)) cmbPortName.Text = Properties.Settings.Default.PortName;
+            else if (cmbPortName.Items.Count > 0) cmbPortName.SelectedIndex = cmbPortName.Items.Count - 1;
+            else
+            {
+                MessageBox.Show(this, "There are no COM Ports detected on this computer.\nPlease install a COM Port and restart this app.", "No COM Ports Installed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+            }
+        }
+
+        private string[] OrderedPortNames()
+        {
+            // Just a placeholder for a successful parsing of a string to an integer
+            int num;
+
+            // Order the serial port names in numberic order (if possible)
+            return SerialPort.GetPortNames().OrderBy(a => a.Length > 3 && int.TryParse(a.Substring(3), out num) ? num : 0).ToArray();
+        }
+
+        private void RefreshComPortList()
+        {
+            // Determain if the list of com port names has changed since last checked
+            string selected = RefreshComPortList(cmbPortName.Items.Cast<string>(), cmbPortName.SelectedItem as string, comport.IsOpen);
+
+            // If there was an update, then update the control showing the user the list of port names
+            if (!String.IsNullOrEmpty(selected))
+            {
+                cmbPortName.Items.Clear();
+                cmbPortName.Items.AddRange(OrderedPortNames());
+                cmbPortName.SelectedItem = selected;
+            }
+        }
+
+        private string RefreshComPortList(IEnumerable<string> PreviousPortNames, string CurrentSelection, bool PortOpen)
+        {
+            // Create a new return report to populate
+            string selected = null;
+
+            // Retrieve the list of ports currently mounted by the operating system (sorted by name)
+            string[] ports = SerialPort.GetPortNames();
+
+            // First determain if there was a change (any additions or removals)
+            bool updated = PreviousPortNames.Except(ports).Count() > 0 || ports.Except(PreviousPortNames).Count() > 0;
+
+            // If there was a change, then select an appropriate default port
+            if (updated)
+            {
+                // Use the correctly ordered set of port names
+                ports = OrderedPortNames();
+
+                // Find newest port if one or more were added
+                string newest = SerialPort.GetPortNames().Except(PreviousPortNames).OrderBy(a => a).LastOrDefault();
+
+                // If the port was already open... (see logic notes and reasoning in Notes.txt)
+                if (PortOpen)
+                {
+                    if (ports.Contains(CurrentSelection)) selected = CurrentSelection;
+                    else if (!String.IsNullOrEmpty(newest)) selected = newest;
+                    else selected = ports.LastOrDefault();
+                }
+                else
+                {
+                    if (!String.IsNullOrEmpty(newest)) selected = newest;
+                    else if (ports.Contains(CurrentSelection)) selected = CurrentSelection;
+                    else selected = ports.LastOrDefault();
+                }
+            }
+
+            // If there was a change to the port list, return the recommended default selection
+            return selected;
+        }
+
+        /// <summary> Save the user's settings. </summary>
+
+        /// <summary> Log data to the terminal window. </summary>
+        /// <param name="msgtype"> The type of message to be written. </param>
+        /// <param name="msg"> The string containing the message to be shown. </param>
+        private void Log(LogMsgType msgtype, string msg)
+        {
+            rtfTerminal.Invoke(new EventHandler(delegate
+            {
+                rtfTerminal.SelectedText = string.Empty;
+                rtfTerminal.SelectionFont = new System.Drawing.Font(rtfTerminal.SelectionFont, FontStyle.Bold);
+                rtfTerminal.SelectionColor = LogMsgTypeColor[(int)msgtype];
+                rtfTerminal.AppendText(msg);
+                rtfTerminal.ScrollToCaret();
+            }));
+        }
+
+        private void ThreadProcSafe()
+        {
+            // Wait two seconds to simulate some background work
+            // being done.
+            //       Thread.Sleep(2000);
+
+            //  string text = Convert.ToString(mdt.myDT) + "\t\t" + Convert.ToString(mdt.ST) + "\t\t" + Convert.ToString(mdt.Beam);
+            // Check if this method is running on a different thread
+            // than the thread that created the control.
+            /*       if (this.f2.GravityRichTextBox1.InvokeRequired)
+                   {
+                       // It's on a different thread, so use Invoke.
+                       SetTextCallback d = new SetTextCallback(SetText);
+                       this.Invoke(d, new object[] { text });
+                       Thread.Sleep(2000);
+                   }
+                   else
+                   {
+                       // It's on the same thread, no need for Invoke
+                       this.f2.GravityRichTextBox1.Text = text + " (No Invoke)";
+                   }
+                   */
+            //        this.Invoke(d, new object[] { text });
+        }
+
+        private DataMode CurrentDataMode
+        {
+            get
+            {
+                return DataMode.Hex;
+            }
+            set
+            {
+            }
+        }
+
+        private string ByteArrayToHexString(byte[] data)
+        {
+            StringBuilder sb = new StringBuilder(data.Length * 3);
+            foreach (byte b in data)
+                sb.Append(Convert.ToString(b, 16).PadLeft(2, '0').PadRight(3, ' '));
+            return sb.ToString().ToUpper();
+        }
+
+        private void port_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            // If the com port has been closed, do nothing
+            if (!comport.IsOpen) return;
+
+            // This method will be called when there is data waiting in the port's buffer
+
+            // Determain which mode (string or binary) the user is in
+            if (CurrentDataMode == DataMode.Text)// data mode will never be text.  delete this later
+            {
+                // Read all the data waiting in the buffer
+                string data = comport.ReadExisting();
+
+                // Display the text to the user in the terminal
+                Log(LogMsgType.Incoming, data);
+            }
+            else
+            {
+                // Obtain the number of bytes waiting in the port's buffer
+                int bytes = comport.BytesToRead;
+
+                // Create a byte array buffer to hold the incoming data
+                byte[] buffer = new byte[bytes];
+                // IF CHECKING FOR METER CONNECTION SET FLAG AND DUMP DATA
+
+                if (checkMeterExistance == true)
+                {
+                    // Read the data from the port and store it in our buffer
+                    comport.Read(buffer, 0, bytes);
+                    if (buffer.Length == 0)
+                    {
+                        meterExists = false;
+                    }
+                }
+                else
+                {
+                    // Read the data from the port and store it in our buffer
+                    comport.Read(buffer, 0, bytes);
+
+                    // Show the user the incoming data in hex format
+                    Log(LogMsgType.Incoming, ByteArrayToHexString(buffer));
+
+                    //mdt.GetMeterData(buffer);// send buffer for parsing
+                    ThreadProcSafe();
+
+                }
+        
+
+
+            }
+        }
+
+        private void comport_PinChanged(object sender, SerialPinChangedEventArgs e)
+        {
+            // Show the state of the pins
+            UpdatePinState();
+        }
+
+        private void UpdatePinState()
+        {
+            this.Invoke(new ThreadStart(() =>
+            {
+            }));
+        }
+
         private void GetEnvironmentVariables()
         {
-             string osVersion = Convert.ToString(Environment.OSVersion);
-             int processors = Environment.ProcessorCount;
-             string netVersion = Convert.ToString(Environment.Version);
-
-
+            string osVersion = Convert.ToString(Environment.OSVersion);
+            int processors = Environment.ProcessorCount;
+            string netVersion = Convert.ToString(Environment.Version);
         }
+
         private void InitializedataGridView()
         {
             //  SETUP MAIN  DATA GRID
@@ -148,6 +450,8 @@ namespace ChartBinding
             this.dataGridView1.Columns[10].Name = "Long Acceleration or LACC";
             this.dataGridView1.Columns[11].Name = "Cross Acceleration or XACC";
         }
+
+        #endregion Stuff from serial port terminal
 
         public static class mySimData
         {
@@ -288,61 +592,9 @@ namespace ChartBinding
             Thread TimeThread = new Thread(new ThreadStart(TimeWorker));
             TimeThread.IsBackground = true;
             TimeThread.Start();
-            traceVisibilityComboBox.Visible = false;
-            emergencyStopGroupBox.Visible = false;
-            chartWindowGroupBox.Visible = false;
-            SetupChart();
-            SetupDataTable();
-
-            configFilePath = Properties.Settings.Default.configFilePath;
-            configFileName = Properties.Settings.Default.configFileName;
-            calFilePath = Properties.Settings.Default.calFilePath;
-            calFileName = Properties.Settings.Default.calFileName;
-
-            ReadConfigFile(null);
-            // cal file path
-            // cal file name
-            string nullStr = null;
-            mode = Properties.Settings.Default.mode;
-            modeLabel.Text = mode + " mode";
-
-            readCalibrationFile(nullStr);// Read calibration table file  Meter#.tab
-            DateTime nowDateTime = DateTime.Now;
-            this.timeNowLabel.Text = Convert.ToString(nowDateTime);
-            this.meterNumberTextBox.Text = ConfigData.meterNumber;
-            calFileTextBox.Text = calFilePath + calFileName;
-            configurationFileTextBox.Text = configFilePath + configFileName;
-
-            manualStartupGroupBox.Visible = false;
-            SwitchesTorqueMotorsCheckBox.Enabled = false;
-            SwitchesSpringTensionCheckBox.Enabled = false;
-            viewAllDataRadioButton.Checked = true;
-            fileType = Properties.Settings.Default.fileFormat;
-            fileDateFormat = Properties.Settings.Default.fileDateFormat;
-
-            //create directories if they don't exist
-            System.IO.Directory.CreateDirectory("c:\\Ultrasys");
-            System.IO.Directory.CreateDirectory(filePath);
-            System.IO.Directory.CreateDirectory(programPath);
-            //   UpdateNameLabel(string fileName);
-
-            exitProgramToolStripMenuItem1.BackColor = System.Drawing.Color.Red;
-            shutDownGroupBox.Visible = false;
-
-            DynamicDataDataSet myDB = new DynamicDataDataSet();
-
-            //http://www.asp.net/web-forms/overview/data-access/accessing-the-database-directly-from-an-aspnet-page/inserting-updating-and-deleting-data-with-the-sqldatasource-cs
-
-            UpdateDataFileName();
-            UpdateNameLabel();
-            //****************************************************************************************
-            //                      start thread to run sine wave gen.  Move thread from start button
-            //****************************************************************************************
-
-            Thread WorkerThread = new Thread(new ParameterizedThreadStart(ArrayDataWorker));
-            WorkerThread.IsBackground = true;
-            WorkerThread.Start(new Action<myData>(this.AddDataPoint));
         }
+
+        #region Setup
 
         private void SetToolTips()
         {
@@ -488,6 +740,10 @@ namespace ChartBinding
             dtSet.Tables.Add(dataTable);
         }
 
+        #endregion Setup
+
+        #region Meter calculations and filters
+
         private void oneSecStuff()// change to array    double[] data1, double[] data2, double[] data3, double ccFact
         {
             ConfigData ConfigData = new ConfigData();
@@ -586,6 +842,8 @@ namespace ChartBinding
             MeterData.data4[22] = MeterData.data4[22] + (MeterData.data4[4] - MeterData.data4[22]) / cper;  // Cross Coupling
             MeterData.data4[23] = MeterData.data4[23] + (MeterData.totalCorrection - MeterData.data4[23]) / cper;          // TC
         }
+
+        #endregion Meter calculations and filters
 
         private void AddDataToGrid()
         {
@@ -964,48 +1222,7 @@ namespace ChartBinding
             //  public double AUX4;
         }
 
-        /*
-                private void ArrayData()
-                {
-                    MeterData MeterData = new MeterData();
-                    MeterData Class1 = new MeterData();
-
-                    DataGridView dataGridView1 = new DataGridView();
-
-                    int arrayLength = mySimData.simData.GetLength(1);
-                    int arrayWidth = mySimData.simData.GetLength(0);
-                    byte[] byteArray = new byte[arrayWidth];
-
-                    if (surveyName == "dude")
-                    {
-                        // MessageBox.Show("Survey name cannot be empty.");
-                    }
-                    //////////////////////////////////////////////////////////
-                    else
-                    {
-                        //  recordingTextBox.Visible = true;
-
-                        // start new thread here GetMeterData();
-
-                        for (int ii = 0; ii < arrayWidth; ii++)
-                        {
-                            for (int i = 0; i < arrayLength; i++)
-                            {
-                                byteArray[i] = mySimData.simData[ii, i];
-                            }
-
-                            Class1.CheckMeterData(byteArray);
-                            oneSecStuff();
-                            AddDataToGrid();
-                            UpdateChart();
-                            RecordDataToFile("Append", d);
-
-                            // Thread.Sleep(1000);
-                        }
-                        //      FileClass.RecordDataToFile("Append");
-                    }
-                }
-        */
+        #region Update methods
 
         public class myData//  set this up so all chart data in in one class.  Maybe not need use MeterData
         {
@@ -1041,12 +1258,11 @@ namespace ChartBinding
 
         public void UpdateChartThreadSafe(myData d)
         {
-            
             if (firstTimeData == true)
             {
-               // dataStartTime = d.Date;
-            //    minValue = crossCouplingChart.ChartAreas[0].AxisX.Minimum;
-                minStartValue = d.Date.ToOADate(); 
+                // dataStartTime = d.Date;
+                //    minValue = crossCouplingChart.ChartAreas[0].AxisX.Minimum;
+                minStartValue = d.Date.ToOADate();
                 firstTimeData = false;
             }
 
@@ -1078,60 +1294,48 @@ namespace ChartBinding
                 else
                 {
                     minValue = d.Date.AddMinutes(-dataWindowSize).ToOADate();
-
                 }
             }
-
-
-
-
-
 
             crossCouplingChart.ChartAreas[0].AxisX.Minimum = minValue; //d.Date.AddSeconds(-60).ToOADate();
             GravityChart.ChartAreas[0].AxisX.Minimum = minValue; //d.Date.AddSeconds(-60).ToOADate();
 
+            //   DateTime maxValue = d.Date.AddSeconds(10);
 
-         //   DateTime maxValue = d.Date.AddSeconds(10);
-            
             // datatable order    "DateTime", "DigitalGravity" , "springTension", "Cross Coupling","RawBeam", "TotalCorrection", "AL", "AX", "VE", "AX2",  "LACC",  "XACC",
 
-      //      dataTable.Rows.Add(d.Date, d.Gravity, d.SpringTension, d.CrossCoupling, d.RawBeam, d.TotalCorrection, d.AL, d.AX, d.VE, d.AX2, d.LACC, d.XACC);
-
+            //      dataTable.Rows.Add(d.Date, d.Gravity, d.SpringTension, d.CrossCoupling, d.RawBeam, d.TotalCorrection, d.AL, d.AX, d.VE, d.AX2, d.LACC, d.XACC);
 
             // Adjust X axis scale
-         //   GravityChart.ChartAreas["Default"].AxisX.Minimum = DateTime.Now.AddSeconds(-20);
+            //   GravityChart.ChartAreas["Default"].AxisX.Minimum = DateTime.Now.AddSeconds(-20);
             //		GravityChart.ChartAreas["Default"].AxisX.Maximum
 
             // var runningTime = TimeSpan.FromTicks(DateTime.Now.Ticks - fileStartTime.Ticks);
             // new DateTime(runningTime.Ticks).ToString("HH:mm");
 
+            //     GravityChart.ChartAreas[0].AxisX.Maximum = maxValue.AddSeconds(60).ToOADate();
 
-       //     GravityChart.ChartAreas[0].AxisX.Maximum = maxValue.AddSeconds(60).ToOADate();
-
-
-                 GravityChart.DataBind();
+            GravityChart.DataBind();
             crossCouplingChart.DataBind();
 
-
-
             //      UPDATE MAIN GRAVITY CHART
-/*
-            GravityChart.Series["Digital Gravity"].Points.AddXY(d.Date, d.Gravity);
-            GravityChart.Series["Spring Tension"].Points.AddXY(d.Date, d.SpringTension);
-            GravityChart.Series["Cross Coupling"].Points.AddXY(d.Date, d.CrossCoupling);
-            GravityChart.Series["Raw Beam"].Points.AddXY(d.Date, d.RawBeam);
-            GravityChart.Series["Total Correction"].Points.AddXY(d.Date, d.TotalCorrection);
-            GravityChart.Update();
+            /*
+                        GravityChart.Series["Digital Gravity"].Points.AddXY(d.Date, d.Gravity);
+                        GravityChart.Series["Spring Tension"].Points.AddXY(d.Date, d.SpringTension);
+                        GravityChart.Series["Cross Coupling"].Points.AddXY(d.Date, d.CrossCoupling);
+                        GravityChart.Series["Raw Beam"].Points.AddXY(d.Date, d.RawBeam);
+                        GravityChart.Series["Total Correction"].Points.AddXY(d.Date, d.TotalCorrection);
+                        GravityChart.Update();
 
-            // crossCouplingChart.Series["Raw Gravity"].Points.AddXY(d.Date, d.RawGravity);
-            crossCouplingChart.Series["AL"].Points.AddXY(d.Date, d.AL);
-            crossCouplingChart.Series["AX"].Points.AddXY(d.Date, d.AX);
-            crossCouplingChart.Series["VE"].Points.AddXY(d.Date, d.VE);
-            crossCouplingChart.Series["AX2"].Points.AddXY(d.Date, d.AX2);
-            crossCouplingChart.Series["LACC"].Points.AddXY(d.Date, d.LACC);
-            crossCouplingChart.Series["XACC"].Points.AddXY(d.Date, d.XACC);
-            crossCouplingChart.Update();
-*/
+                        // crossCouplingChart.Series["Raw Gravity"].Points.AddXY(d.Date, d.RawGravity);
+                        crossCouplingChart.Series["AL"].Points.AddXY(d.Date, d.AL);
+                        crossCouplingChart.Series["AX"].Points.AddXY(d.Date, d.AX);
+                        crossCouplingChart.Series["VE"].Points.AddXY(d.Date, d.VE);
+                        crossCouplingChart.Series["AX2"].Points.AddXY(d.Date, d.AX2);
+                        crossCouplingChart.Series["LACC"].Points.AddXY(d.Date, d.LACC);
+                        crossCouplingChart.Series["XACC"].Points.AddXY(d.Date, d.XACC);
+                        crossCouplingChart.Update();
+            */
             // Adjust X axis scale
             //		GravityChart.ChartAreas["Default"].AxisX.Minimum = pointIndex - numberOfPointsAfterRemoval;
             //		GravityChart.ChartAreas["Default"].AxisX.Maximum
@@ -1416,6 +1620,10 @@ namespace ChartBinding
             }
             this.dataGridView1.Update();
         }
+
+
+#endregion
+
 
         private void ReadMarineDataFile()
         {
@@ -1982,15 +2190,12 @@ namespace ChartBinding
             GravityChart.ChartAreas["ChartArea1"].CursorX.IsUserSelectionEnabled = true;
             GravityChart.ChartAreas["ChartArea1"].CursorY.IsUserSelectionEnabled = true;
 
-
             crossCouplingChart.ChartAreas["ChartArea1"].CursorX.IntervalType = DateTimeIntervalType.Seconds;
             crossCouplingChart.ChartAreas["ChartArea1"].CursorY.Interval = 1;
             crossCouplingChart.ChartAreas["ChartArea1"].CursorX.IsUserEnabled = true;
             crossCouplingChart.ChartAreas["ChartArea1"].CursorY.IsUserEnabled = true;
             crossCouplingChart.ChartAreas["ChartArea1"].CursorX.IsUserSelectionEnabled = true;
             crossCouplingChart.ChartAreas["ChartArea1"].CursorY.IsUserSelectionEnabled = true;
-
-
         }
 
         private void SetChartZoom()
@@ -2009,27 +2214,21 @@ namespace ChartBinding
 
         private void SetChartScaleView()
         {
-           // GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollSizeType = DateTimeIntervalType.Minutes;
+            // GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollSizeType = DateTimeIntervalType.Minutes;
             GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollSize = .1;
             GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.Zoomable = true;
 
-           // GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.MinSizeType = DateTimeIntervalType.Minutes;
+            // GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.MinSizeType = DateTimeIntervalType.Minutes;
             GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.MinSize = .1;
 
-           // GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollMinSizeType = DateTimeIntervalType.Minutes;
+            // GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollMinSizeType = DateTimeIntervalType.Minutes;
 
             GravityChart.ChartAreas["ChartArea1"].AxisY.ScaleView.Zoomable = true;
-
 
             GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SizeType = DateTimeIntervalType.Seconds;
             GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.MinSizeType = DateTimeIntervalType.Seconds;
             GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollMinSizeType = DateTimeIntervalType.Seconds;
             GravityChart.ChartAreas["ChartArea1"].AxisX.ScaleView.SmallScrollSizeType = DateTimeIntervalType.Seconds;
-
-
-
-
-  
         }
 
         private void SetChartScroll()
@@ -2048,7 +2247,7 @@ namespace ChartBinding
 
             GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.Size = 30;
             // show either just the center scroll button..
-        //    GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.ButtonStyle = ScrollBarButtonStyles.ResetZoom;
+            //    GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.ButtonStyle = ScrollBarButtonStyles.ResetZoom;
             // .. or include the left and right buttons:
             GravityChart.ChartAreas["ChartArea1"].AxisX.ScrollBar.ButtonStyle =
                  ScrollBarButtonStyles.All ^ ScrollBarButtonStyles.ResetZoom;
@@ -2272,17 +2471,16 @@ namespace ChartBinding
             crossCouplingChart.Series["AX2"].YValueMembers = "AX2";
             crossCouplingChart.DataSource = dataTable;
             crossCouplingChart.DataBind();
-/*
-            crossCouplingChart.Series["XACC"].XValueMember = "dateTime";
-            crossCouplingChart.Series["XACC"].YValueMembers = "XACC2";
-            crossCouplingChart.DataSource = dataTable;
-            crossCouplingChart.DataBind();
-*/
+            /*
+                        crossCouplingChart.Series["XACC"].XValueMember = "dateTime";
+                        crossCouplingChart.Series["XACC"].YValueMembers = "XACC2";
+                        crossCouplingChart.DataSource = dataTable;
+                        crossCouplingChart.DataBind();
+            */
             crossCouplingChart.Series["LACC"].XValueMember = "dateTime";
             crossCouplingChart.Series["LACC"].YValueMembers = "LACC";
             crossCouplingChart.DataSource = dataTable;
             crossCouplingChart.DataBind();
-
 
             //this.crossCouplingChart.Titles.Add("Cross Coupling");
 
@@ -2507,77 +2705,77 @@ namespace ChartBinding
             System.Drawing.Color myColor = System.Drawing.Color.DarkCyan;
             GravityChart.ChartAreas["ChartArea1"].BackColor = scheme;
             crossCouplingChart.ChartAreas["ChartArea1"].BackColor = scheme;
-/*
+            /*
 
-            if (scheme == 0)// Light background
-            {
-                //  GRAVITY
-                GravityChart.ChartAreas["ChartArea1"].BackColor = System.Drawing.Color.White;
-                GravityChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Black;
-                GravityChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Black;
-                GravityChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Black;
-                GravityChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Black;
+                        if (scheme == 0)// Light background
+                        {
+                            //  GRAVITY
+                            GravityChart.ChartAreas["ChartArea1"].BackColor = System.Drawing.Color.White;
+                            GravityChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Black;
+                            GravityChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Black;
+                            GravityChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Black;
+                            GravityChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Black;
 
-                // CROSS COUPLING
-                crossCouplingChart.ChartAreas["ChartArea1"].BackColor = System.Drawing.Color.White;
-                crossCouplingChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Black;
-                crossCouplingChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Black;
-                crossCouplingChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Black;
-                crossCouplingChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Black;
-                Properties.Settings.Default.chartColor = 0;
-            }
-            if (scheme == 1)// gray background
-            {
-                //  GRAVITY
-                GravityChart.ChartAreas["ChartArea1"].BackColor = System.Drawing.Color.Gray;
-                GravityChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Black;
-                GravityChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Black;
-                GravityChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Black;
-                GravityChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Black;
+                            // CROSS COUPLING
+                            crossCouplingChart.ChartAreas["ChartArea1"].BackColor = System.Drawing.Color.White;
+                            crossCouplingChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Black;
+                            crossCouplingChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Black;
+                            crossCouplingChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Black;
+                            crossCouplingChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Black;
+                            Properties.Settings.Default.chartColor = 0;
+                        }
+                        if (scheme == 1)// gray background
+                        {
+                            //  GRAVITY
+                            GravityChart.ChartAreas["ChartArea1"].BackColor = System.Drawing.Color.Gray;
+                            GravityChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Black;
+                            GravityChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Black;
+                            GravityChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Black;
+                            GravityChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Black;
 
-                // CROSS COUPLING
-                crossCouplingChart.ChartAreas["ChartArea1"].BackColor = System.Drawing.Color.Gray;
-                crossCouplingChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Black;
-                crossCouplingChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Black;
-                crossCouplingChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Black;
-                crossCouplingChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Black;
-                Properties.Settings.Default.chartColor = 1;
-            }
-            if (scheme == 2)// black background
-            {
-                //  GRAVITY
-                GravityChart.ChartAreas["ChartArea1"].BackColor = System.Drawing.Color.Black;
-                GravityChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Gray;
-                GravityChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Gray;
-                GravityChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Gray;
-                GravityChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                            // CROSS COUPLING
+                            crossCouplingChart.ChartAreas["ChartArea1"].BackColor = System.Drawing.Color.Gray;
+                            crossCouplingChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Black;
+                            crossCouplingChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Black;
+                            crossCouplingChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Black;
+                            crossCouplingChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Black;
+                            Properties.Settings.Default.chartColor = 1;
+                        }
+                        if (scheme == 2)// black background
+                        {
+                            //  GRAVITY
+                            GravityChart.ChartAreas["ChartArea1"].BackColor = System.Drawing.Color.Black;
+                            GravityChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                            GravityChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                            GravityChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                            GravityChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Gray;
 
-                // CROSS COUPLING
-                crossCouplingChart.ChartAreas["ChartArea1"].BackColor = System.Drawing.Color.Black;
-                crossCouplingChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Gray;
-                crossCouplingChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Gray;
-                crossCouplingChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Gray;
-                crossCouplingChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Gray;
-                Properties.Settings.Default.chartColor = 2;
-            }
-            if (scheme == 3)// black background
-            {
-                //  GRAVITY
-                GravityChart.ChartAreas["ChartArea1"].BackColor = myColor;
-                GravityChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Gray;
-                GravityChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Gray;
-                GravityChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Gray;
-                GravityChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                            // CROSS COUPLING
+                            crossCouplingChart.ChartAreas["ChartArea1"].BackColor = System.Drawing.Color.Black;
+                            crossCouplingChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                            crossCouplingChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                            crossCouplingChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                            crossCouplingChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                            Properties.Settings.Default.chartColor = 2;
+                        }
+                        if (scheme == 3)// black background
+                        {
+                            //  GRAVITY
+                            GravityChart.ChartAreas["ChartArea1"].BackColor = myColor;
+                            GravityChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                            GravityChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                            GravityChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                            GravityChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Gray;
 
-                // CROSS COUPLING
-                crossCouplingChart.ChartAreas["ChartArea1"].BackColor = myColor;
-                crossCouplingChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Gray;
-                crossCouplingChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Gray;
-                crossCouplingChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Gray;
-                crossCouplingChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Gray;
-                Properties.Settings.Default.chartColor = 3;
-            }
- * */
+                            // CROSS COUPLING
+                            crossCouplingChart.ChartAreas["ChartArea1"].BackColor = myColor;
+                            crossCouplingChart.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                            crossCouplingChart.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                            crossCouplingChart.ChartAreas["ChartArea1"].AxisX2.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                            crossCouplingChart.ChartAreas["ChartArea1"].AxisY2.MajorGrid.LineColor = System.Drawing.Color.Gray;
+                            Properties.Settings.Default.chartColor = 3;
+                        }
+             * */
         }
 
         private void chart1_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -3718,7 +3916,7 @@ namespace ChartBinding
                     break;
             }
 
-            string fileName;
+ //           string fileName;
 
             if (Form1.gravityFileName == null)
             {
@@ -3939,7 +4137,6 @@ namespace ChartBinding
             myFileForm.Show();
         }
 
-     
         private void toolStripMenuItem2_Click(object sender, EventArgs e)
         {
             int traceWidth = 0;
@@ -4358,8 +4555,7 @@ namespace ChartBinding
 
         private void serialPortPreferencesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SerialPortForm mySerialPortForm = new SerialPortForm();
-            mySerialPortForm.Show();
+            serialPortGroupBox.Visible = true;
         }
 
         private void label3_Click(object sender, EventArgs e)
@@ -4424,18 +4620,134 @@ namespace ChartBinding
             // Show color dialog
             DialogResult colorResult = colorDialog1.ShowDialog();
             System.Drawing.Color BackColor = colorDialog1.Color;
-        //    string hexValue = ColorTranslator.ToHtml(colorDialog1.Color);
-        //   int decValue = int.Parse(hexValue, System.Globalization.NumberStyles.HexNumber);
+            //    string hexValue = ColorTranslator.ToHtml(colorDialog1.Color);
+            //   int decValue = int.Parse(hexValue, System.Globalization.NumberStyles.HexNumber);
             SetChartAreaColors(BackColor);
         }
 
         private void richTextBox1_TextChanged(object sender, EventArgs e)
         {
+        }
 
+        private void serialPortDoneButton_Click(object sender, EventArgs e)
+        {
+            serialPortGroupBox.Visible = false;
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+
+            Thread WorkerThread = new Thread(new ParameterizedThreadStart(ArrayDataWorker));
+            WorkerThread.IsBackground = true;
+            if (simulatorRunning == false)
+            {
+
+
+                bool error = false;
+                //           if (this.f2.GravityRichTextBox1.InvokeRequired)
+
+                // If the port is open, close it.
+                if (comport.IsOpen) comport.Close();
+                else
+                {
+                    // Set the port's settings
+                    comport.PortName = cmbPortName.Text;
+
+                    try
+                    {
+                        // Open the port
+                        comport.Open();
+                    }
+                    catch (UnauthorizedAccessException) { error = true; }
+                    catch (IOException) { error = true; }
+                    catch (ArgumentException) { error = true; }
+
+                    if (error) MessageBox.Show(this, "Could not open the COM port.  Most likely it is already in use, has been removed, or is unavailable.", "COM Port Unavalible", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                    else
+                    {
+                        // Show the initial pin states
+                        UpdatePinState();
+                    }
+
+                    //  f2.Show();  // WHAT IS F2?? SEE SERIAL PORT TERMINAL
+                }
+
+                // If the port is open, send focus to the send data box
+                if (comport.IsOpen)
+                {
+                    // SEND INTIAL COMMAND TO METER AND WAIT FOR RESPONSE
+                    // DUMP THE DATA AS WE ARE ONLY LOOKING TO SEE IF  THE METER IS PRESENT.
+                    // IF NO RESPONSE IN 5 SECONDS "METER IS NOT RESPONDING OR IS NOT PRESSENT.  PLEASE SELECT OPTION.
+                    // (1) WAIT FOR METER (2) ENTER SIMULATION MODE (3) EXIT PROGRAM
+
+                    // Convert the user's string of hex digits (ex: B4 CA E2) to a byte array
+                    byte[] data = { 0x01, 0x08, 0x09 };  //HexStringToByteArray(txtSendData.Text);
+
+                    // Alternate data
+                    //            byte[] data = { 0x00, 0x80, 0x80, 0x04, 0x07, 0x45, 0xf3, 0x37, 0x9a, 0x99, 0x99, 0x3e, 0xcd, 0xcc, 0x4c, 0x3e, 0x33, 0x33, 0xb3, 0x3e, 0x2e, 0x90, 0x20, 0xbb, 0x66, 0x66, 0x66, 0x3f, 0xa4, 0x05, 0x93, 0x1a, 0xda, 0x37, 0x85, 0xeb, 0x91, 0x3e, 0xcd, 0xcc, 0x4c, 0x3e, 0x33, 0x33, 0xb3, 0x3e, 0x89, 0xd2, 0x5e, 0xbb, 0x00, 0x00, 0x80, 0x3f, 0x5f, 0x08, 0x3f, 0x35, 0x5e, 0x3e, 0x68, 0x91, 0x2d, 0x3e, 0x14, 0xae, 0x47, 0x3e, 0xa4, 0x70, 0x3d, 0x3e, 0x5c, 0x21, 0x88, 0xbf, 0x00, 0xc0, 0xda, 0x45, 0x89, 0x01, 0x08, 0x09, 0x0a, 0x88, 0x45, 0xb3, 0xc3, 0xa3, 0x8e, 0xf3, 0xc2, 0xab };
+
+
+
+                    // Send the binary data out the port
+                    comport.Write(data, 0, data.Length);
+
+                    // Show the hex digits on in the terminal window
+                    Log(LogMsgType.Outgoing, ByteArrayToHexString(data) + "\n");
+
+
+                }
+
+                //****************************************************************************************
+                //                      start thread to run sine wave gen.  Move thread from start button
+                //****************************************************************************************
+                // NEED TO MOVE THIS.  THE THREAD SHOULD EITHER START READING METER OR START SIMULATED DATA.
+                // MAY NEED ANOTHER THREAD TO CHECK FOR METER AVAILABILITY IF USER SELECTS TO WAIT.
+
+                if (isSimulated == true)
+                {
+                    button3.Text = "Stop Simulation";
+
+
+                    WorkerThread.Start(new Action<myData>(this.AddDataPoint));
+                    simulatorRunning = true;
+                   
+                }
+            }
+            else
+            {
+                isSimulated = false;
+                simulatorRunning = false;
+                
+                //******************************************************************************
+                // RATHER THAN TRYING TO KILL THE THREAD HAVE IT OPERATE BOTH THE SIMULATOR
+                // AND REAL DATA INPUT.  USE A VARIABLE AND IF OR CASE TO DETERMINE WHICH 
+                // OPERATES.  WHEN CHANGING MODES ALL DATA SHOULD BE REMOVED AND FILES CLOSED
+                //******************************************************************************
+
+
+
+
+
+                button3.Text = "Connect to Meter";
+                button3.BackColor =  System.Drawing.Color.Green;
+
+            }
         }
 
 
 
+
+
+        private void enterSimulatedModeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            isSimulated = true;
+            button3.Text = "Start simulator";
+            button3.BackColor = System.Drawing.Color.Aquamarine;
+        }
+
+
+
+  
         /////////////////////////////////////////////////////////////////////////////////////////////////
     }
 }

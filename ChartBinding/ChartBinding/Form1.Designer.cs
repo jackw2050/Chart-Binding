@@ -187,6 +187,7 @@
             this.manualOperationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setConfigFIleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setCalFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.enterSimulatedModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setSpringTensionGroupBox = new System.Windows.Forms.GroupBox();
             this.label10 = new System.Windows.Forms.Label();
             this.curerntSpringTensionLabel = new System.Windows.Forms.Label();
@@ -214,6 +215,13 @@
             this.button2 = new System.Windows.Forms.Button();
             this.showAllDataCheckBox = new System.Windows.Forms.CheckBox();
             this.label13 = new System.Windows.Forms.Label();
+            this.rtfTerminal = new System.Windows.Forms.RichTextBox();
+            this.serialPortGroupBox = new System.Windows.Forms.GroupBox();
+            this.label15 = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
+            this.serialPortDoneButton = new System.Windows.Forms.Button();
+            this.cmbPortName = new System.Windows.Forms.ComboBox();
+            this.button3 = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.crossCouplingChart)).BeginInit();
             this.chartContextMenuStrip.SuspendLayout();
@@ -230,6 +238,7 @@
             this.emergencyStopGroupBox.SuspendLayout();
             this.chartWindowGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.windowSizeNumericUpDown)).BeginInit();
+            this.serialPortGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // startButton
@@ -1200,7 +1209,8 @@
             this.autoStartNowToolStripMenuItem,
             this.manualOperationToolStripMenuItem,
             this.setConfigFIleToolStripMenuItem,
-            this.setCalFileToolStripMenuItem});
+            this.setCalFileToolStripMenuItem,
+            this.enterSimulatedModeToolStripMenuItem});
             this.setupContextMenuStrip1.Name = "setupContextMenuStrip1";
             resources.ApplyResources(this.setupContextMenuStrip1, "setupContextMenuStrip1");
             // 
@@ -1253,6 +1263,12 @@
             this.setCalFileToolStripMenuItem.Name = "setCalFileToolStripMenuItem";
             resources.ApplyResources(this.setCalFileToolStripMenuItem, "setCalFileToolStripMenuItem");
             this.setCalFileToolStripMenuItem.Click += new System.EventHandler(this.setCalFileToolStripMenuItem_Click);
+            // 
+            // enterSimulatedModeToolStripMenuItem
+            // 
+            this.enterSimulatedModeToolStripMenuItem.Name = "enterSimulatedModeToolStripMenuItem";
+            resources.ApplyResources(this.enterSimulatedModeToolStripMenuItem, "enterSimulatedModeToolStripMenuItem");
+            this.enterSimulatedModeToolStripMenuItem.Click += new System.EventHandler(this.enterSimulatedModeToolStripMenuItem_Click);
             // 
             // setSpringTensionGroupBox
             // 
@@ -1420,6 +1436,59 @@
             resources.ApplyResources(this.label13, "label13");
             this.label13.Name = "label13";
             // 
+            // rtfTerminal
+            // 
+            resources.ApplyResources(this.rtfTerminal, "rtfTerminal");
+            this.rtfTerminal.Name = "rtfTerminal";
+            // 
+            // serialPortGroupBox
+            // 
+            this.serialPortGroupBox.Controls.Add(this.label15);
+            this.serialPortGroupBox.Controls.Add(this.label14);
+            this.serialPortGroupBox.Controls.Add(this.serialPortDoneButton);
+            this.serialPortGroupBox.Controls.Add(this.cmbPortName);
+            resources.ApplyResources(this.serialPortGroupBox, "serialPortGroupBox");
+            this.serialPortGroupBox.Name = "serialPortGroupBox";
+            this.serialPortGroupBox.TabStop = false;
+            // 
+            // label15
+            // 
+            resources.ApplyResources(this.label15, "label15");
+            this.label15.Name = "label15";
+            // 
+            // label14
+            // 
+            resources.ApplyResources(this.label14, "label14");
+            this.label14.Name = "label14";
+            // 
+            // serialPortDoneButton
+            // 
+            resources.ApplyResources(this.serialPortDoneButton, "serialPortDoneButton");
+            this.serialPortDoneButton.Name = "serialPortDoneButton";
+            this.serialPortDoneButton.UseVisualStyleBackColor = true;
+            this.serialPortDoneButton.Click += new System.EventHandler(this.serialPortDoneButton_Click);
+            // 
+            // cmbPortName
+            // 
+            this.cmbPortName.FormattingEnabled = true;
+            this.cmbPortName.Items.AddRange(new object[] {
+            resources.GetString("cmbPortName.Items"),
+            resources.GetString("cmbPortName.Items1"),
+            resources.GetString("cmbPortName.Items2"),
+            resources.GetString("cmbPortName.Items3"),
+            resources.GetString("cmbPortName.Items4"),
+            resources.GetString("cmbPortName.Items5")});
+            resources.ApplyResources(this.cmbPortName, "cmbPortName");
+            this.cmbPortName.Name = "cmbPortName";
+            // 
+            // button3
+            // 
+            this.button3.BackColor = System.Drawing.Color.MediumAquamarine;
+            resources.ApplyResources(this.button3, "button3");
+            this.button3.Name = "button3";
+            this.button3.UseVisualStyleBackColor = false;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
             // Form1
             // 
             resources.ApplyResources(this, "$this");
@@ -1427,6 +1496,9 @@
             this.BackColor = System.Drawing.Color.WhiteSmoke;
             this.ContextMenuStrip = this.setupContextMenuStrip1;
             this.ControlBox = false;
+            this.Controls.Add(this.button3);
+            this.Controls.Add(this.serialPortGroupBox);
+            this.Controls.Add(this.rtfTerminal);
             this.Controls.Add(this.setSpringTensionGroupBox);
             this.Controls.Add(this.emergencyStopGroupBox);
             this.Controls.Add(this.shutDownGroupBox);
@@ -1487,6 +1559,8 @@
             this.chartWindowGroupBox.ResumeLayout(false);
             this.chartWindowGroupBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.windowSizeNumericUpDown)).EndInit();
+            this.serialPortGroupBox.ResumeLayout(false);
+            this.serialPortGroupBox.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1668,6 +1742,14 @@
         private System.Windows.Forms.NumericUpDown windowSizeNumericUpDown;
         private System.Windows.Forms.RadioButton radioButton2;
         private System.Windows.Forms.RadioButton viewAllDataRadioButton;
+        private System.Windows.Forms.RichTextBox rtfTerminal;
+        private System.Windows.Forms.GroupBox serialPortGroupBox;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.Button serialPortDoneButton;
+        public System.Windows.Forms.ComboBox cmbPortName;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.ToolStripMenuItem enterSimulatedModeToolStripMenuItem;
 
 
        

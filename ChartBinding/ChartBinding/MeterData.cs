@@ -12,7 +12,7 @@ namespace ChartBinding
         public double n15V;
         public double p5V;
     }
-
+/*
     internal class AD_Input_Buffer// IRAW[n,1]
     {
         public double xGyro;
@@ -46,7 +46,7 @@ namespace ChartBinding
         public double aux3;
         public double aux4;
     }
-
+    
     internal class AD_OutputBuffer// IDAC[n]
     {
         public double xTorque;
@@ -180,7 +180,7 @@ namespace ChartBinding
         public double aux5;
         public double aux6;
     }
-
+*/
     public class DataOutputBufferFilter// Data[4,n]
     {
         public double analogG;
@@ -204,7 +204,7 @@ namespace ChartBinding
         public double aux5;
         public double aux6;
     }
-
+/*
     internal class CrossCouplingPhase// AFILT[n]
     {
         public double aL;
@@ -297,7 +297,7 @@ namespace ChartBinding
             }
         }
     }
-
+*/
     internal class MeterData
     {
         private SystemVoltages SystemVoltages = new SystemVoltages();

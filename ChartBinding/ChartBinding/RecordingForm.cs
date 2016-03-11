@@ -47,7 +47,7 @@ namespace ChartBinding
 
         private void dailyComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (dailyComboBox.SelectedItem == "At Other Time")
+            if (Convert.ToString( dailyComboBox.SelectedItem) == "At Other Time")
             {
                 refreshTimeComboBox.Visible = true;
             }

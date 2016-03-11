@@ -282,7 +282,7 @@ Does not affect data from meter or startup of meter.</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;menuStrip1.ZOrder" xml:space="preserve">
-    <value>30</value>
+    <value>33</value>
   </data>
   <data name="crossCouplingChart.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Left, Right</value>
@@ -627,7 +627,7 @@ Does not affect data from meter or startup of meter.</value>
     <value>0, 426</value>
   </data>
   <data name="crossCouplingChart.Size" type="System.Drawing.Size, System.Drawing">
-    <value>1363, 260</value>
+    <value>1193, 260</value>
   </data>
   <data name="crossCouplingChart.TabIndex" type="System.Int32, mscorlib">
     <value>20</value>
@@ -645,7 +645,7 @@ Does not affect data from meter or startup of meter.</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;crossCouplingChart.ZOrder" xml:space="preserve">
-    <value>29</value>
+    <value>32</value>
   </data>
   <data name="dataGridView1.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Bottom, Left, Right</value>
@@ -654,7 +654,7 @@ Does not affect data from meter or startup of meter.</value>
     <value>0, 683</value>
   </data>
   <data name="dataGridView1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>1363, 387</value>
+    <value>1193, 8992</value>
   </data>
   <data name="dataGridView1.TabIndex" type="System.Int32, mscorlib">
     <value>21</value>
@@ -669,7 +669,7 @@ Does not affect data from meter or startup of meter.</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;dataGridView1.ZOrder" xml:space="preserve">
-    <value>32</value>
+    <value>35</value>
   </data>
   <data name="temperatureLabel.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -1002,7 +1002,7 @@ Does not affect data from meter or startup of meter.</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;timeNowLabel.ZOrder" xml:space="preserve">
-    <value>28</value>
+    <value>31</value>
   </data>
   <data name="recordingTextBox.Location" type="System.Drawing.Point, System.Drawing">
     <value>465, 12</value>
@@ -1026,7 +1026,7 @@ Does not affect data from meter or startup of meter.</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;recordingTextBox.ZOrder" xml:space="preserve">
-    <value>27</value>
+    <value>30</value>
   </data>
   <data name="fileStartTimeLabel.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -1053,7 +1053,7 @@ Does not affect data from meter or startup of meter.</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;fileStartTimeLabel.ZOrder" xml:space="preserve">
-    <value>26</value>
+    <value>29</value>
   </data>
   <data name="recordingDurationLabel.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -1089,7 +1089,7 @@ Does not affect data from meter or startup of meter.</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;recordingDurationLabel.ZOrder" xml:space="preserve">
-    <value>25</value>
+    <value>28</value>
   </data>
   <metadata name="printDialog1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>251, 17</value>
@@ -1325,7 +1325,7 @@ Does not affect data from meter or startup of meter.</value>
     <value>XACC</value>
   </data>
   <data name="traceVisibilityComboBox.Location" type="System.Drawing.Point, System.Drawing">
-    <value>1254, 656</value>
+    <value>1084, 656</value>
   </data>
   <data name="traceVisibilityComboBox.Size" type="System.Drawing.Size, System.Drawing">
     <value>97, 21</value>
@@ -1346,7 +1346,7 @@ Does not affect data from meter or startup of meter.</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;traceVisibilityComboBox.ZOrder" xml:space="preserve">
-    <value>15</value>
+    <value>18</value>
   </data>
   <data name="surveyTextBox.Location" type="System.Drawing.Point, System.Drawing">
     <value>78, 47</value>
@@ -1376,7 +1376,7 @@ Does not affect data from meter or startup of meter.</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;surveyTextBox.ZOrder" xml:space="preserve">
-    <value>24</value>
+    <value>27</value>
   </data>
   <data name="meterNumberTextBox.Location" type="System.Drawing.Point, System.Drawing">
     <value>6, 47</value>
@@ -1397,7 +1397,7 @@ Does not affect data from meter or startup of meter.</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;meterNumberTextBox.ZOrder" xml:space="preserve">
-    <value>23</value>
+    <value>26</value>
   </data>
   <data name="label11.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -1424,7 +1424,7 @@ Does not affect data from meter or startup of meter.</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;label11.ZOrder" xml:space="preserve">
-    <value>22</value>
+    <value>25</value>
   </data>
   <data name="label12.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -1451,7 +1451,7 @@ Does not affect data from meter or startup of meter.</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;label12.ZOrder" xml:space="preserve">
-    <value>21</value>
+    <value>24</value>
   </data>
   <metadata name="pageSetupDialog1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>525, 17</value>
@@ -1511,7 +1511,7 @@ Does not affect data from meter or startup of meter.</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;surveyRecordGroupBox.ZOrder" xml:space="preserve">
-    <value>20</value>
+    <value>23</value>
   </data>
   <data name="digitalTextBox.Location" type="System.Drawing.Point, System.Drawing">
     <value>329, 36</value>
@@ -1892,7 +1892,7 @@ Does not affect data from meter or startup of meter.</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;auxGroupBox.ZOrder" xml:space="preserve">
-    <value>19</value>
+    <value>22</value>
   </data>
   <data name="startupLabel.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -1922,7 +1922,7 @@ Does not affect data from meter or startup of meter.</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;startupLabel.ZOrder" xml:space="preserve">
-    <value>18</value>
+    <value>21</value>
   </data>
   <data name="SwitchesSpringTensionCheckBox.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -2087,7 +2087,7 @@ Does not affect data from meter or startup of meter.</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;manualStartupGroupBox.ZOrder" xml:space="preserve">
-    <value>17</value>
+    <value>20</value>
   </data>
   <data name="recordingLabel.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -2114,7 +2114,7 @@ Does not affect data from meter or startup of meter.</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;recordingLabel.ZOrder" xml:space="preserve">
-    <value>16</value>
+    <value>19</value>
   </data>
   <data name="groupBox1.Location" type="System.Drawing.Point, System.Drawing">
     <value>750, 26</value>
@@ -2135,7 +2135,7 @@ Does not affect data from meter or startup of meter.</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;groupBox1.ZOrder" xml:space="preserve">
-    <value>14</value>
+    <value>17</value>
   </data>
   <data name="configFileLabel.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -2162,7 +2162,7 @@ Does not affect data from meter or startup of meter.</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;configFileLabel.ZOrder" xml:space="preserve">
-    <value>13</value>
+    <value>16</value>
   </data>
   <data name="calFileLabel.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -2189,7 +2189,7 @@ Does not affect data from meter or startup of meter.</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;calFileLabel.ZOrder" xml:space="preserve">
-    <value>12</value>
+    <value>15</value>
   </data>
   <data name="configurationFileTextBox.Location" type="System.Drawing.Point, System.Drawing">
     <value>601, 49</value>
@@ -2210,7 +2210,7 @@ Does not affect data from meter or startup of meter.</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;configurationFileTextBox.ZOrder" xml:space="preserve">
-    <value>11</value>
+    <value>14</value>
   </data>
   <data name="calFileTextBox.Location" type="System.Drawing.Point, System.Drawing">
     <value>601, 99</value>
@@ -2231,13 +2231,13 @@ Does not affect data from meter or startup of meter.</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;calFileTextBox.ZOrder" xml:space="preserve">
-    <value>10</value>
+    <value>13</value>
   </data>
   <data name="groupBox2.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Right</value>
   </data>
   <data name="groupBox2.Location" type="System.Drawing.Point, System.Drawing">
-    <value>1162, 27</value>
+    <value>992, 27</value>
   </data>
   <data name="groupBox2.Size" type="System.Drawing.Size, System.Drawing">
     <value>200, 74</value>
@@ -2255,7 +2255,7 @@ Does not affect data from meter or startup of meter.</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;groupBox2.ZOrder" xml:space="preserve">
-    <value>9</value>
+    <value>12</value>
   </data>
   <data name="dataFileTextBox.Location" type="System.Drawing.Point, System.Drawing">
     <value>232, 62</value>
@@ -2276,7 +2276,7 @@ Does not affect data from meter or startup of meter.</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;dataFileTextBox.ZOrder" xml:space="preserve">
-    <value>8</value>
+    <value>11</value>
   </data>
   <data name="shutDownLabel1.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -2386,13 +2386,13 @@ exit the program?</value>
     <value>3</value>
   </data>
   <data name="shutDownGroupBox.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Top</value>
+    <value>Bottom</value>
   </data>
   <data name="shutDownGroupBox.Font" type="System.Drawing.Font, System.Drawing">
     <value>Microsoft Sans Serif, 14.25pt</value>
   </data>
   <data name="shutDownGroupBox.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 24</value>
+    <value>0, 1382</value>
   </data>
   <data name="shutDownGroupBox.Size" type="System.Drawing.Size, System.Drawing">
     <value>1380, 252</value>
@@ -2413,13 +2413,13 @@ exit the program?</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;shutDownGroupBox.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>7</value>
   </data>
   <metadata name="setupContextMenuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>544, 56</value>
   </metadata>
   <data name="setSpringSensionToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>171, 22</value>
+    <value>191, 22</value>
   </data>
   <data name="setSpringSensionToolStripMenuItem.Text" xml:space="preserve">
     <value>Set Spring Sension</value>
@@ -2437,37 +2437,43 @@ exit the program?</value>
     <value>Hi resolution</value>
   </data>
   <data name="setModeToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>171, 22</value>
+    <value>191, 22</value>
   </data>
   <data name="setModeToolStripMenuItem.Text" xml:space="preserve">
     <value>Set Mode</value>
   </data>
   <data name="autoStartNowToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>171, 22</value>
+    <value>191, 22</value>
   </data>
   <data name="autoStartNowToolStripMenuItem.Text" xml:space="preserve">
     <value>Auto Start Now</value>
   </data>
   <data name="manualOperationToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>171, 22</value>
+    <value>191, 22</value>
   </data>
   <data name="manualOperationToolStripMenuItem.Text" xml:space="preserve">
     <value>Manual Operation</value>
   </data>
   <data name="setConfigFIleToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>171, 22</value>
+    <value>191, 22</value>
   </data>
   <data name="setConfigFIleToolStripMenuItem.Text" xml:space="preserve">
     <value>Set Config FIle</value>
   </data>
   <data name="setCalFileToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>171, 22</value>
+    <value>191, 22</value>
   </data>
   <data name="setCalFileToolStripMenuItem.Text" xml:space="preserve">
     <value>Set Cal File</value>
   </data>
+  <data name="enterSimulatedModeToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>191, 22</value>
+  </data>
+  <data name="enterSimulatedModeToolStripMenuItem.Text" xml:space="preserve">
+    <value>Enter Simulated Mode</value>
+  </data>
   <data name="setupContextMenuStrip1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>172, 136</value>
+    <value>192, 158</value>
   </data>
   <data name="&gt;&gt;setupContextMenuStrip1.Name" xml:space="preserve">
     <value>setupContextMenuStrip1</value>
@@ -2683,7 +2689,7 @@ exit the program?</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;setSpringTensionGroupBox.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>5</value>
   </data>
   <data name="modeLabel.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Left, Right</value>
@@ -2713,7 +2719,7 @@ exit the program?</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;modeLabel.ZOrder" xml:space="preserve">
-    <value>7</value>
+    <value>10</value>
   </data>
   <data name="GravityChart.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Left, Right</value>
@@ -2722,7 +2728,7 @@ exit the program?</value>
     <value>-1, 153</value>
   </data>
   <data name="GravityChart.Size" type="System.Drawing.Size, System.Drawing">
-    <value>1363, 260</value>
+    <value>1193, 260</value>
   </data>
   <data name="GravityChart.TabIndex" type="System.Int32, mscorlib">
     <value>80</value>
@@ -2740,7 +2746,7 @@ exit the program?</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;GravityChart.ZOrder" xml:space="preserve">
-    <value>6</value>
+    <value>9</value>
   </data>
   <data name="emergencyShutdownButton.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Right</value>
@@ -2749,7 +2755,7 @@ exit the program?</value>
     <value>Popup</value>
   </data>
   <data name="emergencyShutdownButton.Location" type="System.Drawing.Point, System.Drawing">
-    <value>1081, 35</value>
+    <value>1215, 34</value>
   </data>
   <data name="emergencyShutdownButton.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 45</value>
@@ -2770,7 +2776,7 @@ exit the program?</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;emergencyShutdownButton.ZOrder" xml:space="preserve">
-    <value>5</value>
+    <value>8</value>
   </data>
   <data name="button1.Font" type="System.Drawing.Font, System.Drawing">
     <value>Microsoft Sans Serif, 8.25pt</value>
@@ -2841,13 +2847,13 @@ Press close to continue
     <value>1</value>
   </data>
   <data name="emergencyStopGroupBox.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
+    <value>Bottom</value>
   </data>
   <data name="emergencyStopGroupBox.Font" type="System.Drawing.Font, System.Drawing">
     <value>Microsoft Sans Serif, 12pt</value>
   </data>
   <data name="emergencyStopGroupBox.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 276</value>
+    <value>0, 829</value>
   </data>
   <data name="emergencyStopGroupBox.Size" type="System.Drawing.Size, System.Drawing">
     <value>1380, 553</value>
@@ -2868,7 +2874,7 @@ Press close to continue
     <value>$this</value>
   </data>
   <data name="&gt;&gt;emergencyStopGroupBox.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>6</value>
   </data>
   <metadata name="startupToolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>413, 56</value>
@@ -3048,7 +3054,7 @@ Press close to continue
     <value>Bottom</value>
   </data>
   <data name="chartWindowGroupBox.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 829</value>
+    <value>0, 1634</value>
   </data>
   <data name="chartWindowGroupBox.Size" type="System.Drawing.Size, System.Drawing">
     <value>1380, 100</value>
@@ -3069,13 +3075,202 @@ Press close to continue
     <value>$this</value>
   </data>
   <data name="&gt;&gt;chartWindowGroupBox.ZOrder" xml:space="preserve">
-    <value>31</value>
+    <value>34</value>
+  </data>
+  <data name="rtfTerminal.Location" type="System.Drawing.Point, System.Drawing">
+    <value>3, 78</value>
+  </data>
+  <data name="rtfTerminal.Size" type="System.Drawing.Size, System.Drawing">
+    <value>153, 66</value>
+  </data>
+  <data name="rtfTerminal.TabIndex" type="System.Int32, mscorlib">
+    <value>84</value>
+  </data>
+  <data name="rtfTerminal.Text" xml:space="preserve">
+    <value />
+  </data>
+  <data name="&gt;&gt;rtfTerminal.Name" xml:space="preserve">
+    <value>rtfTerminal</value>
+  </data>
+  <data name="&gt;&gt;rtfTerminal.Type" xml:space="preserve">
+    <value>System.Windows.Forms.RichTextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;rtfTerminal.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;rtfTerminal.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="label15.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="label15.Location" type="System.Drawing.Point, System.Drawing">
+    <value>19, 113</value>
+  </data>
+  <data name="label15.Size" type="System.Drawing.Size, System.Drawing">
+    <value>186, 13</value>
+  </data>
+  <data name="label15.TabIndex" type="System.Int32, mscorlib">
+    <value>8</value>
+  </data>
+  <data name="label15.Text" xml:space="preserve">
+    <value>The following are available serial ports</value>
+  </data>
+  <data name="&gt;&gt;label15.Name" xml:space="preserve">
+    <value>label15</value>
+  </data>
+  <data name="&gt;&gt;label15.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label15.Parent" xml:space="preserve">
+    <value>serialPortGroupBox</value>
+  </data>
+  <data name="&gt;&gt;label15.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="label14.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="label14.Location" type="System.Drawing.Point, System.Drawing">
+    <value>19, 34</value>
+  </data>
+  <data name="label14.Size" type="System.Drawing.Size, System.Drawing">
+    <value>85, 13</value>
+  </data>
+  <data name="label14.TabIndex" type="System.Int32, mscorlib">
+    <value>7</value>
+  </data>
+  <data name="label14.Text" xml:space="preserve">
+    <value>Select serial port</value>
+  </data>
+  <data name="&gt;&gt;label14.Name" xml:space="preserve">
+    <value>label14</value>
+  </data>
+  <data name="&gt;&gt;label14.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label14.Parent" xml:space="preserve">
+    <value>serialPortGroupBox</value>
+  </data>
+  <data name="&gt;&gt;label14.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="serialPortDoneButton.Location" type="System.Drawing.Point, System.Drawing">
+    <value>190, 33</value>
+  </data>
+  <data name="serialPortDoneButton.Size" type="System.Drawing.Size, System.Drawing">
+    <value>75, 23</value>
+  </data>
+  <data name="serialPortDoneButton.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="serialPortDoneButton.Text" xml:space="preserve">
+    <value>Done</value>
+  </data>
+  <data name="&gt;&gt;serialPortDoneButton.Name" xml:space="preserve">
+    <value>serialPortDoneButton</value>
+  </data>
+  <data name="&gt;&gt;serialPortDoneButton.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;serialPortDoneButton.Parent" xml:space="preserve">
+    <value>serialPortGroupBox</value>
+  </data>
+  <data name="&gt;&gt;serialPortDoneButton.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="cmbPortName.Items" xml:space="preserve">
+    <value>COM1</value>
+  </data>
+  <data name="cmbPortName.Items1" xml:space="preserve">
+    <value>COM2</value>
+  </data>
+  <data name="cmbPortName.Items2" xml:space="preserve">
+    <value>COM3</value>
+  </data>
+  <data name="cmbPortName.Items3" xml:space="preserve">
+    <value>COM4</value>
+  </data>
+  <data name="cmbPortName.Items4" xml:space="preserve">
+    <value>COM5</value>
+  </data>
+  <data name="cmbPortName.Items5" xml:space="preserve">
+    <value>COM6</value>
+  </data>
+  <data name="cmbPortName.Location" type="System.Drawing.Point, System.Drawing">
+    <value>15, 59</value>
+  </data>
+  <data name="cmbPortName.Size" type="System.Drawing.Size, System.Drawing">
+    <value>101, 21</value>
+  </data>
+  <data name="cmbPortName.TabIndex" type="System.Int32, mscorlib">
+    <value>5</value>
+  </data>
+  <data name="&gt;&gt;cmbPortName.Name" xml:space="preserve">
+    <value>cmbPortName</value>
+  </data>
+  <data name="&gt;&gt;cmbPortName.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ComboBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;cmbPortName.Parent" xml:space="preserve">
+    <value>serialPortGroupBox</value>
+  </data>
+  <data name="&gt;&gt;cmbPortName.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="serialPortGroupBox.Location" type="System.Drawing.Point, System.Drawing">
+    <value>535, 209</value>
+  </data>
+  <data name="serialPortGroupBox.Size" type="System.Drawing.Size, System.Drawing">
+    <value>297, 168</value>
+  </data>
+  <data name="serialPortGroupBox.TabIndex" type="System.Int32, mscorlib">
+    <value>85</value>
+  </data>
+  <data name="serialPortGroupBox.Text" xml:space="preserve">
+    <value>Serial Port Selection</value>
+  </data>
+  <data name="&gt;&gt;serialPortGroupBox.Name" xml:space="preserve">
+    <value>serialPortGroupBox</value>
+  </data>
+  <data name="&gt;&gt;serialPortGroupBox.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;serialPortGroupBox.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;serialPortGroupBox.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="button3.Location" type="System.Drawing.Point, System.Drawing">
+    <value>702, 2</value>
+  </data>
+  <data name="button3.Size" type="System.Drawing.Size, System.Drawing">
+    <value>98, 23</value>
+  </data>
+  <data name="button3.TabIndex" type="System.Int32, mscorlib">
+    <value>86</value>
+  </data>
+  <data name="button3.Text" xml:space="preserve">
+    <value>Connect to meter</value>
+  </data>
+  <data name="&gt;&gt;button3.Name" xml:space="preserve">
+    <value>button3</value>
+  </data>
+  <data name="&gt;&gt;button3.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;button3.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;button3.ZOrder" xml:space="preserve">
+    <value>2</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>48</value>
+    <value>184</value>
   </metadata>
   <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
     <value>6, 13</value>
@@ -3588,6 +3783,12 @@ Press close to continue
     <value>setCalFileToolStripMenuItem</value>
   </data>
   <data name="&gt;&gt;setCalFileToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;enterSimulatedModeToolStripMenuItem.Name" xml:space="preserve">
+    <value>enterSimulatedModeToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;enterSimulatedModeToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;gravityChartToolTip.Name" xml:space="preserve">
