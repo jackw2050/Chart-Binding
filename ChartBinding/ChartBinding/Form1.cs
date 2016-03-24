@@ -68,7 +68,13 @@ namespace ChartBinding
         public static Boolean checkMeterExistance = true;
         public static Boolean meterExists = false;
         public static Boolean simulatorRunning = false;
+        public static int clockTick;
+        public static Boolean dataStart = false;
+
         private delegate void SetChartCallback(object meterData);
+
+        public static string meterType = "old";
+
         public static double[] table1 = {
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -151,11 +157,49 @@ namespace ChartBinding
             initializeForm();
 
             // When data is recieved through the port, call this method
+            // REMOVE THESE METHODS IS TIMER WORKS.  COMMENT OUT WHILE TESTING
             comport.DataReceived += new SerialDataReceivedEventHandler(port_DataReceived);
             comport.PinChanged += new SerialPinChangedEventHandler(comport_PinChanged);
 
             InitializeControlValues();
+            // START NEW THREAD
+            // INITIALIZE TIMER AND START
+            timer1Sec.Interval = (1000 - DateTime.Now.Millisecond);
+            timer1Sec.Enabled = true;
+            timer1Sec.Tick += new EventHandler(GetData);
+
         }
+
+
+        public void GetData(object sender, EventArgs e)
+        {
+            Thread WorkerThread = new Thread(new ParameterizedThreadStart(ArrayDataWorker));
+            WorkerThread.IsBackground = true;
+
+            timer1Sec.Interval = 1000;
+
+            DateTime nowDateTime = DateTime.Now;
+            clockTick = nowDateTime.Second;
+            Log(LogMsgType.Outgoing, Convert.ToString(clockTick) + "\n");
+
+
+            if (isSimulated == true)
+            {
+                button3.Text = "Stop Simulation";
+
+                WorkerThread.Start(new Action<myData>(this.AddDataPoint));
+                simulatorRunning = true;  
+            }
+            else
+            {
+
+            }
+
+
+
+
+        }
+
 
         private void initializeForm()
         {
@@ -187,6 +231,7 @@ namespace ChartBinding
 
             readCalibrationFile(nullStr);// Read calibration table file  Meter#.tab
             DateTime nowDateTime = DateTime.Now;
+            clockTick = nowDateTime.Second;
             this.timeNowLabel.Text = Convert.ToString(nowDateTime);
             this.meterNumberTextBox.Text = ConfigData.meterNumber;
             calFileTextBox.Text = calFilePath + calFileName;
@@ -362,53 +407,65 @@ namespace ChartBinding
 
         private void port_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            // If the com port has been closed, do nothing
-            if (!comport.IsOpen) return;
-
-            // This method will be called when there is data waiting in the port's buffer
-
-            // Determain which mode (string or binary) the user is in
-            if (CurrentDataMode == DataMode.Text)// data mode will never be text.  delete this later
+            bool oneSecond = false;
+            // THIS EVENT HANDLER RUNS WHENEVER THE PORT HAS DATA.  WE NEED TO CHECK THE TIME IN SECONDS TO ENSURE
+            // WE ARE ONLY GRABBING THE DATA EVERY SECOND OTHERWISE WE GET PARTIAL DATA.
+            if (oneSecond == false)
             {
-                // Read all the data waiting in the buffer
-                string data = comport.ReadExisting();
 
-                // Display the text to the user in the terminal
-                Log(LogMsgType.Incoming, data);
             }
             else
             {
-                // Obtain the number of bytes waiting in the port's buffer
-                int bytes = comport.BytesToRead;
 
-                // Create a byte array buffer to hold the incoming data
-                byte[] buffer = new byte[bytes];
-                // IF CHECKING FOR METER CONNECTION SET FLAG AND DUMP DATA
+                MeterData myMeterData = new MeterData();
+                Thread WorkerThread = new Thread(new ParameterizedThreadStart(ArrayDataWorker));
+                WorkerThread.IsBackground = true;
+                // If the com port has been closed, do nothing
+                if (!comport.IsOpen) return;
+                checkMeterExistance = true;
+                // This method will be called when there is data waiting in the port's buffer
 
-                if (checkMeterExistance == true)
+                // Determain which mode (string or binary) the user is in
+                if (CurrentDataMode == DataMode.Text)// data mode will never be text.  delete this later
                 {
-                    // Read the data from the port and store it in our buffer
-                    comport.Read(buffer, 0, bytes);
-                    if (buffer.Length == 0)
-                    {
-                        meterExists = false;
-                    }
+                    // Read all the data waiting in the buffer
+                    string data = comport.ReadExisting();
+
+                    // Display the text to the user in the terminal
+                    Log(LogMsgType.Incoming, data);
                 }
                 else
                 {
-                    // Read the data from the port and store it in our buffer
-                    comport.Read(buffer, 0, bytes);
+                    // Obtain the number of bytes waiting in the port's buffer
+                    int bytes = comport.BytesToRead;
 
-                    // Show the user the incoming data in hex format
-                    Log(LogMsgType.Incoming, ByteArrayToHexString(buffer));
+                    // Create a byte array buffer to hold the incoming data
+                    byte[] buffer = new byte[bytes];
+                    // IF CHECKING FOR METER CONNECTION SET FLAG AND DUMP DATA
 
-                    //mdt.GetMeterData(buffer);// send buffer for parsing
-                    ThreadProcSafe();
+                    if (checkMeterExistance == !true)
+                    {
+                        // Read the data from the port and store it in our buffer
+                        comport.Read(buffer, 0, bytes);
+                        if (buffer.Length == 0)
+                        {
+                            //    meterExists = false;
+                        }
+                    }
+                    else
+                    {
+                        // Read the data from the port and store it in our buffer
+                        comport.Read(buffer, 0, bytes);//  SHOULD I KEEP THE EVENT HANDLER OR JUST READ THE COMPORT EVERY SECOND????
 
+                        // Show the user the incoming data in hex format
+                        Log(LogMsgType.Incoming, ByteArrayToHexString(buffer));
+                        // GetMeterData(buffer);// send buffer for parsing
+                        myMeterData.CheckMeterData(buffer);
+                        WorkerThread.Start(new Action<myData>(this.AddDataPoint));
+
+                        //  ThreadProcSafe();
+                    }
                 }
-        
-
-
             }
         }
 
@@ -1265,7 +1322,7 @@ namespace ChartBinding
                 minStartValue = d.Date.ToOADate();
                 firstTimeData = false;
             }
-
+            DataRow myDataRow = dataTable.NewRow();
             if (viewAllDataRadioButton.Checked == true)
             {
                 if (showAllDataCheckBox.Checked == true)
@@ -1521,7 +1578,7 @@ namespace ChartBinding
                         LACC = MeterData.data4[13]
                     });
 
-                    Thread.Sleep(1000);
+              //      Thread.Sleep(1000);
 
                     //      FileClass.RecordDataToFile("Append");
                 }
@@ -1529,9 +1586,13 @@ namespace ChartBinding
 
             if (true)
             {
-                double degrees = 0;
-                do
-                {
+                
+                Random random = new Random();
+                double degrees = random.Next(0, 100);
+
+           
+             //   do
+               // {
                     _delegate(new myData
                     {
                         Date = DateTime.Now,
@@ -1554,8 +1615,8 @@ namespace ChartBinding
                         LACC = Math.Sin(degrees + 275) * 100
                     });
                     degrees = degrees + .25;
-                    Thread.Sleep(1000);
-                } while (true);
+                   // Thread.Sleep(1000);
+            //    } while (true);
             }
         }
 
@@ -1615,15 +1676,13 @@ namespace ChartBinding
                 string[] row1 = new string[] { date, digitalGravity, springTension, crossCoupling, rawBeam, totalCorrection, AL, AX, VE, AX2, LACC, XACC };
 
                 //  this.dataGridView1.Rows.Add(row1);
-                dataTable.Rows.Add(row1);
+ ///////               dataTable.Rows.Add(row1);
                 dataGridView1.Rows.Insert(0, row1);
             }
             this.dataGridView1.Update();
         }
 
-
-#endregion
-
+        #endregion Update methods
 
         private void ReadMarineDataFile()
         {
@@ -3916,7 +3975,7 @@ namespace ChartBinding
                     break;
             }
 
- //           string fileName;
+            //           string fileName;
 
             if (Form1.gravityFileName == null)
             {
@@ -4636,13 +4695,10 @@ namespace ChartBinding
 
         private void button3_Click(object sender, EventArgs e)
         {
-
             Thread WorkerThread = new Thread(new ParameterizedThreadStart(ArrayDataWorker));
             WorkerThread.IsBackground = true;
             if (simulatorRunning == false)
             {
-
-
                 bool error = false;
                 //           if (this.f2.GravityRichTextBox1.InvokeRequired)
 
@@ -4686,15 +4742,11 @@ namespace ChartBinding
                     // Alternate data
                     //            byte[] data = { 0x00, 0x80, 0x80, 0x04, 0x07, 0x45, 0xf3, 0x37, 0x9a, 0x99, 0x99, 0x3e, 0xcd, 0xcc, 0x4c, 0x3e, 0x33, 0x33, 0xb3, 0x3e, 0x2e, 0x90, 0x20, 0xbb, 0x66, 0x66, 0x66, 0x3f, 0xa4, 0x05, 0x93, 0x1a, 0xda, 0x37, 0x85, 0xeb, 0x91, 0x3e, 0xcd, 0xcc, 0x4c, 0x3e, 0x33, 0x33, 0xb3, 0x3e, 0x89, 0xd2, 0x5e, 0xbb, 0x00, 0x00, 0x80, 0x3f, 0x5f, 0x08, 0x3f, 0x35, 0x5e, 0x3e, 0x68, 0x91, 0x2d, 0x3e, 0x14, 0xae, 0x47, 0x3e, 0xa4, 0x70, 0x3d, 0x3e, 0x5c, 0x21, 0x88, 0xbf, 0x00, 0xc0, 0xda, 0x45, 0x89, 0x01, 0x08, 0x09, 0x0a, 0x88, 0x45, 0xb3, 0xc3, 0xa3, 0x8e, 0xf3, 0xc2, 0xab };
 
-
-
                     // Send the binary data out the port
                     comport.Write(data, 0, data.Length);
 
                     // Show the hex digits on in the terminal window
                     Log(LogMsgType.Outgoing, ByteArrayToHexString(data) + "\n");
-
-
                 }
 
                 //****************************************************************************************
@@ -4707,36 +4759,25 @@ namespace ChartBinding
                 {
                     button3.Text = "Stop Simulation";
 
-
                     WorkerThread.Start(new Action<myData>(this.AddDataPoint));
                     simulatorRunning = true;
-                   
                 }
             }
             else
             {
                 isSimulated = false;
                 simulatorRunning = false;
-                
+
                 //******************************************************************************
                 // RATHER THAN TRYING TO KILL THE THREAD HAVE IT OPERATE BOTH THE SIMULATOR
-                // AND REAL DATA INPUT.  USE A VARIABLE AND IF OR CASE TO DETERMINE WHICH 
+                // AND REAL DATA INPUT.  USE A VARIABLE AND IF OR CASE TO DETERMINE WHICH
                 // OPERATES.  WHEN CHANGING MODES ALL DATA SHOULD BE REMOVED AND FILES CLOSED
                 //******************************************************************************
 
-
-
-
-
                 button3.Text = "Connect to Meter";
-                button3.BackColor =  System.Drawing.Color.Green;
-
+                button3.BackColor = System.Drawing.Color.Green;
             }
         }
-
-
-
-
 
         private void enterSimulatedModeToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -4745,9 +4786,6 @@ namespace ChartBinding
             button3.BackColor = System.Drawing.Color.Aquamarine;
         }
 
-
-
-  
         /////////////////////////////////////////////////////////////////////////////////////////////////
     }
 }

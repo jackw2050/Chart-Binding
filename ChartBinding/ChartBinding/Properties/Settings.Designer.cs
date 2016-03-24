@@ -293,5 +293,17 @@ namespace ChartBinding.Properties {
                 return ((decimal)(this["DataMode"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("\"old\"")]
+        public string MeterType {
+            get {
+                return ((string)(this["MeterType"]));
+            }
+            set {
+                this["MeterType"] = value;
+            }
+        }
     }
 }

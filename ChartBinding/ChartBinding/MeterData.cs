@@ -321,23 +321,6 @@ namespace ChartBinding
         public static double i4Par;
         public static DateTime dataTime = new DateTime(2015, 1, 1);
 
-        /*
-
-                private void TenSecondStuff()// PASS CONFIG DATA IN AS A PARAMETER
-                {
-                  //  ConfigData ConfigData = new ConfigData();
-                 //   MeterData Class1 = new MeterData();
-                    MeterData.beam = ConfigData.beamScale *   DataOutputBuffer    MeterData.data4[5];           // Beam scale determined by K-check
-                    MeterData.beamFirstDifference = MeterData.beam - MeterData.oldBeam;      // Get beam velocities first difference
-                    MeterData.oldBeam = MeterData.beam;
-                    MeterData.totalCorrection = MeterData.beamFirstDifference * 3 + MeterData.data4[4];   // Scale velocity to mGal & add cross coupling
-                    MeterData.rAwg = MeterData.data4[3] + MeterData.totalCorrection;                      // Add spring tension
-                    MeterData.data4[2] = DigitalFilter(MeterData.rAwg);               // Filter with LaCoste 60 point table
-
-                    MeterData.gravity = UpLook(MeterData.data4[2]) + .05;                 // Apply calibration table
-                }
-
-        */
 
         public void CheckMeterData(byte[] meterBytes)
         {
@@ -354,7 +337,7 @@ namespace ChartBinding
             if (dataLen != meterBytes.Length)
             {
                 // error invalid data.  increment error counter.  drop ot of loop
-                validData = true;//  change later
+                validData = false;//  change later
             }
             else
             {
@@ -370,8 +353,39 @@ namespace ChartBinding
             {
                 //exit
             }
+
+
+
+
             if (validData)
             {
+                if (Form1.meterType  == "old")
+                {
+                    MeterDataOld(meterBytes);
+                    validData = false;// Reset for next data
+                }
+                else if (Form1.meterType == "GPS")
+                {
+                    MeterDataGPS(meterBytes);
+                    validData = false;// Reset for next data
+
+                }
+                else
+                {
+                    // catch error here.  Incorrect meter type
+                }
+            }
+
+
+        }
+
+
+
+        private void MeterDataOld(byte[] meterBytes)
+        {
+            byte[] tempByte = { 0, 0, 0, 0 };
+            byte[] tempByte2 = { 0, 0 };
+
                 tempByte[0] = meterBytes[6];
                 // Hour = BitConverter.ToSingle( getDataByte(meterBytes, 6, 1), 0);
                 Hour = BitConverter.ToInt32(tempByte, 0);
@@ -638,8 +652,246 @@ namespace ChartBinding
                 //       }
 
                 //                   return (InputData);
-            }
+            
         }
+        private void MeterDataGPS(byte[] meterBytes)
+        {
+            byte[] tempByte = { 0, 0, 0, 0 };
+            byte[] tempByte2 = { 0, 0 };
+
+                            tempByte[0] = meterBytes[6];
+                // Hour = BitConverter.ToSingle( getDataByte(meterBytes, 6, 1), 0);
+                Hour = BitConverter.ToInt32(tempByte, 0);
+                //     Console.Write("Hour\t" + Hour + "\n");
+
+                tempByte[0] = meterBytes[7];
+                tempByte[1] = 0;
+                tempByte[2] = 0;
+                tempByte[3] = 0;
+                // Min = BitConverter.ToSingle( getDataByte(meterBytes, 7, 1), 0);
+                Min = BitConverter.ToInt32(tempByte, 0);
+
+                tempByte[0] = meterBytes[8];
+                tempByte[1] = 0;
+                tempByte[2] = 0;
+                tempByte[3] = 0;
+                // Sec = BitConverter.ToSingle( getDataByte(meterBytes, 8, 1), 0);
+                Sec = BitConverter.ToInt32(tempByte, 0);
+
+                tempByte[0] = meterBytes[4];
+                tempByte[1] = meterBytes[5];
+                // day = BitConverter.ToSingle( getDataByte(meterBytes, 4, 2), 0);
+                day = BitConverter.ToInt32(tempByte, 0);
+
+                tempByte[0] = meterBytes[2];
+                tempByte[1] = meterBytes[3];
+                // year = BitConverter.ToSingle( getDataByte(meterBytes, 2, 2), 0);
+                year = BitConverter.ToInt32(tempByte, 0);
+
+                tempByte[0] = meterBytes[9];
+                tempByte[1] = meterBytes[10];
+                tempByte[2] = meterBytes[11];
+                tempByte[3] = meterBytes[12];
+                // data1[3] = BitConverter.ToSingle( getDataByte(meterBytes, 9, 5), 0);
+                data1[3] = BitConverter.ToSingle(tempByte, 0);
+                //data1[3] = ST;
+
+                dataTime = dataTime.AddYears(year - 2015);
+                dataTime = dataTime.AddDays(day - 1);
+                dataTime = dataTime.AddHours(Hour);
+                dataTime = dataTime.AddMinutes(Min);
+                dataTime = dataTime.AddSeconds(Sec);
+
+                //GET RAW BEAM  ------------------------------------------------------------
+                tempByte[0] = meterBytes[13];
+                tempByte[1] = meterBytes[14];
+                tempByte[2] = meterBytes[15];
+                tempByte[3] = meterBytes[16];
+                // data1[5] = BitConverter.ToSingle( getDataByte(meterBytes, 13, 5), 0);
+                data1[5] = BitConverter.ToSingle(tempByte, 0);
+                //data1[5] = Beam;
+
+                //GET VCC  ------------------------------------------------------------
+                tempByte[0] = meterBytes[17];
+                tempByte[1] = meterBytes[18];
+                tempByte[2] = meterBytes[19];
+                tempByte[3] = meterBytes[20];
+                // data1[6] = BitConverter.ToSingle( getDataByte(meterBytes, 13, 5), 0);
+                data1[6] = BitConverter.ToSingle(tempByte, 0);
+                //data1[6] = VCC;
+
+                //GET AL  ------------------------------------------------------------
+                tempByte[0] = meterBytes[21];
+                tempByte[1] = meterBytes[22];
+                tempByte[2] = meterBytes[23];
+                tempByte[3] = meterBytes[24];
+                // data1[7] = BitConverter.ToSingle( getDataByte(meterBytes, 21, 5), 0);
+                data1[7] = BitConverter.ToSingle(tempByte, 0);
+                //data1[7] = AL;
+
+                //GET AX  ------------------------------------------------------------
+                tempByte[0] = meterBytes[25];
+                tempByte[1] = meterBytes[26];
+                tempByte[2] = meterBytes[27];
+                tempByte[3] = meterBytes[28];
+                // data1[8] = BitConverter.ToSingle( getDataByte(meterBytes, 25, 5), 0);
+                data1[8] = BitConverter.ToSingle(tempByte, 0);
+                //data1[8] = AX;
+                //      Console.Write("Data 1 " + data1[8] + "\n");
+                //GET VE  ------------------------------------------------------------
+                tempByte[0] = meterBytes[29];
+                tempByte[1] = meterBytes[30];
+                tempByte[2] = meterBytes[31];
+                tempByte[3] = meterBytes[32];
+                data1[9] = BitConverter.ToSingle(tempByte, 0);
+                // data1[9] = BitConverter.ToSingle( getDataByte(meterBytes, 29, 4), 0);
+                //data1[9] = VE;
+
+                //GET AX2  ------------------------------------------------------------
+                tempByte[0] = meterBytes[33];
+                tempByte[1] = meterBytes[34];
+                tempByte[2] = meterBytes[35];
+                tempByte[3] = meterBytes[36];
+                // data1[10] = BitConverter.ToSingle( getDataByte(meterBytes, 33, 5), 0);
+                data1[10] = BitConverter.ToSingle(tempByte, 0);
+                //data1[10] = AX2;
+
+                //GET XACC2  ------------------------------------------------------------
+                tempByte[0] = meterBytes[37];
+                tempByte[1] = meterBytes[38];
+                tempByte[2] = meterBytes[39];
+                tempByte[3] = meterBytes[40];
+                // data1[11] = BitConverter.ToSingle( getDataByte(meterBytes, 37, 5), 0);
+                data1[11] = BitConverter.ToSingle(tempByte, 0);
+                //data1[11] = XACC2;
+
+                //GET LACC2  ------------------------------------------------------------
+
+                tempByte[0] = meterBytes[41];
+                tempByte[1] = meterBytes[42];
+                tempByte[2] = meterBytes[43];
+                tempByte[3] = meterBytes[44];
+                // data1[9] = BitConverter.ToSingle( getDataByte(meterBytes, 41, 5), 0);
+                data1[12] = BitConverter.ToSingle(tempByte, 0);
+                //data1[12] = LACC2;
+
+                //GET XACC  ------------------------------------------------------------
+                tempByte[0] = meterBytes[45];
+                tempByte[1] = meterBytes[46];
+                tempByte[2] = meterBytes[47];
+                tempByte[3] = meterBytes[48];
+                // data1[9] = BitConverter.ToSingle( getDataByte(meterBytes, 45, 5), 0);
+                data1[13] = BitConverter.ToSingle(tempByte, 0);
+                //data1[13] = XACC;
+
+                //GET LACC  ------------------------------------------------------------
+                tempByte[0] = meterBytes[49];
+                tempByte[1] = meterBytes[50];
+                tempByte[2] = meterBytes[51];
+                tempByte[3] = meterBytes[52];
+                // data1[9] = BitConverter.ToSingle( getDataByte(meterBytes, 49, 5), 0);
+                data1[14] = BitConverter.ToSingle(tempByte, 0);
+                //data1[14] = LACC;
+
+                //GET AUX1  ------------------------------------------------------------
+                tempByte[0] = meterBytes[53];
+                tempByte[1] = meterBytes[54];
+                data1[15] = BitConverter.ToSingle(tempByte, 0);
+                // data1[9] = BitConverter.ToSingle( getDataByte(meterBytes, 53, 2), 0);
+                //data1[15] = AUX1;
+
+                //GET AUX2  ------------------------------------------------------------
+                tempByte[0] = meterBytes[55];
+                tempByte[1] = meterBytes[56];
+                // data1[16] = BitConverter.ToSingle( getDataByte(meterBytes, 55, 2), 0);
+                data1[16] = BitConverter.ToSingle(tempByte, 0);
+                //data1[16] = AUX2;
+
+                //GET AUX3  ------------------------------------------------------------
+                tempByte[0] = meterBytes[57];
+                tempByte[1] = meterBytes[58];
+                // data1[17] = BitConverter.ToSingle( getDataByte(meterBytes, 57, 2), 0);
+                data1[17] = BitConverter.ToSingle(tempByte, 0);
+                //data1[17] = AUX3;
+
+                //GET AUX4  ------------------------------------------------------------
+                tempByte[0] = meterBytes[59];
+                tempByte[1] = meterBytes[60];
+                // data1[18] = BitConverter.ToSingle( getDataByte(meterBytes, 59, 2), 0);
+                data1[18] = BitConverter.ToSingle(tempByte, 0);
+                //data1[18] = AUX4;
+
+                tempByte[0] = meterBytes[61];
+                tempByte[1] = meterBytes[62];
+                tempByte[2] = meterBytes[63];
+                tempByte[3] = 0;
+                // i4Par = BitConverter.ToSingle( getDataByte(meterBytes, 61, 3), 0);
+                i4Par = BitConverter.ToSingle(tempByte, 0);
+
+                //GET +28V  ------------------------------------------------------------
+                for (int i = 0; i < 4; i++) { tempByte[i] = 0x00; }
+                tempByte[0] = meterBytes[64];
+                tempByte[1] = meterBytes[65];
+                //  Array.Copy(meterBytes, 64, tempByte, 0, 2);
+                // p28Vi = BitConverter.ToSingle( getDataByte(meterBytes, 64, 2), 0);
+                int p28Vi = BitConverter.ToInt32(tempByte, 0);
+                SystemVoltages.p28V = Convert.ToDouble(p28Vi * 2 / 3276.7);
+                //     IVOLTS[1] = p28V;
+
+                //GET -28V  ------------------------------------------------------------
+                for (int i = 0; i < 4; i++) { tempByte[i] = 0x00; }
+                tempByte[0] = meterBytes[66];
+                tempByte[1] = meterBytes[67];
+                // n28Vi = BitConverter.ToSingle( getDataByte(meterBytes, 66, 2), 0);
+                int n28Vi = BitConverter.ToInt32(tempByte, 0);
+                SystemVoltages.n28V = Convert.ToDouble(n28Vi * -5 / 3276.7);   //  check this conversion
+                //     IVOLTS[2] = n28V;
+
+                //GET +24V  ------------------------------------------------------------
+                for (int i = 0; i < 4; i++) { tempByte[i] = 0x00; }
+                tempByte[0] = meterBytes[68];
+                tempByte[1] = meterBytes[69];
+                // p24Vi = BitConverter.ToSingle( getDataByte(meterBytes, 68, 2), 0);
+                int p24Vi = BitConverter.ToInt32(tempByte, 0);
+                SystemVoltages.p24V = Convert.ToDouble(p24Vi * 2 / 3276.7);
+                //     IVOLTS[3] = p24V;
+
+                //GET+15V  ------------------------------------------------------------
+                for (int i = 0; i < 4; i++) { tempByte[i] = 0x00; }
+                tempByte[0] = meterBytes[70];
+                tempByte[1] = meterBytes[71];
+                // p15Vi = BitConverter.ToSingle( getDataByte(meterBytes, 70, 2), 0);
+                int p15Vi = BitConverter.ToInt32(tempByte, 0);
+                SystemVoltages.p15V = Convert.ToDouble(p15Vi / 3276.7);   //  check this conversion
+                //     IVOLTS[4] = p15V;
+
+                //GET -15V  ------------------------------------------------------------
+                for (int i = 0; i < 4; i++) { tempByte[i] = 0x00; }
+                tempByte[0] = meterBytes[72];
+                tempByte[1] = meterBytes[73];
+                // n15Vi = BitConverter.ToSingle( getDataByte(meterBytes, 72, 2), 0);
+                int n15Vi = BitConverter.ToInt32(tempByte, 0);
+                SystemVoltages.n15V = Convert.ToDouble(n15Vi * -3 / 3276.7);   //  check this conversion
+                //    IVOLTS[5] = n15V;
+
+                //GET +5V  ------------------------------------------------------------
+                for (int i = 0; i < 4; i++) { tempByte[i] = 0x00; }
+                tempByte[0] = meterBytes[74];
+                tempByte[1] = meterBytes[75];
+                // p5Vi = BitConverter.ToSingle( getDataByte(meterBytes, 74, 2), 0);
+                int p5Vi = BitConverter.ToInt32(tempByte, 0);
+                SystemVoltages.p5V = Convert.ToDouble(p5Vi / 3 / 3276.7);   //  check this conversion
+                //        IVOLTS[6] = p5V;
+
+                //GET STATUS  ------------------------------------------------------------
+                tempByte[0] = meterBytes[76];
+                int ISTAT = tempByte[0];
+
+
+            // GPS data here
+
+        }
+
 
         public void CheckMeterDataSim()
         {

@@ -32,12 +32,12 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series7 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series8 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series9 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series10 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series11 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series12 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             this.startButton = new System.Windows.Forms.Button();
@@ -222,6 +222,7 @@
             this.serialPortDoneButton = new System.Windows.Forms.Button();
             this.cmbPortName = new System.Windows.Forms.ComboBox();
             this.button3 = new System.Windows.Forms.Button();
+            this.timer1Sec = new System.Windows.Forms.Timer(this.components);
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.crossCouplingChart)).BeginInit();
             this.chartContextMenuStrip.SuspendLayout();
@@ -381,36 +382,36 @@
             this.crossCouplingChart.Legends.Add(legend1);
             this.crossCouplingChart.Name = "crossCouplingChart";
             this.crossCouplingChart.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Fire;
-            series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series1.Legend = "Legend2";
-            series1.Name = "AL";
-            series2.ChartArea = "ChartArea1";
-            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series2.Legend = "Legend2";
-            series2.Name = "AX";
-            series3.ChartArea = "ChartArea1";
-            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series3.Legend = "Legend2";
-            series3.Name = "VE";
-            series4.ChartArea = "ChartArea1";
-            series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series4.Legend = "Legend2";
-            series4.Name = "AX2";
-            series5.ChartArea = "ChartArea1";
-            series5.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series5.Legend = "Legend2";
-            series5.Name = "LACC";
-            series6.ChartArea = "ChartArea1";
-            series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series6.Legend = "Legend2";
-            series6.Name = "XACC";
-            this.crossCouplingChart.Series.Add(series1);
-            this.crossCouplingChart.Series.Add(series2);
-            this.crossCouplingChart.Series.Add(series3);
-            this.crossCouplingChart.Series.Add(series4);
-            this.crossCouplingChart.Series.Add(series5);
-            this.crossCouplingChart.Series.Add(series6);
+            series7.ChartArea = "ChartArea1";
+            series7.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series7.Legend = "Legend2";
+            series7.Name = "AL";
+            series8.ChartArea = "ChartArea1";
+            series8.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series8.Legend = "Legend2";
+            series8.Name = "AX";
+            series9.ChartArea = "ChartArea1";
+            series9.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series9.Legend = "Legend2";
+            series9.Name = "VE";
+            series10.ChartArea = "ChartArea1";
+            series10.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series10.Legend = "Legend2";
+            series10.Name = "AX2";
+            series11.ChartArea = "ChartArea1";
+            series11.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series11.Legend = "Legend2";
+            series11.Name = "LACC";
+            series12.ChartArea = "ChartArea1";
+            series12.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series12.Legend = "Legend2";
+            series12.Name = "XACC";
+            this.crossCouplingChart.Series.Add(series7);
+            this.crossCouplingChart.Series.Add(series8);
+            this.crossCouplingChart.Series.Add(series9);
+            this.crossCouplingChart.Series.Add(series10);
+            this.crossCouplingChart.Series.Add(series11);
+            this.crossCouplingChart.Series.Add(series12);
             // 
             // chartContextMenuStrip
             // 
@@ -1280,8 +1281,8 @@
             this.setSpringTensionGroupBox.Controls.Add(this.label3);
             this.setSpringTensionGroupBox.Controls.Add(this.label2);
             this.setSpringTensionGroupBox.Controls.Add(this.label1);
-            resources.ApplyResources(this.setSpringTensionGroupBox, "setSpringTensionGroupBox");
             this.setSpringTensionGroupBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            resources.ApplyResources(this.setSpringTensionGroupBox, "setSpringTensionGroupBox");
             this.setSpringTensionGroupBox.Name = "setSpringTensionGroupBox";
             this.setSpringTensionGroupBox.TabStop = false;
             // 
@@ -1489,6 +1490,10 @@
             this.button3.UseVisualStyleBackColor = false;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
+            // timer1Sec
+            // 
+            this.timer1Sec.Interval = 1000;
+            // 
             // Form1
             // 
             resources.ApplyResources(this, "$this");
@@ -1496,6 +1501,7 @@
             this.BackColor = System.Drawing.Color.WhiteSmoke;
             this.ContextMenuStrip = this.setupContextMenuStrip1;
             this.ControlBox = false;
+            this.Controls.Add(this.auxGroupBox);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.serialPortGroupBox);
             this.Controls.Add(this.rtfTerminal);
@@ -1516,7 +1522,6 @@
             this.Controls.Add(this.recordingLabel);
             this.Controls.Add(this.manualStartupGroupBox);
             this.Controls.Add(this.startupLabel);
-            this.Controls.Add(this.auxGroupBox);
             this.Controls.Add(this.surveyRecordGroupBox);
             this.Controls.Add(this.label12);
             this.Controls.Add(this.label11);
@@ -1750,6 +1755,7 @@
         public System.Windows.Forms.ComboBox cmbPortName;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.ToolStripMenuItem enterSimulatedModeToolStripMenuItem;
+        private System.Windows.Forms.Timer timer1Sec;
 
 
        
